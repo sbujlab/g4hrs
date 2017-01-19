@@ -3,7 +3,7 @@
 # Setup the project
 #
 cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
-project(REMOLL)
+project(G4HRS)
 
 #MAC specific variable
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -30,10 +30,10 @@ add_custom_target( gitinfo ALL COMMAND ${PROJECT_SOURCE_DIR}/pullgitinfo.py ${PR
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 
 ROOT_GENERATE_DICTIONARY(
-    remollDict                         # path to dictionary to generate
-    "include/remollRunData.hh"         # list of classes to process
-    "include/remollTextFile.hh"
-    LINKDEF "include/remollLinkDef.h"  # ROOT linkDef file
+    g4hrsDict                         # path to dictionary to generate
+    "include/g4hrsRunData.hh"         # list of classes to process
+    "include/g4hrsTextFile.hh"
+    LINKDEF "include/g4hrsLinkDef.h"  # ROOT linkDef file
 )
 
 #----------------------------------------------------------------------------
@@ -98,55 +98,29 @@ include_directories(${PROJECT_SOURCE_DIR}/include ${ROOT_INCLUDE_DIR} ${CMAKE_CU
 # Locate sources and headers for this project
 # NB: headers are included so they will show up in IDEs
 #
-file(GLOB sources ${PROJECT_SOURCE_DIR}/src/remoll*.cc)
+file(GLOB sources ${PROJECT_SOURCE_DIR}/src/g4hrs*.cc)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh ${CMAKE_CURRENT_BINARY_DIR}/include/gitinfo.hh)
 
-file(GLOB libsources ${PROJECT_SOURCE_DIR}/src/remollRunData.cc ${PROJECT_SOURCE_DIR}/src/remollTextFile.cc)
+file(GLOB libsources ${PROJECT_SOURCE_DIR}/src/g4hrsRunData.cc ${PROJECT_SOURCE_DIR}/src/g4hrsTextFile.cc)
 file(GLOB libheaders ${PROJECT_SOURCE_DIR}/include/*.hh ${CMAKE_CURRENT_BINARY_DIR}/include/gitinfo.hh)
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 #
-add_executable(remoll remoll.cc ${sources} ${headers} remollDict.cxx)
-add_library(remollroot SHARED ${libsources} ${libheaders} remollDict.cxx)
-target_link_libraries(remoll ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} ${Boost_LIBRARIES} )
-target_link_libraries(remollroot ${ROOT_LIBRARIES} ${Boost_LIBRARIES} )
+add_executable(g4hrs g4hrs.cc ${sources} ${headers} g4hrsDict.cxx)
+add_library(g4hrsroot SHARED ${libsources} ${libheaders} g4hrsDict.cxx)
+target_link_libraries(g4hrs ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} ${Boost_LIBRARIES} )
+target_link_libraries(g4hrsroot ${ROOT_LIBRARIES} ${Boost_LIBRARIES} )
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we
-# build remoll. This is so that we can run the executable directly because it
+# build g4hrs. This is so that we can run the executable directly because it
 # relies on these scripts being in the current working directory.
 #
 
-FILE( GLOB REMOLL_GEO "geometry/*" )
+FILE( GLOB G4HRS_GEO "geometry/*" )
 
-set(REMOLL_SCRIPTS
-    geometry/mollerMother.gdml
-    geometry/detectorDaughter.gdml
-    geometry/hybridDaughter.gdml
-    geometry/targetDaughter.gdml
-    geometry/upstreamDaughter.gdml
-    geometry/schema/gdml.xsd
-    geometry/schema/gdml_core.xsd
-    geometry/schema/gdml_define.xsd
-    geometry/schema/gdml_extensions.xsd
-    geometry/schema/gdml_materials.xsd
-    geometry/schema/gdml_parameterised.xsd
-    geometry/schema/gdml_replicas.xsd
-    geometry/schema/gdml_solids.xsd
-    geometry_sculpt/mollerMother.gdml
-    geometry_sculpt/detectorDaughter.gdml
-    geometry_sculpt/hybridDaughter.gdml
-    geometry_sculpt/targetDaughter.gdml
-    geometry_sculpt/upstreamDaughter.gdml
-    geometry_sculpt/schema/gdml.xsd
-    geometry_sculpt/schema/gdml_core.xsd
-    geometry_sculpt/schema/gdml_define.xsd
-    geometry_sculpt/schema/gdml_extensions.xsd
-    geometry_sculpt/schema/gdml_materials.xsd
-    geometry_sculpt/schema/gdml_parameterised.xsd
-    geometry_sculpt/schema/gdml_replicas.xsd
-    geometry_sculpt/schema/gdml_solids.xsd
+set(G4HRS_SCRIPTS
     vis/OIX.mac
     vis/Qt.mac
     vis/vis.mac
@@ -157,7 +131,7 @@ set(REMOLL_SCRIPTS
     rootlogon.C
   )
 
-foreach(_script ${REMOLL_SCRIPTS})
+foreach(_script ${G4HRS_SCRIPTS})
   configure_file(
     ${PROJECT_SOURCE_DIR}/${_script}
     ${PROJECT_BINARY_DIR}/${_script}
@@ -169,11 +143,11 @@ endforeach()
 # For internal Geant4 use - but has no effect if you build this
 # example standalone
 #
-add_custom_target(REMOLL DEPENDS remoll)
+add_custom_target(G4HRS DEPENDS g4hrs)
 
 #----------------------------------------------------------------------------
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
-install(TARGETS remoll DESTINATION bin)
+install(TARGETS g4hrs DESTINATION bin)
 
 
