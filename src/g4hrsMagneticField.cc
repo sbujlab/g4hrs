@@ -1,4 +1,4 @@
-#include "remollMagneticField.hh"
+#include "g4hrsMagneticField.hh"
 #include "G4UImanager.hh"
 
 #include "G4PhysicalConstants.hh"
@@ -22,7 +22,7 @@
 #include <boost/iostreams/device/file.hpp>
 #endif
 
-remollMagneticField::remollMagneticField( G4String filename ){ 
+g4hrsMagneticField::g4hrsMagneticField( G4String filename ){ 
 
     fFilename = filename;
 
@@ -46,10 +46,10 @@ remollMagneticField::remollMagneticField( G4String filename ){
     ReadFieldMap();
 }
 
-remollMagneticField::~remollMagneticField(){ 
+g4hrsMagneticField::~g4hrsMagneticField(){ 
 }
 
-G4String remollMagneticField::GetName(){ 
+G4String g4hrsMagneticField::GetName(){ 
     if( !fInit ){
 	G4cerr << "WARNING " << __FILE__ << " line " << __LINE__ 
 	    << ": access uninitialized field." << G4endl;
@@ -59,13 +59,13 @@ G4String remollMagneticField::GetName(){
     return fFilename;
 }
 
-void remollMagneticField::SetFieldScale(G4double s){ 
+void g4hrsMagneticField::SetFieldScale(G4double s){ 
     fFieldScale = s;
     G4cout << fFilename << " scale set to " << s << G4endl;
     return;
 }
 
-void remollMagneticField::SetMagnetCurrent(G4double s){ 
+void g4hrsMagneticField::SetMagnetCurrent(G4double s){ 
     if( fMagCurrent0 > 0.0 ){
        	SetFieldScale(s/fMagCurrent0);
     } else {
@@ -76,7 +76,7 @@ void remollMagneticField::SetMagnetCurrent(G4double s){
 }
 
 
-void remollMagneticField::InitializeGrid() {
+void g4hrsMagneticField::InitializeGrid() {
     /*!  
      * Dynamically size 3D vectors to what we need to store the file
      * These should already be set from values read in from the fieldmap
@@ -114,7 +114,7 @@ void remollMagneticField::InitializeGrid() {
     return;
 }
 
-void remollMagneticField::ReadFieldMap(){
+void g4hrsMagneticField::ReadFieldMap(){
     const G4double eps = 1e-6;
 
     G4cout << "--------------------------------------------------------------------------------" << G4endl;
@@ -373,7 +373,7 @@ void remollMagneticField::ReadFieldMap(){
 
 }
 
-void remollMagneticField::GetFieldValue(const G4double Point[4], G4double *Bfield ) const {
+void g4hrsMagneticField::GetFieldValue(const G4double Point[4], G4double *Bfield ) const {
 
     // First we have to translate into polar or cylindric coordinates
     // since the field maps are given in cylindric coordinates and the 

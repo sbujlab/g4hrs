@@ -1,11 +1,11 @@
-#include "remollGlobalField.hh"
+#include "g4hrsGlobalField.hh"
 #include "G4TransportationManager.hh"
 #include "G4FieldManager.hh"
-#include "remollMagneticField.hh"
+#include "g4hrsMagneticField.hh"
 
-#include <remolltypes.hh>
-#include <remollRun.hh>
-#include <remollRunData.hh>
+#include <g4hrstypes.hh>
+#include <g4hrsRun.hh>
+#include <g4hrsRunData.hh>
 
 #include <TMD5.h>
 #include <sys/stat.h>
@@ -14,15 +14,15 @@
 
 #define __GLOBAL_NDIM 3
 
-remollGlobalField::remollGlobalField(){
+g4hrsGlobalField::g4hrsGlobalField(){
 }
 
-remollGlobalField::~remollGlobalField(){
+g4hrsGlobalField::~g4hrsGlobalField(){
 }
 
-void remollGlobalField::AddNewField( G4String name ){
+void g4hrsGlobalField::AddNewField( G4String name ){
 
-    remollMagneticField *thisfield = new remollMagneticField(name);
+    g4hrsMagneticField *thisfield = new g4hrsMagneticField(name);
 
     if( thisfield->IsInit() ){
 	fFields.push_back( thisfield );
@@ -36,7 +36,7 @@ void remollGlobalField::AddNewField( G4String name ){
 
 	// Add file data to output data stream
 
-	remollRunData *rd = remollRun::GetRun()->GetData();
+	g4hrsRunData *rd = g4hrsRun::GetRun()->GetData();
 
 	TMD5 *md5 = TMD5::FileChecksum(name.data());
 
@@ -65,8 +65,8 @@ void remollGlobalField::AddNewField( G4String name ){
     return;
 }
 
-remollMagneticField *remollGlobalField::GetFieldByName(G4String name) {
-    std::vector<remollMagneticField*>::iterator it = fFields.begin();
+g4hrsMagneticField *g4hrsGlobalField::GetFieldByName(G4String name) {
+    std::vector<g4hrsMagneticField*>::iterator it = fFields.begin();
 
     while( it != fFields.end() ){ 
 	if( (*it)->GetName() == name ) break; 
@@ -82,7 +82,7 @@ remollMagneticField *remollGlobalField::GetFieldByName(G4String name) {
     }
 }
 
-void remollGlobalField::GetFieldValue( const G4double p[], G4double *resB) const {
+void g4hrsGlobalField::GetFieldValue( const G4double p[], G4double *resB) const {
     G4double Bsum [__GLOBAL_NDIM], thisB[__GLOBAL_NDIM];
     int i;
 
@@ -90,7 +90,7 @@ void remollGlobalField::GetFieldValue( const G4double p[], G4double *resB) const
 	Bsum[i] = 0.0;
     }	
 
-    std::vector<remollMagneticField*>::const_iterator it = fFields.begin();
+    std::vector<g4hrsMagneticField*>::const_iterator it = fFields.begin();
     for( it = fFields.begin(); it != fFields.end(); it++){
 	(*it)->GetFieldValue( p, thisB );
 	for( i = 0; i < __GLOBAL_NDIM; i++ ){
@@ -106,8 +106,8 @@ void remollGlobalField::GetFieldValue( const G4double p[], G4double *resB) const
 }
 
 
-void remollGlobalField::SetFieldScale( G4String name, G4double scale ){
-	remollMagneticField *field = GetFieldByName(name);
+void g4hrsGlobalField::SetFieldScale( G4String name, G4double scale ){
+	g4hrsMagneticField *field = GetFieldByName(name);
 	if( field ){
 	    field->SetFieldScale(scale);
 	} else {
@@ -118,8 +118,8 @@ void remollGlobalField::SetFieldScale( G4String name, G4double scale ){
     return;
 }
 
-void remollGlobalField::SetMagnetCurrent( G4String name, G4double scale ){
-	remollMagneticField *field = GetFieldByName(name);
+void g4hrsGlobalField::SetMagnetCurrent( G4String name, G4double scale ){
+	g4hrsMagneticField *field = GetFieldByName(name);
 	if( field ){
 	    field->SetMagnetCurrent(scale);
 	} else {

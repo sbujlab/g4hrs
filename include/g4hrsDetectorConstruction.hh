@@ -3,7 +3,7 @@
 
 #include "G4GDMLParser.hh"
 #include "G4VUserDetectorConstruction.hh"
-#include "remollGlobalField.hh"
+#include "g4hrsGlobalField.hh"
 #include <vector>
 
 class G4Tubs;
@@ -11,14 +11,14 @@ class G4LogicalVolume;
 class G4VPhysicalVolume;
 class G4VSensitiveDetector;
 
-class remollIO;
+class g4hrsIO;
 
-class remollDetectorConstruction : public G4VUserDetectorConstruction
+class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
 {
   public:
 
-    remollDetectorConstruction();
-    virtual ~remollDetectorConstruction();
+    g4hrsDetectorConstruction();
+    virtual ~g4hrsDetectorConstruction();
 
   public:
 
@@ -26,13 +26,7 @@ class remollDetectorConstruction : public G4VUserDetectorConstruction
 
     void CreateGlobalMagneticField();
 
-    void SetDetectorGeomFile(const G4String&);
-
-    remollGlobalField* GetGlobalField(){ return fGlobalField; }
-
-    G4GDMLParser *fGDMLParser;
-
-    void SetIO( remollIO *io ){ fIO = io; }
+    g4hrsGlobalField* GetGlobalField(){ return fGlobalField; }
 
   private:
     //----------------------
@@ -41,21 +35,20 @@ class remollDetectorConstruction : public G4VUserDetectorConstruction
     //
 
     G4FieldManager*         fGlobalFieldManager;
-    remollGlobalField*      fGlobalField;
+    g4hrsGlobalField*       fGlobalField;
     G4String                fDetFileName;
-
-    remollIO *fIO;
 
     G4VPhysicalVolume*      fWorldVolume;
 
   public:
 
-    void DumpGeometricalTree(G4VPhysicalVolume* aVolume = NULL,
-      G4int depth = 0,G4bool surfchk = false);
 
   private:
+      void CreateTarget();
+      void CreateTargetChamber(G4LogicalVolume *);
+      void CreateSeptum();
+      void CreateHRS();
 
-    G4int UpdateCopyNo(G4VPhysicalVolume* aVolume, G4int index = 0);
 
 };
 

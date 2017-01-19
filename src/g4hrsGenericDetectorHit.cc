@@ -1,8 +1,8 @@
-#include "remollGenericDetectorHit.hh"
+#include "g4hrsGenericDetectorHit.hh"
 
-G4Allocator<remollGenericDetectorHit> remollGenericDetectorHitAllocator;
+G4Allocator<g4hrsGenericDetectorHit> g4hrsGenericDetectorHitAllocator;
 
-remollGenericDetectorHit::remollGenericDetectorHit(G4int det, G4int copy){
+g4hrsGenericDetectorHit::g4hrsGenericDetectorHit(G4int det, G4int copy){
     fDetID  = det;
     fCopyID = copy;
 
@@ -22,10 +22,10 @@ remollGenericDetectorHit::remollGenericDetectorHit(G4int det, G4int copy){
 
 }
 
-remollGenericDetectorHit::~remollGenericDetectorHit(){
+g4hrsGenericDetectorHit::~g4hrsGenericDetectorHit(){
 }
 
-remollGenericDetectorHit::remollGenericDetectorHit(const remollGenericDetectorHit &right) : G4VHit(){
+g4hrsGenericDetectorHit::g4hrsGenericDetectorHit(const g4hrsGenericDetectorHit &right) : G4VHit(){
     // copy constructor
 
     fDetID  = right.fDetID;
@@ -45,11 +45,11 @@ remollGenericDetectorHit::remollGenericDetectorHit(const remollGenericDetectorHi
 
 }
 
-const remollGenericDetectorHit& remollGenericDetectorHit::operator =(const remollGenericDetectorHit &right){
+const g4hrsGenericDetectorHit& g4hrsGenericDetectorHit::operator =(const g4hrsGenericDetectorHit &right){
     (*this) = right;
     return *this;
 }
 
-G4int remollGenericDetectorHit::operator==(const remollGenericDetectorHit &right ) const {
+G4int g4hrsGenericDetectorHit::operator==(const g4hrsGenericDetectorHit &right ) const {
     return (this==&right) ? 1 : 0;
 }

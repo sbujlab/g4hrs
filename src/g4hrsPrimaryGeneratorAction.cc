@@ -1,32 +1,32 @@
-#include "remollPrimaryGeneratorAction.hh"
+#include "g4hrsPrimaryGeneratorAction.hh"
 
 #include "G4Event.hh"
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
 #include "G4ParticleDefinition.hh"
-#include "remollIO.hh"
-#include "remollVEventGen.hh"
-#include "remollEvent.hh"
-#include "remollRun.hh"
-#include "remollRunData.hh"
-#include "remolltypes.hh"
+#include "g4hrsIO.hh"
+#include "g4hrsVEventGen.hh"
+#include "g4hrsEvent.hh"
+#include "g4hrsRun.hh"
+#include "g4hrsRunData.hh"
+#include "g4hrstypes.hh"
 #include "globals.hh"
 
-#include "remollGenMoller.hh"
-#include "remollGenpElastic.hh"
-#include "remollGenpInelastic.hh"
-#include "remollGenPion.hh"
-#include "remollGenBeam.hh"
-#include "remollGenFlat.hh"
-#include "remollGenAl.hh"
-#include "remollGenLUND.hh" //Dominic Lunde adding the LUND generator command
+#include "g4hrsGenMoller.hh"
+#include "g4hrsGenpElastic.hh"
+#include "g4hrsGenpInelastic.hh"
+#include "g4hrsGenPion.hh"
+#include "g4hrsGenBeam.hh"
+#include "g4hrsGenFlat.hh"
+#include "g4hrsGenAl.hh"
+#include "g4hrsGenLUND.hh" //Dominic Lunde adding the LUND generator command
 
-remollPrimaryGeneratorAction::remollPrimaryGeneratorAction() {
+g4hrsPrimaryGeneratorAction::g4hrsPrimaryGeneratorAction() {
     G4int n_particle = 1;
     fParticleGun = new G4ParticleGun(n_particle);
 
 
-    fDefaultEvent = new remollEvent();
+    fDefaultEvent = new g4hrsEvent();
     fDefaultEvent->ProduceNewParticle(
         G4ThreeVector(0.*cm,0.*cm,-100.*cm),
         G4ThreeVector(0.0,0.0, gDefaultBeamE),
@@ -45,35 +45,35 @@ remollPrimaryGeneratorAction::remollPrimaryGeneratorAction() {
     fEventGen = NULL;
 }
 
-remollPrimaryGeneratorAction::~remollPrimaryGeneratorAction() {
+g4hrsPrimaryGeneratorAction::~g4hrsPrimaryGeneratorAction() {
     delete fParticleGun;
     delete fDefaultEvent;
 }
 
-void remollPrimaryGeneratorAction::SetGenerator(G4String genname) {
+void g4hrsPrimaryGeneratorAction::SetGenerator(G4String genname) {
 
     fEventGen = NULL;
 
     if( genname == "moller" ) {
-        fEventGen = new remollGenMoller();
+        fEventGen = new g4hrsGenMoller();
     }else if( genname == "elastic" ) {
-        fEventGen = new remollGenpElastic();
+        fEventGen = new g4hrsGenpElastic();
     }else if( genname == "inelastic" ) {
-        fEventGen = new remollGenpInelastic();
+        fEventGen = new g4hrsGenpInelastic();
     }else if( genname == "pion" ) {
-        fEventGen = new remollGenPion();
+        fEventGen = new g4hrsGenPion();
     }else if( genname == "beam" ) {
-        fEventGen = new remollGenBeam();
+        fEventGen = new g4hrsGenBeam();
     }else if( genname == "flat" ) {
-        fEventGen = new remollGenFlat();
+        fEventGen = new g4hrsGenFlat();
     }else if( genname == "inelasticAl" ) {
-        fEventGen = new remollGenAl(2);
+        fEventGen = new g4hrsGenAl(2);
     }else if( genname == "quasielasticAl" ) {
-        fEventGen = new remollGenAl(1);
+        fEventGen = new g4hrsGenAl(1);
     }else if( genname == "elasticAl" ) {
-        fEventGen = new remollGenAl(0);
+        fEventGen = new g4hrsGenAl(0);
     }else if( genname == "pion_LUND" ) { //Dominic Lunde - adding GenLUND into the generators
-        fEventGen = new remollGenLUND();  
+        fEventGen = new g4hrsGenLUND();  
     }
 
     if( !fEventGen ) {
@@ -83,16 +83,16 @@ void remollPrimaryGeneratorAction::SetGenerator(G4String genname) {
         G4cout << "Setting generator to " << genname << G4endl;
     }
 
-    remollRun::GetRun()->GetData()->SetGenName(genname.data());
+    g4hrsRun::GetRun()->GetData()->SetGenName(genname.data());
 
     return;
 }
 
-void remollPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
+void g4hrsPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
 
     /*  Generate event, set IO data */
 
-    remollEvent *thisev = NULL;
+    g4hrsEvent *thisev = NULL;
     if( fEventGen ) { // Specified our own generator
         thisev = fEventGen->GenerateEvent();
         for( unsigned int pidx = 0; pidx < thisev->fPartType.size(); pidx++ ) {
@@ -131,7 +131,7 @@ void remollPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
     }
 }
 
-G4ParticleGun* remollPrimaryGeneratorAction::GetParticleGun() {
+G4ParticleGun* g4hrsPrimaryGeneratorAction::GetParticleGun() {
     return fParticleGun;
 }
 

@@ -1,28 +1,28 @@
-#include "remollGenericDetectorSum.hh"
+#include "g4hrsGenericDetectorSum.hh"
 
-G4Allocator<remollGenericDetectorSum> remollGenericDetectorSumAllocator;
+G4Allocator<g4hrsGenericDetectorSum> g4hrsGenericDetectorSumAllocator;
 
-remollGenericDetectorSum::remollGenericDetectorSum(int detid, int copyid){
+g4hrsGenericDetectorSum::g4hrsGenericDetectorSum(int detid, int copyid){
     fDetID  = detid;
     fCopyID = copyid;
     fEdep   = 0.0;
 }
 
-remollGenericDetectorSum::~remollGenericDetectorSum(){
+g4hrsGenericDetectorSum::~g4hrsGenericDetectorSum(){
 }
 
-remollGenericDetectorSum::remollGenericDetectorSum(const remollGenericDetectorSum &right) : G4VHit(){
+g4hrsGenericDetectorSum::g4hrsGenericDetectorSum(const g4hrsGenericDetectorSum &right) : G4VHit(){
     // copy constructor
     fDetID  = right.fDetID;
     fCopyID = right.fCopyID;
     fEdep   = right.fEdep;
 }
 
-const remollGenericDetectorSum& remollGenericDetectorSum::operator =(const remollGenericDetectorSum &right){
+const g4hrsGenericDetectorSum& g4hrsGenericDetectorSum::operator =(const g4hrsGenericDetectorSum &right){
     (*this) = right;
     return *this;
 }
 
-G4int remollGenericDetectorSum::operator==(const remollGenericDetectorSum &right ) const {
+G4int g4hrsGenericDetectorSum::operator==(const g4hrsGenericDetectorSum &right ) const {
     return (this==&right) ? 1 : 0;
 }

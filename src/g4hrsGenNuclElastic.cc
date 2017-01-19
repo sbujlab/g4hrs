@@ -1,4 +1,4 @@
-#include "remollGenpElastic.hh"
+#include "g4hrsGenpElastic.hh"
 
 #include "CLHEP/Random/RandFlat.h"
 
@@ -8,32 +8,32 @@
 #include "G4LogicalVolume.hh"
 #include "G4PhysicalConstants.hh"
 
-#include "remollEvent.hh"
-#include "remollVertex.hh"
-#include "remollBeamTarget.hh"
-#include "remollMultScatt.hh"
-#include "remolltypes.hh"
+#include "g4hrsEvent.hh"
+#include "g4hrsVertex.hh"
+#include "g4hrsBeamTarget.hh"
+#include "g4hrsMultScatt.hh"
+#include "g4hrstypes.hh"
 
 #include <math.h>
 
 #define Euler 0.5772157
 #define NINTERVAL 3
 
-remollGenpElastic::remollGenpElastic(){
-    fTh_min =     0.1*deg;
-    fTh_max =     2.0*deg;
+g4hrsGenpElastic::g4hrsGenpElastic(){
+    fTh_min =     1.0*deg;
+    fTh_max =     10.0*deg;
 
     fE_min = 80.0*MeV; // Absolute minimum of electron energy
                             // to generate
 
     fApplyMultScatt = true;
-    fBeamTarg = remollBeamTarget::GetBeamTarget();
+    fBeamTarg = g4hrsBeamTarget::GetBeamTarget();
 }
 
-remollGenpElastic::~remollGenpElastic(){
+g4hrsGenpElastic::~g4hrsGenpElastic(){
 }
 
-void remollGenpElastic::SamplePhysics(remollVertex *vert, remollEvent *evt){
+void g4hrsGenpElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
     // Generate ep event
     
     //  Crazy weighting for brem because ep cross section blows up at low Q2
@@ -302,7 +302,7 @@ void remollGenpElastic::SamplePhysics(remollVertex *vert, remollEvent *evt){
 
 }
 
-G4double remollGenpElastic::RadProfile(G4double eloss, G4double btt){
+G4double g4hrsGenpElastic::RadProfile(G4double eloss, G4double btt){
      double Ekin = fBeamTarg->fBeamE - electron_mass_c2;
      double retval = 1./eloss*(1.-eloss/Ekin+0.75*pow(eloss/Ekin,2))*pow(eloss/Ekin,btt);
 
@@ -317,7 +317,7 @@ G4double remollGenpElastic::RadProfile(G4double eloss, G4double btt){
      return retval;
 }
 
-G4double remollGenpElastic::EnergNumInt(G4double btt, G4double a0, G4double b0){
+G4double g4hrsGenpElastic::EnergNumInt(G4double btt, G4double a0, G4double b0){
     const int nbin = 1000;
     double sum = 0.0;
     double bremcut = fBeamTarg->fEcut;

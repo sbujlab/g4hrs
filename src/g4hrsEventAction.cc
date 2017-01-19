@@ -1,6 +1,6 @@
-#include "remollEventAction.hh"
-#include "remollGenericDetectorHit.hh"
-#include "remollGenericDetectorSum.hh"
+#include "g4hrsEventAction.hh"
+#include "g4hrsGenericDetectorHit.hh"
+#include "g4hrsGenericDetectorSum.hh"
 
 #include "G4Event.hh"
 #include "G4EventManager.hh"
@@ -13,17 +13,17 @@
 #include "G4UImanager.hh"
 #include "G4ios.hh"
 
-#include "remollIO.hh"
+#include "g4hrsIO.hh"
 
 
-remollEventAction::remollEventAction() {
+g4hrsEventAction::g4hrsEventAction() {
 }
 
-remollEventAction::~remollEventAction(){
+g4hrsEventAction::~g4hrsEventAction(){
 }
 
 
-void remollEventAction::BeginOfEventAction(const G4Event* ev){
+void g4hrsEventAction::BeginOfEventAction(const G4Event* ev){
   // Start timer at event 0
   if (ev->GetEventID() == 0) fTimer.Start();
   // Pretty ongoing status
@@ -43,7 +43,7 @@ void remollEventAction::BeginOfEventAction(const G4Event* ev){
   }
 }
 
-void remollEventAction::EndOfEventAction(const G4Event* evt ) {
+void g4hrsEventAction::EndOfEventAction(const G4Event* evt ) {
   //G4SDManager   *SDman = G4SDManager::GetSDMpointer();
   G4HCofThisEvent *HCE = evt->GetHCofThisEvent();
 
@@ -56,19 +56,19 @@ void remollEventAction::EndOfEventAction(const G4Event* evt ) {
       // Dyanmic cast to test types, process however see fit and feed to IO
       
       ////  Generic Detector Hits ///////////////////////////////////
-      if( remollGenericDetectorHitsCollection *thiscast = 
-	  dynamic_cast<remollGenericDetectorHitsCollection *>(thiscol)){
+      if( g4hrsGenericDetectorHitsCollection *thiscast = 
+	  dynamic_cast<g4hrsGenericDetectorHitsCollection *>(thiscol)){
 	for( unsigned int hidx = 0; hidx < thiscast->GetSize(); hidx++ ){
-	  fIO->AddGenericDetectorHit((remollGenericDetectorHit *) 
+	  fIO->AddGenericDetectorHit((g4hrsGenericDetectorHit *) 
 				     thiscast->GetHit(hidx) );	  
 	}
       }
       
       ////  Generic Detector Sum ////////////////////////////////////
-      if( remollGenericDetectorSumCollection *thiscast = 
-	  dynamic_cast<remollGenericDetectorSumCollection *>(thiscol)){
+      if( g4hrsGenericDetectorSumCollection *thiscast = 
+	  dynamic_cast<g4hrsGenericDetectorSumCollection *>(thiscol)){
 	for( unsigned int hidx = 0; hidx < thiscast->GetSize(); hidx++ ){
-	  fIO->AddGenericDetectorSum((remollGenericDetectorSum *) 
+	  fIO->AddGenericDetectorSum((g4hrsGenericDetectorSum *) 
 				     thiscast->GetHit(hidx) );
 	}
       }

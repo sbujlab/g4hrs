@@ -1,4 +1,4 @@
-#include "remollIO.hh"
+#include "g4hrsIO.hh"
 
 #include <TFile.h>
 #include <TTree.h>
@@ -6,12 +6,12 @@
 
 #include "G4ParticleDefinition.hh"
 
-#include "remollGenericDetectorHit.hh"
-#include "remollGenericDetectorSum.hh"
-#include "remollEvent.hh"
-#include "remollRun.hh"
-#include "remollRunData.hh"
-#include "remollBeamTarget.hh"
+#include "g4hrsGenericDetectorHit.hh"
+#include "g4hrsGenericDetectorSum.hh"
+#include "g4hrsEvent.hh"
+#include "g4hrsRun.hh"
+#include "g4hrsRunData.hh"
+#include "g4hrsBeamTarget.hh"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -23,28 +23,28 @@
 #include <xercesc/dom/DOMNode.hpp>
 
 
-remollIO::remollIO(){
+g4hrsIO::g4hrsIO(){
     fTree = NULL;
     InitializeTree();
     // Default filename
-    strcpy(fFilename, "remollout.root");
+    strcpy(fFilename, "g4hrsout.root");
 
     fFile = NULL;
 }
 
-remollIO::~remollIO(){
+g4hrsIO::~g4hrsIO(){
     if( fTree ){ delete fTree; }
     fTree = NULL;
     if( fFile ){ delete fFile; }
     fFile = NULL;
 }
 
-void remollIO::SetFilename(G4String fn){
+void g4hrsIO::SetFilename(G4String fn){
     G4cout << "Setting output file to " << fn << G4endl;
     strcpy(fFilename, fn.data());
 }
 
-void remollIO::InitializeTree(){
+void g4hrsIO::InitializeTree(){
     if( fFile ){
 	fFile->Close();
 	delete fFile;
@@ -131,7 +131,7 @@ void remollIO::InitializeTree(){
     return;
 }
 
-void remollIO::FillTree(){
+void g4hrsIO::FillTree(){
     if( !fTree ){ 
 	fprintf(stderr, "Error %s: %s line %d - Trying to fill non-existant tree\n", __PRETTY_FUNCTION__, __FILE__, __LINE__ );
 	return; 
@@ -141,14 +141,14 @@ void remollIO::FillTree(){
     fTree->GetCurrentFile();
 }
 
-void remollIO::Flush(){
+void g4hrsIO::Flush(){
     //  Set arrays to 0
     fNGenDetHit = 0;
     fNGenDetSum = 0;
     fCollCut = 1; // default
 }
 
-void remollIO::WriteTree(){
+void g4hrsIO::WriteTree(){
     assert( fFile );
     assert( fTree );
 
@@ -162,7 +162,7 @@ void remollIO::WriteTree(){
     fFile->cd();
 
     fTree->Write("T", TObject::kOverwrite);
-    remollRun::GetRun()->GetData()->Write("run_data", TObject::kOverwrite); 
+    g4hrsRun::GetRun()->GetData()->Write("run_data", TObject::kOverwrite); 
 
     fTree->ResetBranchAddresses();
     delete fTree;
@@ -183,7 +183,7 @@ void remollIO::WriteTree(){
 
 // Event Data
 
-void remollIO::SetEventData(remollEvent *ev){
+void g4hrsIO::SetEventData(g4hrsEvent *ev){
     int n = ev->fPartType.size();
     if( n > __IO_MAXHIT ){
 	G4cerr << "WARNING: " << __PRETTY_FUNCTION__ << " line " << __LINE__ << ":  Buffer size exceeded!" << G4endl;
@@ -226,7 +226,7 @@ void remollIO::SetEventData(remollEvent *ev){
     /////////////////////////////////////////////////
     //  Set beam data as well
 
-    remollBeamTarget *bt = remollBeamTarget::GetBeamTarget();
+    g4hrsBeamTarget *bt = g4hrsBeamTarget::GetBeamTarget();
 
     fBmX = bt->fVer.x()/__L_UNIT;
     fBmY = bt->fVer.y()/__L_UNIT;
@@ -245,7 +245,7 @@ void remollIO::SetEventData(remollEvent *ev){
 
 // GenericDetectorHit
 
-void remollIO::AddGenericDetectorHit(remollGenericDetectorHit *hit){
+void g4hrsIO::AddGenericDetectorHit(g4hrsGenericDetectorHit *hit){
     int n = fNGenDetHit;
     if( n > __IO_MAXHIT ){
 	G4cerr << "WARNING: " << __PRETTY_FUNCTION__ << " line " << __LINE__ << ":  Buffer size exceeded!" << G4endl;
@@ -289,7 +289,7 @@ void remollIO::AddGenericDetectorHit(remollGenericDetectorHit *hit){
 
 // GenericDetectorSum
 
-void remollIO::AddGenericDetectorSum(remollGenericDetectorSum *hit){
+void g4hrsIO::AddGenericDetectorSum(g4hrsGenericDetectorSum *hit){
     int n = fNGenDetSum;
     if( n > __IO_MAXHIT ){
 	G4cerr << "WARNING: " << __PRETTY_FUNCTION__ << " line " << __LINE__ << ":  Buffer size exceeded!" << G4endl;
@@ -305,11 +305,11 @@ void remollIO::AddGenericDetectorSum(remollGenericDetectorSum *hit){
 
 /*---------------------------------------------------------------------------------*/
 
-void remollIO::GrabGDMLFiles(G4String fn){
+void g4hrsIO::GrabGDMLFiles(G4String fn){
     // Reset list
     fGDMLFileNames.clear();
 
-    remollRunData *rundata = remollRun::GetRun()->GetData();
+    g4hrsRunData *rundata = g4hrsRun::GetRun()->GetData();
     rundata->ClearGDMLFiles();
 
     xercesc::XMLPlatformUtils::Initialize();
@@ -330,7 +330,7 @@ void remollIO::GrabGDMLFiles(G4String fn){
     return;
 }
 
-void remollIO::SearchGDMLforFiles(G4String fn){
+void g4hrsIO::SearchGDMLforFiles(G4String fn){
     /*!  Chase down files to be included by GDML.
      *   Mainly look for file tags and perform recursively */
 
@@ -358,7 +358,7 @@ void remollIO::SearchGDMLforFiles(G4String fn){
    return;
 }
 
-void remollIO::TraverseChildren( xercesc::DOMElement *thisel ){
+void g4hrsIO::TraverseChildren( xercesc::DOMElement *thisel ){
 
    xercesc::DOMNodeList*      children = thisel->getChildNodes();
    const XMLSize_t nodeCount = children->getLength();

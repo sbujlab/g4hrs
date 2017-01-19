@@ -1,4 +1,4 @@
-#include "remollTextFile.hh"
+#include "g4hrsTextFile.hh"
 
 #include <string.h>
 #include <stdio.h>
@@ -6,7 +6,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 
-remollTextFile::remollTextFile(){
+g4hrsTextFile::g4hrsTextFile(){
     fFilenameSize = 0;
     fFilename = NULL;
 
@@ -14,7 +14,7 @@ remollTextFile::remollTextFile(){
     fBuffer = NULL;
 }
 
-remollTextFile::remollTextFile(const char *fn){
+g4hrsTextFile::g4hrsTextFile(const char *fn){
     fFilenameSize = 0;
     fFilename = NULL;
 
@@ -24,7 +24,7 @@ remollTextFile::remollTextFile(const char *fn){
     copyFileIn(fn);
 }
 
-remollTextFile::remollTextFile(const remollTextFile& r){
+g4hrsTextFile::g4hrsTextFile(const g4hrsTextFile& r){
     fFilenameSize = r.fFilenameSize;
     fFilename = new char[r.fFilenameSize];
     strncpy(fFilename, r.fFilename, fFilenameSize);
@@ -34,7 +34,7 @@ remollTextFile::remollTextFile(const remollTextFile& r){
     memcpy(fBuffer, r.fBuffer, fBufferSize);
 }
 
-const remollTextFile& remollTextFile::operator=(const remollTextFile& r){
+const g4hrsTextFile& g4hrsTextFile::operator=(const g4hrsTextFile& r){
     fFilenameSize = r.fFilenameSize;
     fFilename = new char[r.fFilenameSize];
     strncpy(fFilename, r.fFilename, fFilenameSize);
@@ -46,11 +46,11 @@ const remollTextFile& remollTextFile::operator=(const remollTextFile& r){
     return *this;
 }
 
-remollTextFile::~remollTextFile(){
+g4hrsTextFile::~g4hrsTextFile(){
     if( fBuffer ){ delete fBuffer; }
 }
 
-void remollTextFile::copyFileIn(const char *fn){
+void g4hrsTextFile::copyFileIn(const char *fn){
     if( strlen(fn) > __STRLEN ){
 	fprintf(stderr, "%s %d: ERROR filename too long", __PRETTY_FUNCTION__, __LINE__ );
 	exit(1);
@@ -81,7 +81,7 @@ void remollTextFile::copyFileIn(const char *fn){
     fclose(fd);
 }
 
-void remollTextFile::RecreateInDir(const char *adir, bool clobber ){
+void g4hrsTextFile::RecreateInDir(const char *adir, bool clobber ){
     char *thisdir;
 
     if( adir == NULL ){
@@ -115,7 +115,7 @@ void remollTextFile::RecreateInDir(const char *adir, bool clobber ){
     return;
 }
 
-void remollTextFile::Recreate(const char *fn, bool clobber ){
+void g4hrsTextFile::Recreate(const char *fn, bool clobber ){
     // Behavior 
     //    don't clobber, end with error if we are asked to do this
     //    If directory structure doesn't exist, make file in present directory        
@@ -152,7 +152,7 @@ void remollTextFile::Recreate(const char *fn, bool clobber ){
     fclose(fd);
 }
 
-void remollTextFile::Print(){
+void g4hrsTextFile::Print(){
     if( fBufferSize > 1024 ){
 	printf("Stored file %s (%lld kB)\n", fFilename, fBufferSize/1024);
     } else {
@@ -169,7 +169,7 @@ void remollTextFile::Print(){
     return;
 }
 
-const char *remollTextFile::GetBaseFile(const char *fp){
+const char *g4hrsTextFile::GetBaseFile(const char *fp){
     if( fp == NULL ) fp = fFilename;
 
     int idx = strlen(fp)-1;
@@ -180,7 +180,7 @@ const char *remollTextFile::GetBaseFile(const char *fp){
     return &(fp[idx]);
 }
 
-ClassImp(remollTextFile);
+ClassImp(g4hrsTextFile);
 
 
 

@@ -2,39 +2,39 @@
 // Make this appear first!
 #include "G4Timer.hh"
 
-#include "remollRunAction.hh"
-#include "remollBeamTarget.hh"
+#include "g4hrsRunAction.hh"
+#include "g4hrsBeamTarget.hh"
 #include "G4Run.hh"
 #include "G4UImanager.hh"
 #include "G4ios.hh"
-#include "remollIO.hh"
-#include "remollRun.hh"
+#include "g4hrsIO.hh"
+#include "g4hrsRun.hh"
 
-remollRunAction::remollRunAction()
+g4hrsRunAction::g4hrsRunAction()
 {
   timer = new G4Timer;
 }
 
-remollRunAction::~remollRunAction()
+g4hrsRunAction::~g4hrsRunAction()
 {
   delete timer;
 }
 
-void remollRunAction::BeginOfRunAction(const G4Run* aRun)
+void g4hrsRunAction::BeginOfRunAction(const G4Run* aRun)
 {
   G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
   //  timer->Start();
   fIO->InitializeTree();
 
-  remollRunData *rmrundata = remollRun::GetRun()->GetData();
+  g4hrsRunData *rmrundata = g4hrsRun::GetRun()->GetData();
 
-  rmrundata->SetBeamE( remollBeamTarget::GetBeamTarget()->fBeamE/GeV );
+  rmrundata->SetBeamE( g4hrsBeamTarget::GetBeamTarget()->fBeamE/GeV );
   rmrundata->SetNthrown( aRun->GetNumberOfEventToBeProcessed() );
 
   rmrundata->Print();
 }
 
-void remollRunAction::EndOfRunAction(const G4Run* aRun)
+void g4hrsRunAction::EndOfRunAction(const G4Run* aRun)
 {
   timer->Stop();
   G4cout << "number of event = " << aRun->GetNumberOfEvent() << G4endl;

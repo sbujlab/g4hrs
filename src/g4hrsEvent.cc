@@ -1,17 +1,17 @@
-#include "remollEvent.hh"
+#include "g4hrsEvent.hh"
 #include <math.h>
 
 #include "G4ParticleTable.hh"
 #include "G4SystemOfUnits.hh"
 
-remollEvent::remollEvent(){
+g4hrsEvent::g4hrsEvent(){
     Reset();
 }
 
-remollEvent::~remollEvent(){
+g4hrsEvent::~g4hrsEvent(){
 }
 
-void remollEvent::ProduceNewParticle( G4ThreeVector pos, G4ThreeVector mom, G4String name ){
+void g4hrsEvent::ProduceNewParticle( G4ThreeVector pos, G4ThreeVector mom, G4String name ){
     fPartPos.push_back(pos);
     fPartMom.push_back(mom);
     fPartRealMom.push_back(mom);
@@ -25,7 +25,7 @@ void remollEvent::ProduceNewParticle( G4ThreeVector pos, G4ThreeVector mom, G4St
 }
 
 
-void remollEvent::Reset(){
+void g4hrsEvent::Reset(){
     fPartPos.clear();
     fPartMom.clear();
     fPartRealMom.clear();
@@ -45,14 +45,14 @@ void remollEvent::Reset(){
     fThCoM = -1e9;
 }
 
-void remollEvent::UndoLastParticle(){
+void g4hrsEvent::UndoLastParticle(){
     fPartPos.pop_back();
     fPartMom.pop_back();
     fPartRealMom.pop_back();
     fPartType.pop_back();
 }
 
-G4bool remollEvent::EventIsSane(){
+G4bool g4hrsEvent::EventIsSane(){
     // Here we check all the variables and make sure there is nothing 
     // kinematically wrong and there aren't stuff like nans and infs
 
@@ -84,7 +84,7 @@ G4bool remollEvent::EventIsSane(){
 }
 
 
-void remollEvent::Print(){
+void g4hrsEvent::Print(){
     G4cout << "Event " << this << " dump" << G4endl;
     G4cout << "\t" << fEffXs/nanobarn << " nb effective cross section " << G4endl;
     G4cout << "\t" << fAsym*1e6 << " ppm asymmetry" << G4endl;

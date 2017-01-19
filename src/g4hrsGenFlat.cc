@@ -1,25 +1,25 @@
-#include "remollGenFlat.hh"
+#include "g4hrsGenFlat.hh"
 
 #include "CLHEP/Random/RandFlat.h"
 
 #include "G4Material.hh"
 #include "G4PhysicalConstants.hh"
 
-#include "remollEvent.hh"
-#include "remollVertex.hh"
-#include "remolltypes.hh"
+#include "g4hrsEvent.hh"
+#include "g4hrsVertex.hh"
+#include "g4hrstypes.hh"
 
-remollGenFlat::remollGenFlat(){
+g4hrsGenFlat::g4hrsGenFlat(){
     fTh_min =     0.0*deg;
     fTh_max =     5.0*deg;
 
     fApplyMultScatt = true;
 }
 
-remollGenFlat::~remollGenFlat(){
+g4hrsGenFlat::~g4hrsGenFlat(){
 }
 
-void remollGenFlat::SamplePhysics(remollVertex *vert, remollEvent *evt){
+void g4hrsGenFlat::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
     // Generate event flat in phase space
 
     double beamE = vert->GetBeamE();

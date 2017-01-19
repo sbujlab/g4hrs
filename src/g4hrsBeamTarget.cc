@@ -11,17 +11,17 @@
 #include "CLHEP/Random/RandFlat.h"
 #include "CLHEP/Random/RandGauss.h"
 
-#include "remollBeamTarget.hh"
-#include "remollMultScatt.hh"
+#include "g4hrsBeamTarget.hh"
+#include "g4hrsMultScatt.hh"
 
 #include <math.h>
 
 #define __MAX_MAT 100
 #define Euler 0.5772157
 
-remollBeamTarget *remollBeamTarget::gSingleton = NULL;
+g4hrsBeamTarget *g4hrsBeamTarget::gSingleton = NULL;
 
-remollBeamTarget::remollBeamTarget(){
+g4hrsBeamTarget::g4hrsBeamTarget(){
     gSingleton = this;
     fMother = NULL;
     UpdateInfo();
@@ -32,7 +32,7 @@ remollBeamTarget::remollBeamTarget(){
 
     fCorrTh = fCorrPh = 0.0;
 
-    fMS = new remollMultScatt();
+    fMS = new g4hrsMultScatt();
 
     fBeamE   = gDefaultBeamE;
     fBeamPol = gDefaultBeamPol;
@@ -46,23 +46,23 @@ remollBeamTarget::remollBeamTarget(){
     fAlreadyWarned = false;
 }
 
-remollBeamTarget::~remollBeamTarget(){
+g4hrsBeamTarget::~g4hrsBeamTarget(){
 }
 
-remollBeamTarget *remollBeamTarget::GetBeamTarget() {
+g4hrsBeamTarget *g4hrsBeamTarget::GetBeamTarget() {
     if( gSingleton == NULL ){
-	gSingleton = new remollBeamTarget();
+	gSingleton = new g4hrsBeamTarget();
     }
     return gSingleton;
 }
 
 
-G4double remollBeamTarget::GetEffLumin(){
+G4double g4hrsBeamTarget::GetEffLumin(){
     G4double lumin = fEffMatLen*fBeamCurr/(e_SI*coulomb);
     return lumin;
 }
 
-void remollBeamTarget::UpdateInfo(){
+void g4hrsBeamTarget::UpdateInfo(){
     std::vector<G4VPhysicalVolume *>::iterator it;
 
     fLH2Length   = -1e9;
@@ -103,7 +103,7 @@ void remollBeamTarget::UpdateInfo(){
 }
 
 
-void remollBeamTarget::SetTargetLen(G4double z){
+void g4hrsBeamTarget::SetTargetLen(G4double z){
     std::vector<G4VPhysicalVolume *>::iterator it;
 
     for(it = fTargVols.begin(); it != fTargVols.end(); it++ ){
@@ -139,7 +139,7 @@ void remollBeamTarget::SetTargetLen(G4double z){
     UpdateInfo();
 }
 
-void remollBeamTarget::SetTargetPos(G4double z){
+void g4hrsBeamTarget::SetTargetPos(G4double z){
     std::vector<G4VPhysicalVolume *>::iterator it;
 
     //G4double zshift = z-(fZpos+fLH2pos);
@@ -177,8 +177,8 @@ void remollBeamTarget::SetTargetPos(G4double z){
 ////////////////////////////////////////////////////////////////////////////////////////////
 //  Sampling functions
 
-remollVertex remollBeamTarget::SampleVertex(SampType_t samp){
-    remollVertex thisvert;
+g4hrsVertex g4hrsBeamTarget::SampleVertex(SampType_t samp){
+    g4hrsVertex thisvert;
 
     G4double rasx = CLHEP::RandFlat::shoot( fX0 - fRasterX/2.0, fX0 + fRasterX/2.0);
     G4double rasy = CLHEP::RandFlat::shoot( fY0 - fRasterY/2.0, fY0 + fRasterY/2.0);

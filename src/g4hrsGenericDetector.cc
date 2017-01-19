@@ -1,7 +1,7 @@
-#include "remollGenericDetector.hh"
+#include "g4hrsGenericDetector.hh"
 #include "G4SDManager.hh"
 
-remollGenericDetector::remollGenericDetector( G4String name, G4int detnum ) : G4VSensitiveDetector(name){
+g4hrsGenericDetector::g4hrsGenericDetector( G4String name, G4int detnum ) : G4VSensitiveDetector(name){
     char colname[255];
 
     fDetNo = detnum;
@@ -20,13 +20,13 @@ remollGenericDetector::remollGenericDetector( G4String name, G4int detnum ) : G4
     fSCID = -1;
 }
 
-remollGenericDetector::~remollGenericDetector(){
+g4hrsGenericDetector::~g4hrsGenericDetector(){
 }
 
-void remollGenericDetector::Initialize(G4HCofThisEvent *){
+void g4hrsGenericDetector::Initialize(G4HCofThisEvent *){
 
-    fHitColl = new remollGenericDetectorHitsCollection( SensitiveDetectorName, collectionName[0] );
-    fSumColl = new remollGenericDetectorSumCollection ( SensitiveDetectorName, collectionName[1] );
+    fHitColl = new g4hrsGenericDetectorHitsCollection( SensitiveDetectorName, collectionName[0] );
+    fSumColl = new g4hrsGenericDetectorSumCollection ( SensitiveDetectorName, collectionName[1] );
 
     fSumMap.clear();
 
@@ -34,7 +34,7 @@ void remollGenericDetector::Initialize(G4HCofThisEvent *){
 
 ///////////////////////////////////////////////////////////////////////
 
-G4bool remollGenericDetector::ProcessHits( G4Step *step, G4TouchableHistory *){
+G4bool g4hrsGenericDetector::ProcessHits( G4Step *step, G4TouchableHistory *){
     G4bool badedep = false;
     G4bool badhit  = false;
 
@@ -67,18 +67,18 @@ G4bool remollGenericDetector::ProcessHits( G4Step *step, G4TouchableHistory *){
 
 
     //  Make pointer to new hit if it's a valid track
-    remollGenericDetectorHit *thishit;
+    g4hrsGenericDetectorHit *thishit;
     if( !badhit ){
-	thishit = new remollGenericDetectorHit(fDetNo, copyID);
+	thishit = new g4hrsGenericDetectorHit(fDetNo, copyID);
 	fHitColl->insert( thishit );
     }
 
     //  Get pointer to our sum  /////////////////////////
-    remollGenericDetectorSum *thissum = NULL;
+    g4hrsGenericDetectorSum *thissum = NULL;
 
     if( !fSumMap.count(copyID) ){
 	if( edep > 0.0 ){
-	    thissum = new remollGenericDetectorSum(fDetNo, copyID);
+	    thissum = new g4hrsGenericDetectorSum(fDetNo, copyID);
 	    fSumMap[copyID] = thissum;
 	    fSumColl->insert( thissum );
 	} else {
@@ -120,7 +120,7 @@ G4bool remollGenericDetector::ProcessHits( G4Step *step, G4TouchableHistory *){
 
 ///////////////////////////////////////////////////////////////////////
 
-void remollGenericDetector::EndOfEvent(G4HCofThisEvent*HCE) {
+void g4hrsGenericDetector::EndOfEvent(G4HCofThisEvent*HCE) {
     G4SDManager *sdman = G4SDManager::GetSDMpointer();
 
     if(fHCID<0){ fHCID = sdman->GetCollectionID(collectionName[0]); }

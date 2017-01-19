@@ -1,10 +1,10 @@
-#include "remollGenBeam.hh"
+#include "g4hrsGenBeam.hh"
 
 #include "CLHEP/Random/RandFlat.h"
 
-#include "remollEvent.hh"
-#include "remollVertex.hh"
-#include "remollBeamTarget.hh"
+#include "g4hrsEvent.hh"
+#include "g4hrsVertex.hh"
+#include "g4hrsBeamTarget.hh"
 
 #include "G4Material.hh"
 #include "G4VPhysicalVolume.hh"
@@ -12,21 +12,21 @@
 #include "G4PhysicalConstants.hh"
 #include "Randomize.hh"
 
-#include "remolltypes.hh"
+#include "g4hrstypes.hh"
 
 #include <math.h>
 
-remollGenBeam::remollGenBeam(){
+g4hrsGenBeam::g4hrsGenBeam(){
     fApplyMultScatt = true;
-    fBeamTarg = remollBeamTarget::GetBeamTarget();
+    fBeamTarg = g4hrsBeamTarget::GetBeamTarget();
 
     fZpos = -5.0*m;
 }
 
-remollGenBeam::~remollGenBeam(){
+g4hrsGenBeam::~g4hrsGenBeam(){
 }
 
-void remollGenBeam::SamplePhysics(remollVertex *vert, remollEvent *evt){
+void g4hrsGenBeam::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
     // Get initial beam energy instead of using other sampling
     double beamE = fBeamTarg->fBeamE;
     evt->fBeamE = beamE;

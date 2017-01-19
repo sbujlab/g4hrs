@@ -1,14 +1,14 @@
-#include "remollVertex.hh"
+#include "g4hrsVertex.hh"
 
 #include "G4Material.hh"
 #include "G4SystemOfUnits.hh"
 
-remollVertex::remollVertex(){
+g4hrsVertex::g4hrsVertex(){
     // Some default material
     fMaterial = NULL;
     fBeamE = 0.0*GeV;
     fRadLen = 0.0;
 }
 
-remollVertex::~remollVertex(){
+g4hrsVertex::~g4hrsVertex(){
 }

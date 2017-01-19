@@ -1,4 +1,4 @@
-#include "remollRunData.hh"
+#include "g4hrsRunData.hh"
 #include "gitinfo.hh"
 
 #include <string.h>
@@ -8,17 +8,17 @@
 #include <unistd.h>
 #endif
 
-remollRunData::remollRunData(){
+g4hrsRunData::g4hrsRunData(){
     fNthrown = -1;
     fBeamE   = -1e9;
     fGenName[0]  = '\0';
     fHostName[0] = '\0';
 }
 
-remollRunData::~remollRunData(){
+g4hrsRunData::~g4hrsRunData(){
 }
 
-void remollRunData::Init(){
+void g4hrsRunData::Init(){
     fNthrown = 0;
     fBeamE   = 0;
     strcpy(fGenName, "default");
@@ -32,7 +32,7 @@ void remollRunData::Init(){
     }
 }
 
-void remollRunData::Print(){
+void g4hrsRunData::Print(){
     char gitInfo[__GITMAXINFO_SIZE];
     gitInfo[0] = '\0';
     strcpy(gitInfo, gGitInfoStr);
@@ -69,7 +69,7 @@ void remollRunData::Print(){
 
 }
 
-void remollRunData::AddGDMLFile( const char *fn ){
+void g4hrsRunData::AddGDMLFile( const char *fn ){
     // Check for duplicates I guess
 
     unsigned int i;
@@ -81,10 +81,10 @@ void remollRunData::AddGDMLFile( const char *fn ){
 	}
     }
 
-    fGDMLFiles.push_back(remollTextFile(fn)); 
+    fGDMLFiles.push_back(g4hrsTextFile(fn)); 
 }
 
-void remollRunData::RecreateGDML( const char *adir, bool clobber ){
+void g4hrsRunData::RecreateGDML( const char *adir, bool clobber ){
     unsigned int idx;
 
     for( idx = 0; idx < fGDMLFiles.size(); idx++ ){
@@ -93,7 +93,7 @@ void remollRunData::RecreateGDML( const char *adir, bool clobber ){
     return;
 }
 
-ClassImp(remollRunData);
+ClassImp(g4hrsRunData);
 
 
 

@@ -1,31 +1,31 @@
-#include "remollVEventGen.hh"
+#include "g4hrsVEventGen.hh"
 
 #include "G4RotationMatrix.hh"
 
-#include "remollBeamTarget.hh"
-#include "remollVertex.hh"
-#include "remollEvent.hh"
-#include "remollRun.hh"
-#include "remollRunData.hh"
+#include "g4hrsBeamTarget.hh"
+#include "g4hrsVertex.hh"
+#include "g4hrsEvent.hh"
+#include "g4hrsRun.hh"
+#include "g4hrsRunData.hh"
 
-remollVEventGen::remollVEventGen() {
-    fBeamTarg = remollBeamTarget::GetBeamTarget();
-    fRunData  = remollRun::GetRun()->GetData();
+g4hrsVEventGen::g4hrsVEventGen() {
+    fBeamTarg = g4hrsBeamTarget::GetBeamTarget();
+    fRunData  = g4hrsRun::GetRun()->GetData();
 
     fSampType       = kCryogen;
     fApplyMultScatt = false;
 }
 
-remollVEventGen::~remollVEventGen() {
+g4hrsVEventGen::~g4hrsVEventGen() {
 }
 
-remollEvent *remollVEventGen::GenerateEvent() {
+g4hrsEvent *g4hrsVEventGen::GenerateEvent() {
     // Set up beam/target vertex
-    remollVertex vert   = fBeamTarg->SampleVertex(fSampType);
+    g4hrsVertex vert   = fBeamTarg->SampleVertex(fSampType);
 
     /////////////////////////////////////////////////////////////////////
     // Create and initialize values for event
-    remollEvent *thisev = new remollEvent();
+    g4hrsEvent *thisev = new g4hrsEvent();
     thisev->fVertexPos    = fBeamTarg->fVer;
     if( fApplyMultScatt ) {
         thisev->fBeamMomentum = fBeamTarg->fSampE*(fBeamTarg->fDir.unit());
@@ -42,7 +42,7 @@ remollEvent *remollVEventGen::GenerateEvent() {
 }
 
 
-void remollVEventGen::PolishEvent(remollEvent *ev) {
+void g4hrsVEventGen::PolishEvent(g4hrsEvent *ev) {
     /*!
        Here it's our job to:
           Make sure the event is sane

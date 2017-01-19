@@ -1,5 +1,5 @@
-#include "remollSteppingAction.hh"
-//#include "remollSteppingActionMessenger.hh"
+#include "g4hrsSteppingAction.hh"
+//#include "g4hrsSteppingActionMessenger.hh"
 
 #include "G4VVisManager.hh"
 #include "G4Polyline.hh"
@@ -7,15 +7,15 @@
 #include "G4VisAttributes.hh"
 #include "G4SteppingManager.hh"
 
-remollSteppingAction::remollSteppingAction()
+g4hrsSteppingAction::g4hrsSteppingAction()
 :drawFlag(false)
 {
-///  new remollSteppingActionMessenger(this);
+///  new g4hrsSteppingActionMessenger(this);
 
     fEnableKryptonite = true;
 }
 
-void remollSteppingAction::UserSteppingAction(const G4Step *aStep) {
+void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
     G4Track* fTrack = aStep->GetTrack();
     G4Material* material = fTrack->GetMaterial();
 

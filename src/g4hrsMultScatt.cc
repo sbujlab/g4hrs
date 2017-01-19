@@ -1,4 +1,4 @@
-#include "remollMultScatt.hh"
+#include "g4hrsMultScatt.hh"
 
 #include "globals.hh"
 
@@ -13,13 +13,13 @@
 #include "G4SystemOfUnits.hh"
 #include "G4PhysicalConstants.hh"
 
-remollMultScatt::remollMultScatt() {
+g4hrsMultScatt::g4hrsMultScatt() {
     InitInternal();
 
     return;
 }
 
-remollMultScatt::remollMultScatt( double p, int nmat, double t[], double A[], double Z[] ){
+g4hrsMultScatt::g4hrsMultScatt( double p, int nmat, double t[], double A[], double Z[] ){
     /*
        p    - electron momentum
        nmat - number of materials
@@ -28,12 +28,12 @@ remollMultScatt::remollMultScatt( double p, int nmat, double t[], double A[], do
        Z    - Atomic number
        */
     InitInternal();
-    remollMultScatt();
+    g4hrsMultScatt();
     Init( p, nmat, t, A, Z );
     return;
 }
 
-remollMultScatt::remollMultScatt( double p, double t, double A, double Z ){
+g4hrsMultScatt::g4hrsMultScatt( double p, double t, double A, double Z ){
     /*
        p    - electron momentum
        nmat - number of materials
@@ -47,13 +47,13 @@ remollMultScatt::remollMultScatt( double p, double t, double A, double Z ){
     return;
 }
 
-void remollMultScatt::InitInternal(){
+void g4hrsMultScatt::InitInternal(){
     fInit = false;
     fErf2sig = erf(2.0/sqrt(2.0));
     fNmat = 0;
 }
 
-void remollMultScatt::Init( double p, int nmat, double t[], double A[], double Z[] ){
+void g4hrsMultScatt::Init( double p, int nmat, double t[], double A[], double Z[] ){
     /* 
        Load materials and calculate necessary
        variables to generate distributions
@@ -197,7 +197,7 @@ void remollMultScatt::Init( double p, int nmat, double t[], double A[], double Z
     return;
 }
 
-void   remollMultScatt::Init( double p, double t, double A, double Z ){
+void   g4hrsMultScatt::Init( double p, double t, double A, double Z ){
     /*
        p    - electron momentum, [GeV]
        nmat - number of materials
@@ -214,7 +214,7 @@ void   remollMultScatt::Init( double p, double t, double A, double Z ){
     return;
 }
 
-double remollMultScatt::J0(double x) {
+double g4hrsMultScatt::J0(double x) {
     // Returns J0 for any real x
     // Stolen from ROOT in TMath.cxx
     
@@ -258,7 +258,7 @@ double remollMultScatt::J0(double x) {
     return result;
 }
 
-double remollMultScatt::solvelogeq(double b){
+double g4hrsMultScatt::solvelogeq(double b){
     // Newton's method to solve B - log(B) = b
     const double err = 1e-4;
     const int MAX_ITER = 500;
@@ -308,7 +308,7 @@ double remollMultScatt::solvelogeq(double b){
 }
 
 
-double remollMultScatt::fn_integrand( double u, double th, int n ){
+double g4hrsMultScatt::fn_integrand( double u, double th, int n ){
     // Check for bad values of logarithm
 
     if( !(u > 0.0) ) return 0.0;
@@ -322,7 +322,7 @@ double remollMultScatt::fn_integrand( double u, double th, int n ){
     return retval;
 }
 
-double remollMultScatt::intsimpson_fn( double th, int n ){
+double g4hrsMultScatt::intsimpson_fn( double th, int n ){
     if( n >= 5 ) {fprintf(stderr, "%s %s: %d:  Warning, integrating over integrand terms that are of too large n\n", 
 	    __FILE__, __FUNCTION__, __LINE__ ); }
 
@@ -377,17 +377,17 @@ double remollMultScatt::intsimpson_fn( double th, int n ){
     return sum/fact;
 }
 
-double remollMultScatt::CalcMSDistPlane( double theta, double p, double t, double A, double Z ){
+double g4hrsMultScatt::CalcMSDistPlane( double theta, double p, double t, double A, double Z ){
     Init( p, t, A, Z );
     return CalcMSDistPlane(theta);
 }
 
-double remollMultScatt::CalcMSDistPlane( double theta, double p, int nmat, double t[], double A[], double Z[] ){
+double g4hrsMultScatt::CalcMSDistPlane( double theta, double p, int nmat, double t[], double A[], double Z[] ){
     Init( p, nmat, t, A, Z );
     return CalcMSDistPlane(theta);
 }
 
-double remollMultScatt::CalcMSDistPlane( double theta){
+double g4hrsMultScatt::CalcMSDistPlane( double theta){
     /*
        p    - electron momentum
        nmat - number of materials
@@ -424,21 +424,21 @@ double remollMultScatt::CalcMSDistPlane( double theta){
     return retval;
 }
 
-double remollMultScatt::CalcMSDist( double theta, double p, double t, double A, double Z ){
+double g4hrsMultScatt::CalcMSDist( double theta, double p, double t, double A, double Z ){
     Init( p, t, A, Z );
     return CalcMSDist(theta);
 }
 
-double remollMultScatt::CalcMSDist( double theta, double p, int nmat, double t[], double A[], double Z[] ){
+double g4hrsMultScatt::CalcMSDist( double theta, double p, int nmat, double t[], double A[], double Z[] ){
     Init( p, nmat, t, A, Z );
     return CalcMSDist(theta);
 }
 
-double remollMultScatt::CalcMSDist( double theta){
+double g4hrsMultScatt::CalcMSDist( double theta){
     return CalcMSDistPlane(theta)*sin(fabs(theta));
 }
 
-double remollMultScatt::GenerateMSPlane(){
+double g4hrsMultScatt::GenerateMSPlane(){
     /*
        Generate an event for a single momentum in a
        "plane projected" distribution (i.e. what you
@@ -503,7 +503,7 @@ double remollMultScatt::GenerateMSPlane(){
     return -1e9;
 }
 
-double remollMultScatt::GenerateMSPlane( double p, int nmat, double t[], double A[], double Z[] ){
+double g4hrsMultScatt::GenerateMSPlane( double p, int nmat, double t[], double A[], double Z[] ){
     /*
        p    - electron momentum, [GeV]
        nmat - number of materials
@@ -515,7 +515,7 @@ double remollMultScatt::GenerateMSPlane( double p, int nmat, double t[], double 
     return GenerateMSPlane();
 }
 
-double remollMultScatt::GenerateMSPlane( double p, double t, double A, double Z ){
+double g4hrsMultScatt::GenerateMSPlane( double p, double t, double A, double Z ){
     /*
        p    - electron momentum
        nmat - number of materials
@@ -528,7 +528,7 @@ double remollMultScatt::GenerateMSPlane( double p, double t, double A, double Z 
 }
 
 
-double remollMultScatt::GenerateMS(){
+double g4hrsMultScatt::GenerateMS(){
     // This returns the polar coordinate
     // theta for a single event
 
@@ -544,7 +544,7 @@ double remollMultScatt::GenerateMS(){
     return thisth;
 }
 
-double remollMultScatt::GenerateMS( double p, int nmat, double t[], double A[], double Z[] ){
+double g4hrsMultScatt::GenerateMS( double p, int nmat, double t[], double A[], double Z[] ){
     /*
        p    - electron momentum
        nmat - number of materials
@@ -556,7 +556,7 @@ double remollMultScatt::GenerateMS( double p, int nmat, double t[], double A[], 
     return GenerateMS();
 }
 
-double remollMultScatt::GenerateMS( double p, double t, double A, double Z ){
+double g4hrsMultScatt::GenerateMS( double p, double t, double A, double Z ){
     /*
        p    - electron momentum
        nmat - number of materials

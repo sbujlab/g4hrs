@@ -1,20 +1,20 @@
-#include "remollRun.hh"
-#include "remollRunData.hh"
+#include "g4hrsRun.hh"
+#include "g4hrsRunData.hh"
 
-remollRun *remollRun::gSingleton = NULL;
+g4hrsRun *g4hrsRun::gSingleton = NULL;
 
-remollRun::remollRun() {
+g4hrsRun::g4hrsRun() {
     gSingleton = this;
-    fRunData = new remollRunData();
+    fRunData = new g4hrsRunData();
     fRunData->Init();
 }
 
-remollRun::~remollRun() {
+g4hrsRun::~g4hrsRun() {
 }
 
-remollRun *remollRun::GetRun() {
+g4hrsRun *g4hrsRun::GetRun() {
     if( gSingleton == NULL ) {
-        gSingleton = new remollRun();
+        gSingleton = new g4hrsRun();
     }
     return gSingleton;
 }
