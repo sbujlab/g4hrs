@@ -44,10 +44,10 @@ class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
 
 
   private:
-      void CreateTarget();
+      void CreateTarget(G4LogicalVolume *);
       void CreateTargetChamber(G4LogicalVolume *);
-      void CreateSeptum();
-      void CreateHRS();
+      void CreateSeptum(G4LogicalVolume *);
+      void CreateHRS(G4LogicalVolume *);
 
 
 };
