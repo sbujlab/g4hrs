@@ -18,19 +18,14 @@ private:
 	static BField_Septum* fInstance;
 
 public:
-	BField_Septum(double pMomentumL=0,double pMomentumR=0,
-		const char *inifile="BField_Septum.ini",
-		const char *mapfile="g2p_septumfield.dat");
+	BField_Septum(double pMomentum,
+		const char *inifile,
+		const char *mapfile);
 	virtual ~BField_Septum();
 	bool GetBField(double Pos[3],double B[3]);
 	bool GetBField(float fPos[3],float fB[3]);
 	
-	void SetCurrentRatio(double valL,double valR);
-	void SetCurrentRatioL(double valL);
-	void SetCurrentRatioR(double valR);
-	void SetMomentum(double pMomentumL,double pMomentumR);
-	void SetMomentumL(double pMomentumL);
-	void SetMomentumR(double pMomentumR);
+	void SetMomentum(double pMomentum){fMomentum = pMomentum;}
 
 private:
 	bool ReadIni(const char *filename);
@@ -43,9 +38,6 @@ public:
 	void   Transform_Field2Lab(const double FieldP[3],double LabP[3]);
 	void   Rotate_Lab2Field(const double LabP[3],double FieldP[3]);
 	void   Transform_Lab2Field(const double LabP[3],double FieldP[3]);
-	void   GetCurrentRatio(double L, double R){ L=mCurrentRatioL; R=mCurrentRatioR;}
-	double GetCurrentRatioL(){ return mCurrentRatioL;}
-	double GetCurrentRatioR(){ return mCurrentRatioR;}
 	bool   IsUniformField(){ return (mUseUniformB==0)?false:true;}
 	void   GetUniformField(double pB[]){pB[0]=mUniformB[0];pB[1]=mUniformB[1];pB[2]=mUniformB[2];}
 	void   GetOrigin(double pX[]){pX[0]=mOrigin[0];pX[1]=mOrigin[1];pX[2]=mOrigin[2];}
@@ -88,8 +80,8 @@ private:
 	int	   mRotAxis[3];
 	double mRotAngle[3];
 
-	double mDefaultMomentumL,mDefaultMomentumR;
-	double mCurrentRatioL,mCurrentRatioR;
+	double mDefaultMomentum;
+	double fMomentum;
 
 	bool   mDoShift, mDoRotation;
 	int    mZNum,mXNum,mYNum;

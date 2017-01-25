@@ -33,9 +33,7 @@ private:
   G4double          fRadius;
   G4int             fSnakeModel;
   G4int             fQuadNumber;
-  BField_Septum*    mBField_Septum; 
-  G4double          pLHRSMomentum;
-  G4double          pRHRSMomentum;
+  G4double          fHRSMomentum;
 
 };
 #endif

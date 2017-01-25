@@ -12,14 +12,9 @@
 #include "g4hrstypes.hh"
 #include "globals.hh"
 
-#include "g4hrsGenMoller.hh"
-#include "g4hrsGenpElastic.hh"
-#include "g4hrsGenpInelastic.hh"
-#include "g4hrsGenPion.hh"
+#include "g4hrsGenNuclElastic.hh"
 #include "g4hrsGenBeam.hh"
 #include "g4hrsGenFlat.hh"
-#include "g4hrsGenAl.hh"
-#include "g4hrsGenLUND.hh" //Dominic Lunde adding the LUND generator command
 
 g4hrsPrimaryGeneratorAction::g4hrsPrimaryGeneratorAction() {
     G4int n_particle = 1;
@@ -54,26 +49,11 @@ void g4hrsPrimaryGeneratorAction::SetGenerator(G4String genname) {
 
     fEventGen = NULL;
 
-    if( genname == "moller" ) {
-        fEventGen = new g4hrsGenMoller();
-    }else if( genname == "elastic" ) {
-        fEventGen = new g4hrsGenpElastic();
-    }else if( genname == "inelastic" ) {
-        fEventGen = new g4hrsGenpInelastic();
-    }else if( genname == "pion" ) {
-        fEventGen = new g4hrsGenPion();
+    if( genname == "elastic" ) {
+        fEventGen = new g4hrsGenNuclElastic();
     }else if( genname == "beam" ) {
         fEventGen = new g4hrsGenBeam();
     }else if( genname == "flat" ) {
-        fEventGen = new g4hrsGenFlat();
-    }else if( genname == "inelasticAl" ) {
-        fEventGen = new g4hrsGenAl(2);
-    }else if( genname == "quasielasticAl" ) {
-        fEventGen = new g4hrsGenAl(1);
-    }else if( genname == "elasticAl" ) {
-        fEventGen = new g4hrsGenAl(0);
-    }else if( genname == "pion_LUND" ) { //Dominic Lunde - adding GenLUND into the generators
-        fEventGen = new g4hrsGenLUND();  
     }
 
     if( !fEventGen ) {

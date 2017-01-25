@@ -12,8 +12,8 @@
 #define g4hrsEMFieldSetup_H 1
 
 #include "BField_Quad.hh"
-#include "BField_Dipole_Fringe.hh"
 #include "BField_Dipole.hh"
+#include "BField_Dipole_Fringe.hh"
 
 class G4FieldManager;
 class G4ChordFinder;
@@ -85,7 +85,6 @@ public:
 	G4FieldManager* GetFieldManagerFZBR4(){return fLocalFieldManagerFZBR4;}
 
 private:
-  g4hrsEMFieldSetupMessenger*   messenger;
   g4hrsEMField*                 fEMfield; 
   G4FieldManager*             fFieldManager;
   G4ChordFinder*              fChordFinder ;
@@ -104,13 +103,10 @@ private:
   G4int                       fStepperType ;
   G4double                    fMinStep ;
   
-  G4int                       mSnakeModel;
-  G4double                    mLHRSMomentum;
-  G4double                    mRHRSMomentum;
-  G4double                    mLHRSAngle;
-  G4double                    mRHRSAngle;
-  G4double                    mLSeptumAngle;
-  G4double                    mRSeptumAngle;
+  G4int                       fSnakeModel;
+  G4double                    fHRSMomentum;
+  G4double                    fHRSAngle;
+  G4double                    fSeptumAngle;
 
   //for local field at FZB1 and FZB2
   BField_Quad*                fMagFieldFZBL1 ;

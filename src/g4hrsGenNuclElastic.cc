@@ -1,4 +1,4 @@
-#include "g4hrsGenpElastic.hh"
+#include "g4hrsGenNuclElastic.hh"
 
 #include "CLHEP/Random/RandFlat.h"
 
@@ -19,7 +19,7 @@
 #define Euler 0.5772157
 #define NINTERVAL 3
 
-g4hrsGenpElastic::g4hrsGenpElastic(){
+g4hrsGenNuclElastic::g4hrsGenNuclElastic(){
     fTh_min =     1.0*deg;
     fTh_max =     10.0*deg;
 
@@ -30,10 +30,10 @@ g4hrsGenpElastic::g4hrsGenpElastic(){
     fBeamTarg = g4hrsBeamTarget::GetBeamTarget();
 }
 
-g4hrsGenpElastic::~g4hrsGenpElastic(){
+g4hrsGenNuclElastic::~g4hrsGenNuclElastic(){
 }
 
-void g4hrsGenpElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
+void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
     // Generate ep event
     
     //  Crazy weighting for brem because ep cross section blows up at low Q2
@@ -302,7 +302,7 @@ void g4hrsGenpElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
 
 }
 
-G4double g4hrsGenpElastic::RadProfile(G4double eloss, G4double btt){
+G4double g4hrsGenNuclElastic::RadProfile(G4double eloss, G4double btt){
      double Ekin = fBeamTarg->fBeamE - electron_mass_c2;
      double retval = 1./eloss*(1.-eloss/Ekin+0.75*pow(eloss/Ekin,2))*pow(eloss/Ekin,btt);
 
@@ -317,7 +317,7 @@ G4double g4hrsGenpElastic::RadProfile(G4double eloss, G4double btt){
      return retval;
 }
 
-G4double g4hrsGenpElastic::EnergNumInt(G4double btt, G4double a0, G4double b0){
+G4double g4hrsGenNuclElastic::EnergNumInt(G4double btt, G4double a0, G4double b0){
     const int nbin = 1000;
     double sum = 0.0;
     double bremcut = fBeamTarg->fEcut;

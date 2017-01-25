@@ -13,10 +13,10 @@
 
 class G4ParticleDefinition;
 
-class remollEvent {
+class g4hrsEvent {
     public:
-	 remollEvent();
-	~remollEvent();
+	 g4hrsEvent();
+	~g4hrsEvent();
 
 	void ProduceNewParticle( G4ThreeVector, G4ThreeVector, G4String );
 	void SetEffCrossSection( G4double xs ){ fEffXs = xs; }

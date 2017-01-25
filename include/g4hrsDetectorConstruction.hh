@@ -92,6 +92,10 @@ class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
 
       g4hrsEMFieldSetup *fEMFieldSetup;
 
+      double fFieldX;
+      double fFieldY;
+      double fFieldZ;
+
 };
 
 #endif//__MOLLERDETECTORCONSTRUCTION_HH

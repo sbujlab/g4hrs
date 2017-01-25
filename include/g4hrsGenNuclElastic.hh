@@ -9,22 +9,22 @@
  * Based heavily on previous work from mollersim
 */
 
-#include "remollVEventGen.hh"
+#include "g4hrsVEventGen.hh"
 
-class remollBeamTarget;
+class g4hrsBeamTarget;
 
-class remollGenpElastic : public remollVEventGen {
+class g4hrsGenNuclElastic : public g4hrsVEventGen {
     public:
-	remollGenpElastic();
-	~remollGenpElastic();
+	g4hrsGenNuclElastic();
+	~g4hrsGenNuclElastic();
 
     private:
-	void SamplePhysics(remollVertex *, remollEvent *);
+	void SamplePhysics(g4hrsVertex *, g4hrsEvent *);
 
 	G4double RadProfile(G4double,G4double);
 	G4double EnergNumInt(G4double,G4double,G4double);
 
-	remollBeamTarget *fBeamTarg;
+	g4hrsBeamTarget *fBeamTarg;
 };
 
 #endif//__REMOLLGENPELASTIC_HH 

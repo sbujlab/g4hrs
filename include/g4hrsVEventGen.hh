@@ -1,36 +1,36 @@
 #ifndef __REMOLLVEVENTGEN_HH
 #define __REMOLLVEVENTGEN_HH
 
-#include "remolltypes.hh"
-#include "remollglobs.hh"
+#include "g4hrstypes.hh"
+#include "g4hrsglobs.hh"
 #include "G4String.hh"
 #include "G4ThreeVector.hh"
-#include "remollVertex.hh"
+#include "g4hrsVertex.hh"
 
 /*!
    Generic base class for event generators
    This provides an interface for everyone to
    derive from.
 
-   Ultimately this returns a remollEvent which is
+   Ultimately this returns a g4hrsEvent which is
    what the PrimaryGeneratorAction is going to use and
    contains information that will go in the output.
 
-   It needs to be aware of remollBeamTarget and remollRunData,
+   It needs to be aware of g4hrsBeamTarget and g4hrsRunData,
    take a generically generated event assuming ideal beam
    and transform it into what is going to be simulated.
 */
 
-class remollEvent;
-class remollBeamTarget;
-class remollRunData;
+class g4hrsEvent;
+class g4hrsBeamTarget;
+class g4hrsRunData;
 
-class remollVEventGen {
+class g4hrsVEventGen {
     public:
-	remollVEventGen();
-	virtual ~remollVEventGen();
+	g4hrsVEventGen();
+	virtual ~g4hrsVEventGen();
 
-	remollEvent *GenerateEvent();
+	g4hrsEvent *GenerateEvent();
 
 	G4String GetName(){ return fName; }
 
@@ -54,13 +54,13 @@ class remollVEventGen {
     private:
 	const G4String fName;
 
-	remollBeamTarget *fBeamTarg;
-	remollRunData    *fRunData;
+	g4hrsBeamTarget *fBeamTarg;
+	g4hrsRunData    *fRunData;
 
-	void PolishEvent(remollEvent *);
+	void PolishEvent(g4hrsEvent *);
 	
 	// Pure virtual function that needs to be filled out
-	virtual void SamplePhysics(remollVertex *, remollEvent *) = 0;
+	virtual void SamplePhysics(g4hrsVertex *, g4hrsEvent *) = 0;
 
     protected:
 

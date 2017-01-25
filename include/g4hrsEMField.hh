@@ -9,7 +9,7 @@
 
 #include "G4ThreeVector.hh"
 #include "G4ElectroMagneticField.hh"
-#include "fields/BField_Septum.hh" //Septum Field class
+#include "BField_Septum.hh" //Septum Field class
 
 class g4hrsEMField : public G4ElectroMagneticField
 {
@@ -29,7 +29,6 @@ public:
 	inline G4ThreeVector GetBField3V() const { return BField3V; }
 
 private:
-	g4hrsEMFieldMessenger* messenger;
 
 	bool bUseUniformBField;
 

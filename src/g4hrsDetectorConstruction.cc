@@ -96,6 +96,10 @@ g4hrsDetectorConstruction::g4hrsDetectorConstruction() {
     fSetupCREXGeometry = true;
 
     fEMFieldSetup = NULL;
+
+    fFieldX = 45000*mm;
+    fFieldY = 45000*mm;
+    fFieldZ = 45000*mm;
 }
 
 g4hrsDetectorConstruction::~g4hrsDetectorConstruction() {
@@ -1264,6 +1268,9 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 	G4LogicalVolume* RDipoleLogical = new G4LogicalVolume(DipoleSolid,
 		mMaterialManager->siliconsteel,"RDipoleLogical",0,0,0);
 
+        G4VisAttributes *OrangeVisAtt = new G4VisAttributes(G4Colour(1.0,0.5,0.0));//orange
+
+
 	LDipoleLogical->SetVisAttributes(OrangeVisAtt); 
 	RDipoleLogical->SetVisAttributes(OrangeVisAtt); 	
 
@@ -1604,6 +1611,9 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 		mMaterialManager->vacuum,"LDipoleTunnelLogical",0,0,0);
 	G4LogicalVolume* RDipoleTunnelLogical = new G4LogicalVolume(DipoleTunnelCone5,
 		mMaterialManager->vacuum,"RDipoleTunnelLogical",0,0,0);
+
+        G4VisAttributes *YellowVisAtt = new G4VisAttributes(G4Colour(1.0,1.0,0.0));      //yellow, color for Ultem
+
 	LDipoleTunnelLogical->SetVisAttributes(YellowVisAtt); 
 	RDipoleTunnelLogical->SetVisAttributes(YellowVisAtt); 
 	LDipoleFringe1Logical->SetVisAttributes(YellowVisAtt);
@@ -1785,7 +1795,7 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 	G4VSolid* Quartz1 = new G4Box("Quartz1", X_Q1 / 2.0, Y_Q1 / 2.0, Z_Q1 / 2.0);
 	G4VSolid* Quartz2 = new G4Box("Quartz2", X_Q2 / 2.0, Y_Q2 / 2.0, Z_Q2 / 2.0);
 
-	G4VSolid* magneticSolid = new G4Box("magneticBox",mFieldX/2.0,mFieldY/2.0,mFieldZ/2.0);
+	G4VSolid* magneticSolid = new G4Box("magneticBox",fFieldX/2.0,fFieldY/2.0,fFieldZ/2.0);
 
 	G4LogicalVolume* LFPLogical = new G4LogicalVolume(FPSolid,
 		mMaterialManager->vacuum,"LFPLogical",0,0,0);
@@ -1956,7 +1966,7 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 	//#endif
 	//////////////////////////////////////////////////////////
 
-	return theHRSPhys;
+	return;
 
 }
 

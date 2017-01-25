@@ -41,7 +41,7 @@ g4hrsMaterial::g4hrsMaterial()
 	mNH3WeightRatio=0.8732;
 
 	ConstructMaterials();
-	fg4hrsMaterialManager=this;
+	fHRSMaterialManager=this;
 	//std::cout<<"g4hrsMaterial() construction done!"<<std::endl;
 }
 

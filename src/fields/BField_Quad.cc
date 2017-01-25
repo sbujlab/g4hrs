@@ -3,12 +3,9 @@
 #include "BField_Septum.hh"
 #include "G4RotationMatrix.hh"
 //#include "QuadFringe.hh"
-#include "UsageManager.hh"
 //#define DEBUG_BFIELD_QUAD 0
 
 static G4RotationMatrix IdentityMatrix; 
-
-extern UsageManager* gConfig;
 
 /////////////////////////////////////////////////////////////////////////
 
@@ -23,17 +20,10 @@ BField_Quad::BField_Quad(G4double pGradient, G4ThreeVector
    fLength      = pLength;
    fRadius      = pRadius;
    fQuadNumber  = pQuadNumber;
-   gConfig->GetArgument("SnakeModel",fSnakeModel);
+   fSnakeModel = 49;
 
-   string pTargetFieldIni=gConfig->GetArgument("TargetFieldIni");
-   string pTargetFieldMap=gConfig->GetArgument("TargetFieldMap");
-   gConfig->GetArgument("LHRSMomentum",pLHRSMomentum);
-   gConfig->GetArgument("RHRSMomentum",pRHRSMomentum);
-   string pSeptumFieldIni=gConfig->GetArgument("SeptumFieldIni");
-   string pSeptumFieldMap=gConfig->GetArgument("SeptumFieldMap");
-   mBField_Septum = new BField_Septum(pLHRSMomentum,pRHRSMomentum,
-				      pSeptumFieldIni.c_str(),pSeptumFieldMap.c_str());
-
+   //FIXME
+   fHRSMomentum = 1.068*GeV;
 
 }
 

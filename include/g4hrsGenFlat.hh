@@ -8,17 +8,17 @@
  *
 */
 
-#include "remollVEventGen.hh"
+#include "g4hrsVEventGen.hh"
 
-class remollGenFlat : public remollVEventGen {
+class g4hrsGenFlat : public g4hrsVEventGen {
     public:
-	 remollGenFlat();
-	~remollGenFlat();
+	 g4hrsGenFlat();
+	~g4hrsGenFlat();
 
 	double fE_max;
 
     private:
-	void SamplePhysics(remollVertex *, remollEvent *);
+	void SamplePhysics(g4hrsVertex *, g4hrsEvent *);
 
 
 };

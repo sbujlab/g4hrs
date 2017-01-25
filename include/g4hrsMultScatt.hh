@@ -3,7 +3,7 @@
 
 /*
    -------------------------------------------------
-   remollMultScatt
+   g4hrsMultScatt
 
    Multiple scattering distribution calculation
    class.
@@ -61,17 +61,17 @@
 
 #define MAT_MAX 50
 
-class remollMultScatt {
+class g4hrsMultScatt {
 
     public:
-	remollMultScatt();
-	remollMultScatt( double p, double t, double A, double Z );
-	remollMultScatt( double p, int nmat, double t[], double A[], double Z[] );
+	g4hrsMultScatt();
+	g4hrsMultScatt( double p, double t, double A, double Z );
+	g4hrsMultScatt( double p, int nmat, double t[], double A[], double Z[] );
 
 	void   Init( double p, double t, double A, double Z );
 	void   Init( double p, int nmat, double t[], double A[], double Z[] );
 
-	virtual ~remollMultScatt() {;}
+	virtual ~g4hrsMultScatt() {;}
 
 	double J0(double x);
 	double CalcMSDistPlane( double theta);

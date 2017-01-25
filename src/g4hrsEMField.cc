@@ -7,7 +7,6 @@
 //
 //  
 #include "g4hrsEMField.hh"
-#include "UsageManager.hh"
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -19,9 +18,6 @@ g4hrsEMField::g4hrsEMField(): mBField_Septum(0)
     double pHRSMomentum = 1.068;
 
 
-	messenger = new g4hrsEMFieldMessenger(this); 
-
-	UsageManager* gConfig=UsageManager::GetUsageManager();
 
 	bool pSetupHRS= true;
 	if(pSetupHRS)
@@ -41,8 +37,7 @@ g4hrsEMField::g4hrsEMField(): mBField_Septum(0)
 //  Deconstructors:
 g4hrsEMField::~g4hrsEMField()
 {
-	delete messenger;
-	if(mBField_Septum) delete mBField_Septum;
+	if(mBField_Septum){ delete mBField_Septum; mBField_Septum = NULL;}
 }
 
 

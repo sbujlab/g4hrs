@@ -9,11 +9,11 @@
 #include "G4MagneticField.hh"
 
 /*!
-  \class remollMagneticField
+  \class g4hrsMagneticField
   \brief Individual field map manager
   */
 
-class remollMagneticField : public G4MagneticField {
+class g4hrsMagneticField : public G4MagneticField {
     /*! 
      * Moller spectrometer magnetic field class
      *
@@ -37,8 +37,8 @@ class remollMagneticField : public G4MagneticField {
      */
 
     public:
-	remollMagneticField( G4String );
-	virtual ~remollMagneticField();
+	g4hrsMagneticField( G4String );
+	virtual ~g4hrsMagneticField();
 
 	void GetFieldValue( const   G4double Point[4], G4double *Bfield ) const;  
 

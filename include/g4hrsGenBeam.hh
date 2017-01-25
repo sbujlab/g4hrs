@@ -8,19 +8,19 @@
  *
 */
 
-#include "remollVEventGen.hh"
+#include "g4hrsVEventGen.hh"
 
-class remollBeamTarget;
+class g4hrsBeamTarget;
 
-class remollGenBeam : public remollVEventGen {
+class g4hrsGenBeam : public g4hrsVEventGen {
     public:
-	remollGenBeam();
-	~remollGenBeam();
+	g4hrsGenBeam();
+	~g4hrsGenBeam();
 
     private:
-	void SamplePhysics(remollVertex *, remollEvent *);
+	void SamplePhysics(g4hrsVertex *, g4hrsEvent *);
 
-	remollBeamTarget *fBeamTarg;
+	g4hrsBeamTarget *fBeamTarg;
 
 	double fZpos;
 };

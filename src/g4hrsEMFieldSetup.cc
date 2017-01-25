@@ -7,6 +7,7 @@
 //   User Field class Setup implementation.
 //
 #include "g4hrsEMFieldSetup.hh"
+#include "g4hrsEMField.hh"
 
 #include "G4FieldManager.hh"
 #include "G4TransportationManager.hh"
@@ -18,7 +19,6 @@
 #include "G4MagIntegratorStepper.hh"
 #include "G4MagIntegratorDriver.hh"
 #include "G4ChordFinder.hh"
-#include "UsageManager.hh"
 
 #include "G4ExplicitEuler.hh"
 #include "G4ImplicitEuler.hh"
@@ -36,7 +36,6 @@
 #include <iostream>
 using namespace std;
 
-extern UsageManager* gConfig;	
 
 //////////////////////////////////////////////////////////////////////////
 g4hrsEMFieldSetup* g4hrsEMFieldSetup::fg4hrsEMFieldSetup=0;
@@ -55,19 +54,12 @@ g4hrsEMFieldSetup* g4hrsEMFieldSetup::Getg4hrsEMFieldSetup()
 g4hrsEMFieldSetup::g4hrsEMFieldSetup()
 : fChordFinder(0), fStepper(0), fIntgrDriver(0)
 {
-  gConfig->GetArgument("LHRSMomentum",mLHRSMomentum);
-  gConfig->GetArgument("RHRSMomentum",mRHRSMomentum);
-  mLHRSMomentum /= 1000.;
-  mRHRSMomentum /= 1000.;
-  gConfig->GetArgument("SnakeModel",mSnakeModel);
-  gConfig->GetParameter("LHRSAngle",mLHRSAngle);
-  mLHRSAngle*=deg;
-  gConfig->GetParameter("RHRSAngle",mRHRSAngle);
-  mRHRSAngle*=deg;
-  gConfig->GetParameter("LSeptumAngle",mLSeptumAngle);
-  gConfig->GetParameter("RSeptumAngle",mRSeptumAngle);
+  fHRSMomentum = 1*GeV;
+  fSnakeModel = 49;
+  fHRSAngle = 12.5*deg;
+  fSeptumAngle = 5.0*deg;
 
-  G4cout << "HRS angles: " << mLHRSAngle << " " << mRHRSAngle << G4endl;
+  G4cout << "HRS angles: " << fHRSAngle <<  G4endl;
 
   //G4cout << "Quad fringe?" << G4endl;
   //QuadFringe* fringe = new QuadFringe();
@@ -76,7 +68,6 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
   
   //global EM field
   fEMfield = new g4hrsEMField();
-  messenger = new g4hrsEMFieldSetupMessenger(this) ;
   fEquation = new G4EqMagElectricField(fEMfield);
   fMinStep  = 0.00001*mm ; // minimal step of 1 miron, default is 0.01 mm, Nickie finely
   fStepperType = 4 ;     // ClassicalRK4 -- the default stepper
@@ -96,9 +87,9 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
   //snakemagnumber *= 1.24;//This is my new tune, with snake d.dat problems fixed #2
   //snakemagnumber *= 0.965; #3
   
-  if( mSnakeModel == 53 || mSnakeModel == 55){
+  if( fSnakeModel == 53 || fSnakeModel == 55){
     //snakemagnumber *= 1.063 / 2.2;
-    snakemagnumber *= 1.063 / mLHRSMomentum;    
+    snakemagnumber *= 1.063*GeV / fHRSMomentum;    
   }
   
   G4int    quads_on = 1;
@@ -106,7 +97,7 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
   G4double KAPPA2 =  0.;
   G4double KAPPA3 =  0.;
   G4int sos = 1;
-  if( mSnakeModel >= 52 ){
+  if( fSnakeModel >= 52 ){
     sos = 1;
   }
 
@@ -139,7 +130,7 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
   double pQ3Length=182.68*cm;//SNAKE
   double pQ3Radius=  pQ2Radius;//SNAKE
 
-  if( quads_on == 1 && ( mSnakeModel == 49 || mSnakeModel > 50 ) ){
+  if( quads_on == 1 && ( fSnakeModel == 49 || fSnakeModel > 50 ) ){
     //sos: Pole tip field when particle momentum is 837.56 MeV/c = 0.2804 Tesla
     //G4cout << "The momentum:! " << mRHRSMomentum << G4endl;
     //mRHRSMomentum is in fact in GeV, and not in MeV.
@@ -147,11 +138,11 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
     //KAPPA1 = sos ? ( 0.2804 * tesla) * mRHRSMomentum / 0.83756 : -0.8476  * tesla / snakemagnumber;//diameter is taken into account later, in BField_Quad//This is the current one I use, usually.
     //KAPPA1 = sos ? 1.5554 * -0.8476  * tesla / snakemagnumber : -0.8476  * tesla / snakemagnumber; //test
     //KAPPA1 = sos ? 0.302875 * tesla : -0.8476  * tesla / snakemagnumber; //test2 , this one is great
-    if( ( mSnakeModel == 55 && mLSeptumAngle >= 4.9 ) || 
-	( mSnakeModel != 53 && mSnakeModel   != 54 && mSnakeModel   != 55 ) ){//prex, 5 degrees
+    if( ( fSnakeModel == 55 && fSeptumAngle >= 4.9*deg ) || 
+	( fSnakeModel != 53 && fSnakeModel   != 54 && fSnakeModel   != 55 ) ){//prex, 5 degrees
       G4cout << "IN 5 DEGREE MODE!" << G4endl;
-      G4cout << mSnakeModel << " " << mLSeptumAngle << " " << mRSeptumAngle << G4endl;
-      KAPPA1 = sos ? 0.260387 * tesla / 1.063 * mLHRSMomentum: -0.8476  * tesla / snakemagnumber; //test3
+      G4cout << fSnakeModel << " " << fSeptumAngle << G4endl;
+      KAPPA1 = sos ? 0.260387 * tesla / 1.063 * fHRSMomentum/GeV: -0.8476  * tesla / snakemagnumber; //test3
       //KAPPA1 = -0.8476  * tesla / snakemagnumber;
       //G4cout << "Ratio " << mRHRSMomentum << " " << 0.83756 << G4endl;
       //KAPPA1 *= 1.1;
@@ -166,7 +157,10 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
       KAPPA2 =  0.8680 * tesla / snakemagnumber;
       KAPPA3 =  1.1748 * tesla / snakemagnumber;
     }
-    if( mSnakeModel == 55 && mLSeptumAngle == 6. ){
+
+
+    // FIXME:  Do not do == with float! 
+    if( fSnakeModel == 55 && fSeptumAngle == 6.*deg ){
       G4cout << "Checking the new tune at 6 degrees" << G4endl;
       G4cout << KAPPA1 << " " << KAPPA2 << " " << KAPPA3 << G4endl;
       KAPPA1 = 1.16070 * tesla * pQ1Radius / 1000.;
@@ -174,28 +168,28 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
       KAPPA3 =-1.72440 * tesla * pQ3Radius / 1000.;
       G4cout << pQ1Radius << " " << pQ2Radius << " " << pQ3Radius << " " << tesla << G4endl;
       G4cout << KAPPA1 << " " << KAPPA2 << " " << KAPPA3 << G4endl;
-    }else if(mSnakeModel == 55 && mLSeptumAngle == 4.5){
+    }else if(fSnakeModel == 55 && fSeptumAngle == 4.5*deg){
       G4cout << "Checking the new tune at 4.5 degrees" << G4endl;
       G4cout << KAPPA1 << " " << KAPPA2 << " " << KAPPA3 << G4endl;
-      KAPPA1 = 1.02555 * tesla * pQ1Radius / 1000. / 2.2 * mLHRSMomentum;;
-      KAPPA2 =-1.33393 * tesla * pQ2Radius / 1000. / 2.2 * mLHRSMomentum;;
-      KAPPA3 =-1.70387 * tesla * pQ3Radius / 1000. / 2.2 * mLHRSMomentum;;
+      KAPPA1 = 1.02555 * tesla * pQ1Radius / 1000. / 2.2 * fHRSMomentum/GeV;
+      KAPPA2 =-1.33393 * tesla * pQ2Radius / 1000. / 2.2 * fHRSMomentum/GeV;;
+      KAPPA3 =-1.70387 * tesla * pQ3Radius / 1000. / 2.2 * fHRSMomentum/GeV;;
       G4cout << pQ1Radius << " " << pQ2Radius << " " << pQ3Radius << " " << tesla << G4endl;
       G4cout << KAPPA1 << " " << KAPPA2 << " " << KAPPA3 << G4endl;
-    }else if(mSnakeModel == 55 && mLSeptumAngle == 5.5){
+    }else if(fSnakeModel == 55 && fSeptumAngle == 5.5*deg){
       G4cout << "Checking the new tune at 5.5 degrees" << G4endl;
       G4cout << KAPPA1 << " " << KAPPA2 << " " << KAPPA3 << G4endl;
-      KAPPA1 = 1.10973 * tesla * pQ1Radius / 1000. / 2.2 * mLHRSMomentum;;
-      KAPPA2 =-1.35688 * tesla * pQ2Radius / 1000. / 2.2 * mLHRSMomentum;;
-      KAPPA3 =-1.71687 * tesla * pQ3Radius / 1000. / 2.2 * mLHRSMomentum;;
+      KAPPA1 = 1.10973 * tesla * pQ1Radius / 1000. / 2.2 * fHRSMomentum/GeV;
+      KAPPA2 =-1.35688 * tesla * pQ2Radius / 1000. / 2.2 * fHRSMomentum/GeV;
+      KAPPA3 =-1.71687 * tesla * pQ3Radius / 1000. / 2.2 * fHRSMomentum/GeV;
       G4cout << pQ1Radius << " " << pQ2Radius << " " << pQ3Radius << " " << tesla << G4endl;
       G4cout << KAPPA1 << " " << KAPPA2 << " " << KAPPA3 << G4endl;
-    }else if(mSnakeModel == 55 && mLSeptumAngle == 6.5){
+    }else if(fSnakeModel == 55 && fSeptumAngle == 6.5*deg){
       G4cout << "Checking the new tune at 6.5 degrees" << G4endl;
       G4cout << KAPPA1 << " " << KAPPA2 << " " << KAPPA3 << G4endl;
-      KAPPA1 = 1.20291 * tesla * pQ1Radius / 1000. / 2.2 * mLHRSMomentum;;
-      KAPPA2 =-1.38139 * tesla * pQ2Radius / 1000. / 2.2 * mLHRSMomentum;;
-      KAPPA3 =-1.73056 * tesla * pQ3Radius / 1000. / 2.2 * mLHRSMomentum;;
+      KAPPA1 = 1.20291 * tesla * pQ1Radius / 1000. / 2.2 * fHRSMomentum/GeV;
+      KAPPA2 =-1.38139 * tesla * pQ2Radius / 1000. / 2.2 * fHRSMomentum/GeV;
+      KAPPA3 =-1.73056 * tesla * pQ3Radius / 1000. / 2.2 * fHRSMomentum/GeV;
       G4cout << pQ1Radius << " " << pQ2Radius << " " << pQ3Radius << " " << tesla << G4endl;
       G4cout << KAPPA1 << " " << KAPPA2 << " " << KAPPA3 << G4endl;
 
@@ -221,38 +215,38 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
   }
   //G4double dipoleField = -0.4192 * tesla; //using dipolert2 from SNAKE, thin vb, this one is reconciled with SNAKE
   G4double dipoleField = -0.4205 * tesla; //matches nicely with DATA (not snake comparison) 
-  if( mSnakeModel == 53 || mSnakeModel == 55 ){
+  if( fSnakeModel == 53 || fSnakeModel == 55 ){
     //dipoleField *= 2.2 / 1.063;
-    dipoleField *= mLHRSMomentum / 1.063;
+    dipoleField *= fHRSMomentum /( 1.063 *GeV);
   }
 
   G4cout << "Magnets: " << KAPPA1 << " " << KAPPA2 << " " << dipoleField << " " << KAPPA3 << G4endl;
 
   G4RotationMatrix* LROTATED = new G4RotationMatrix;
   G4RotationMatrix* RROTATED = new G4RotationMatrix;
-  LROTATED->rotateY( mLHRSAngle );
-  RROTATED->rotateY( mRHRSAngle );
+  LROTATED->rotateY( fHRSAngle );
+  RROTATED->rotateY( -fHRSAngle );
   double pDipoleRCenterY=8.4  * m;
   double pDipoleRCenterZ=9.961 * m;//SNAKE
 
-  G4ThreeVector     LORIGIND(pDipoleRCenterZ * sin( mLHRSAngle ), pDipoleRCenterY, pDipoleRCenterZ * cos( mLHRSAngle ));
-  G4ThreeVector     RORIGIND(pDipoleRCenterZ * sin( mRHRSAngle ), pDipoleRCenterY, pDipoleRCenterZ * cos( mRHRSAngle ));
+  G4ThreeVector     LORIGIND(pDipoleRCenterZ * sin( fHRSAngle ), pDipoleRCenterY, pDipoleRCenterZ * cos( fHRSAngle ));
+  G4ThreeVector     RORIGIND(pDipoleRCenterZ * sin( -fHRSAngle ), pDipoleRCenterY, pDipoleRCenterZ * cos( -fHRSAngle ));
     
   
-  G4ThreeVector     LORIGINQ1(pQ1Pos_Z * sin(mLHRSAngle), 0., pQ1Pos_Z * cos(mLHRSAngle));
-  G4ThreeVector     RORIGINQ1(pQ1Pos_Z * sin(mRHRSAngle), 0., pQ1Pos_Z * cos(mRHRSAngle));
+  G4ThreeVector     LORIGINQ1(pQ1Pos_Z * sin(fHRSAngle), 0., pQ1Pos_Z * cos(fHRSAngle));
+  G4ThreeVector     RORIGINQ1(pQ1Pos_Z * sin(-fHRSAngle), 0., pQ1Pos_Z * cos(-fHRSAngle));
   G4RotationMatrix* LROTATEQ1 = new G4RotationMatrix;
   G4RotationMatrix* RROTATEQ1 = new G4RotationMatrix;
-  LROTATEQ1->rotateY( mLHRSAngle);
-  RROTATEQ1->rotateY( mRHRSAngle);
+  LROTATEQ1->rotateY( fHRSAngle);
+  RROTATEQ1->rotateY( -fHRSAngle);
   
-  G4ThreeVector     LORIGINQ2(pQ2Pos_Z * sin(mLHRSAngle), 0., pQ2Pos_Z * cos(mLHRSAngle));
-  G4ThreeVector     RORIGINQ2(pQ2Pos_Z * sin(mRHRSAngle), 0., pQ2Pos_Z * cos(mRHRSAngle));
+  G4ThreeVector     LORIGINQ2(pQ2Pos_Z * sin(fHRSAngle), 0., pQ2Pos_Z * cos(fHRSAngle));
+  G4ThreeVector     RORIGINQ2(pQ2Pos_Z * sin(-fHRSAngle), 0., pQ2Pos_Z * cos(-fHRSAngle));
   G4RotationMatrix* LROTATEQ2 = new G4RotationMatrix;
   G4RotationMatrix* RROTATEQ2 = new G4RotationMatrix;
   
-  LROTATEQ2->rotateY( mLHRSAngle);
-  RROTATEQ2->rotateY( mRHRSAngle);
+  LROTATEQ2->rotateY( fHRSAngle);
+  RROTATEQ2->rotateY( -fHRSAngle);
   
   //double pFPR       = 8.4  * m;//radius of curvature of dipole
   //double pFPA       = 9.96 * m;//distance from pivot to entrance of dipole//NIM
@@ -262,11 +256,11 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
   //double pFPCenterZ = ( pFPA + pFPH + ( pFPH + 1.5 * m + 0.9 * m ) / sqrt(2) ) * cos( mRHRSAngle ); //not including half of Q3//NIM
   //double pFPCenterY = ( pFPH + 1.5 * m + 0.9 * m ) / sqrt(2); //including half of Q3//NIM
   
-  double pLQ3CenterX = (17.0257042 * m  + pQ3Length / sqrt(2.) / 2. ) *  sin( mLHRSAngle );//SNAKE
-  double pLQ3CenterZ = (17.0257042 * m  + pQ3Length / sqrt(2.) / 2. ) *  cos( mLHRSAngle );//SNAKE
+  double pLQ3CenterX = (17.0257042 * m  + pQ3Length / sqrt(2.) / 2. ) *  sin( fHRSAngle );//SNAKE
+  double pLQ3CenterZ = (17.0257042 * m  + pQ3Length / sqrt(2.) / 2. ) *  cos( fHRSAngle );//SNAKE
   double pLQ3CenterY = ( 3.5853101 * m  + pQ3Length / sqrt(2.) / 2. );//SNAKE	
-  double pRQ3CenterX = (17.0257042 * m  + pQ3Length / sqrt(2.) / 2. ) *  sin( mRHRSAngle );//SNAKE
-  double pRQ3CenterZ = (17.0257042 * m  + pQ3Length / sqrt(2.) / 2. ) *  cos( mRHRSAngle );//SNAKE
+  double pRQ3CenterX = (17.0257042 * m  + pQ3Length / sqrt(2.) / 2. ) *  sin( -fHRSAngle );//SNAKE
+  double pRQ3CenterZ = (17.0257042 * m  + pQ3Length / sqrt(2.) / 2. ) *  cos( -fHRSAngle );//SNAKE
   double pRQ3CenterY = ( 3.5853101 * m  + pQ3Length / sqrt(2.) / 2. );//SNAKE	
   
   //cout << pQ3CenterX << " " << pFPCenterX << endl;
@@ -278,9 +272,9 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
   G4RotationMatrix* RROTATEQ3 = new G4RotationMatrix;
   
   LROTATEQ3->rotateX(-45.0 * deg);
-  LROTATEQ3->rotateY( mLHRSAngle);
+  LROTATEQ3->rotateY( fHRSAngle);
   RROTATEQ3->rotateX(-45.0 * deg);
-  RROTATEQ3->rotateY( mRHRSAngle);
+  RROTATEQ3->rotateY( -fHRSAngle);
   
   fMagFieldFZBL1 = new BField_Quad(KAPPA1, LORIGINQ1, LROTATEQ1, pQ1Length, pQ1Radius, 1);
   fEquationFZBL1 = new G4Mag_UsualEqRhs(fMagFieldFZBL1);	
@@ -348,7 +342,6 @@ g4hrsEMFieldSetup::~g4hrsEMFieldSetup()
 	if(fStepper)     delete fStepper;
 	if(fEquation)    delete fEquation;
 	if(fEMfield)     delete fEMfield;
-	if(messenger)    delete messenger;
 }
 
 /////////////////////////////////////////////////////////////////////////////

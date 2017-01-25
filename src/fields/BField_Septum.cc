@@ -5,8 +5,9 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "BField_Septum.hh"
-#include "UsageManager.hh"
 #include "G4UImanager.hh"
+
+#include "g4hrsUsageManager.hh"
 
 #include <iostream>
 #include <stdio.h>
@@ -24,9 +25,6 @@
 //#define CREATE_MAP_NTUPLE 1
 //#define BFIELD_SEPTUM_DEBUG 1
 
-#ifdef BFIELD_SEPTUM_DEBUG
-#include "GlobalDebuger.hh"
-#endif
 
 
 using namespace std;
@@ -49,8 +47,7 @@ BField_Septum* BField_Septum::GetInstance()
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-BField_Septum::BField_Septum(double pMomentumL,double pMomentumR,
-							 const char *inifile,const char *mapfile)
+BField_Septum::BField_Septum(double pMomentum, const char *inifile,const char *mapfile)
 {
 #ifdef BFIELD_SEPTUM_DEBUG
 	if(BFIELD_SEPTUM_DEBUG > Global_Debug_Level)
@@ -60,9 +57,9 @@ BField_Septum::BField_Septum(double pMomentumL,double pMomentumR,
 	fInstance=this;
 
 	this->ReadIni(inifile);
-	if(fabs(mDefaultMomentumL)<1.0E-5 || fabs(mDefaultMomentumR)<1.0E-5) 
+	if(fabs(mDefaultMomentum)<1.0E-5 ) 
 	{
-		cerr<<"\n##DefaultMomentumL is invaid ("<<mDefaultMomentumL<<", "<<mDefaultMomentumR
+		cerr<<"\n##DefaultMomentumL is invaid ("<<mDefaultMomentum
 			<<") in BField_Septum.ini. I quit... \n";
 		exit(-1);
 	}
@@ -138,8 +135,8 @@ BField_Septum::BField_Septum(double pMomentumL,double pMomentumR,
 	if(mUseUniformB!=1) this->ReadMap(mapfile);
 
 	//update the Current Ratio if necessary
-	if(fabs(pMomentumL)>1.0E-5 || fabs(pMomentumR)>1.0E-5) 
-	  SetMomentum(pMomentumL,pMomentumR);
+	if(fabs(pMomentum)>1.0E-5) 
+	  SetMomentum(pMomentum);
 	//SetMomentum(mDefaultMomentumL,mDefaultMomentumR);
 	//
 }
@@ -164,84 +161,18 @@ BField_Septum::~BField_Septum()
 }
 
 
-/////////////////////////////////////////////////////////////////////
-void   BField_Septum::SetMomentum(double pMomentumL,double pMomentumR)
-{ 
-  //G4cout << "Both momenta are being called to be reset " << pMomentumL << " " << pMomentumR << G4endl;
-	SetMomentumL(pMomentumL);
-	SetMomentumR(pMomentumR);
-}
 
-void   BField_Septum::SetMomentumL(double pMomentumL)
-{ 
-  //G4cout << "L momentum is being called to be reset " << pMomentumL << G4endl;
-	//update the Current Ratio if necessary
-	double RatioL=pMomentumL/mDefaultMomentumL;
-	if(fabs(RatioL)<0.00001) RatioL=0.0;
-	SetCurrentRatioL(RatioL);
-}
-
-void   BField_Septum::SetMomentumR(double pMomentumR)
-{ 
-  //G4cout << "R momentum is being called to be reset " << pMomentumR << G4endl;
-	//update the Current Ratio if necessary
-	double RatioR=pMomentumR/mDefaultMomentumR;
-	if(fabs(RatioR)<0.00001) RatioR=0.0;
-	SetCurrentRatioR(RatioR);
-}
-
-
-/////////////////////////////////////////////////////////////////////
-void   BField_Septum::SetCurrentRatio(double valL, double valR)
-{ 
-  //G4cout << "Both currents are being called to be reset " << valL << " " << valR << G4endl;
-	SetCurrentRatioL(valL);
-	SetCurrentRatioR(valR);
-}	
-
-void   BField_Septum::SetCurrentRatioL(double valL)
-{ 
-  //G4cout << "L current is being called to be reset " << valL << G4endl;
-	if(fabs(mCurrentRatioL-valL)>1.0E-05)
-	{
-		mCurrentRatioL=valL;
-		//cout<<"\n##BField_Septum::SetCurrentRatioL(rL): Left septum current ratio is set to "
-		//<<mCurrentRatioL<<endl;
-		
-		UsageManager *pConfig=UsageManager::GetUsageManager();
-		//all these 3 methods work
-		//char tmpStr[20];
-		//sprintf(tmpStr,"%.6f",mCurrentRatioL);
-		//std::string theStr(tmpStr);
-		//pConfig->SetParameter("Septum_CurrentRatioL",tmpStr);  
-		//pConfig->SetParameter("Septum_CurrentRatioL",theStr);
-		pConfig->SetParameter("Septum_CurrentRatioL",mCurrentRatioL);
-	}
-	
-}
-void   BField_Septum::SetCurrentRatioR(double valR)
-{ 
-  //G4cout << "R current is being called to be reset " << valR << G4endl;
-  if(fabs(mCurrentRatioR-valR)>1.0E-05)
-	{
-		mCurrentRatioR=valR;
-		//cout<<"\n##BField_Septum::SetCurrentRatioR(rR): Right septum current ratio is set to "
-		//  <<mCurrentRatioR<<endl;
-		
-		UsageManager *pConfig=UsageManager::GetUsageManager();
-		pConfig->SetParameter("Septum_CurrentRatioR",mCurrentRatioR);
-	}
-}
 
 
 /////////////////////////////////////////////////////////////////////
 bool BField_Septum::ReadIni(const char *filename)
 {
+    g4hrsUsageManager *pConfig= new g4hrsUsageManager(filename);
+
 	double deg2rad=acos(-1.0)/180.;
 	//By Jixie: I am not use this routine to read ini file any longer
 	//I prefer to use UsageManager::ReadFile
 	//
-	UsageManager *pConfig=UsageManager::GetUsageManager();
 	bool ret=pConfig->ReadFile(filename);
 
 	pConfig->GetParameter("Septum_UseUniformB",mUseUniformB);
@@ -274,10 +205,7 @@ bool BField_Septum::ReadIni(const char *filename)
 	pConfig->GetParameter("Septum_RotAngle2",	mRotAngle[1]); mRotAngle[1]*=deg2rad;
 	pConfig->GetParameter("Septum_RotAngle3",	mRotAngle[2]); mRotAngle[2]*=deg2rad;
 
-	pConfig->GetParameter("Septum_DefaultMomentumL",mDefaultMomentumL);
-	pConfig->GetParameter("Septum_CurrentRatioL",mCurrentRatioL);	
-	pConfig->GetParameter("Septum_DefaultMomentumR",mDefaultMomentumR);
-	pConfig->GetParameter("Septum_CurrentRatioR",mCurrentRatioR);	
+	pConfig->GetParameter("Septum_DefaultMomentum",mDefaultMomentum);
 
 #ifdef BFIELD_SEPTUM_DEBUG
 	pConfig->PrintParamMap(); 
@@ -344,11 +272,7 @@ bool BField_Septum::ReadIni(const char *filename)
 		else if (strcmp(name,"Septum_RotAngle2")==0)	mRotAngle[1]=atof(value)*deg2rad;
 		else if (strcmp(name,"Septum_RotAngle3")==0)	mRotAngle[2]=atof(value)*deg2rad;
 
-		else if (strcmp(name,"Septum_DefaultMomentumL")==0)	mDefaultMomentumL=atof(value);
-		else if (strcmp(name,"Septum_CurrentRatioL")==0)	mCurrentRatioL=atof(value);
-		else if (strcmp(name,"Septum_DefaultMomentumR")==0)	mDefaultMomentumR=atof(value);
-		else if (strcmp(name,"Septum_CurrentRatioR")==0)	mCurrentRatioR=atof(value);
-		else continue;
+		else if (strcmp(name,"Septum_DefaultMomentum")==0)	mDefaultMomentum=atof(value);
 	}
 	fclose(ini);
 
@@ -362,7 +286,6 @@ bool BField_Septum::ReadMap(const char *filename)
 {
 	char strLog[1024];
 	sprintf(strLog,"BField_Septum::ReadMap() is loading field map %s......\n",filename);
-	UsageManager::WriteLog(strLog);
 
 	ifstream ins;
 	int indexX=0,indexY=0,indexZ=0,col=0;
@@ -371,7 +294,6 @@ bool BField_Septum::ReadMap(const char *filename)
 	if (ins.fail())
 	{
 		sprintf(strLog,"***ERROR! Can not open field map %s...exit!***\n",filename);
-		UsageManager::WriteLog(strLog);		
 		exit(-1);
 		return false;
 	}
@@ -746,11 +668,6 @@ bool BField_Septum::GetBField(double Pos[3],double B[3]){
 
   }
   
-  if( (fabs(mCurrentRatioL)<1.0E-8 && pPos[0]>=0) || 
-      (fabs(mCurrentRatioR)<1.0E-8 && pPos[0]<0) ){
-    for (i=0;i<3;i++) B[i]=0.0;
-    return true;
-  }
   
   //the map provide fields for the whole range of x and y, but only half of z
   //field is y direction. Need to flip for -z 
@@ -781,8 +698,7 @@ bool BField_Septum::GetBField(double Pos[3],double B[3]){
   */
   for (i=0;i<3;i++) {
     //G4cout << flag[i] << G4endl;
-    if(pPos[0]>=0) B[i]=pB[i]*mCurrentRatioL*flag[i];
-    else B[i]=pB[i]*mCurrentRatioR*flag[i];
+    B[i]=pB[i]*(fMomentum/mDefaultMomentum)*flag[i];
   }
 
   //G4cout << B[0] << " " << B[1] << " " << B[2] << G4endl;

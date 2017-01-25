@@ -5,7 +5,6 @@
 #include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWithABool.hh"
 
-#include "g4hrsOpticalPhysics.hh"
 #include "g4hrsDetectorConstruction.hh"
 #include "g4hrsIO.hh"
 #include "g4hrsEventAction.hh"
@@ -15,9 +14,7 @@
 #include "g4hrsRun.hh"
 #include "g4hrsRunData.hh"
 #include "g4hrsSteppingAction.hh"
-#include "g4hrsGenPion.hh"
 #include "g4hrsGenFlat.hh"
-#include "g4hrsGenLUND.hh" //Dominic Lunde linking GenLUND
 
 #include "G4UImanager.hh"
 #include "G4RunManager.hh"
@@ -104,13 +101,6 @@ g4hrsMessenger::g4hrsMessenger(){
     fileCmd->SetGuidance("Output filename");
     fileCmd->SetParameterName("filename", false);
 
-    LUNDFileCmd = new G4UIcmdWithAString("/g4hrs/LUND_filename",this); //Dominic Lunde - creating LUND generator inputfile command "LUND_filename" 
-    LUNDFileCmd->SetGuidance("LUND Input filename");
-    LUNDFileCmd->SetParameterName("filename", false);
-
-    pionCmd = new G4UIcmdWithAString("/g4hrs/piontype", this);
-    pionCmd->SetGuidance("Generate pion type");
-    pionCmd->SetParameterName("piontype", false);
 
     thminCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/thmin",this);
     thminCmd->SetGuidance("Minimum generation angle");
@@ -313,10 +303,6 @@ g4hrsMessenger::~g4hrsMessenger(){
 
 
 void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
-    if( cmd == detfilesCmd ){
-	fdetcon->SetDetectorGeomFile( newValue );
-    }
-
     if( cmd == seedCmd ){
 	G4int seed = seedCmd->GetNewIntValue(newValue);
 	CLHEP::HepRandom::setTheSeed(seed);
@@ -328,19 +314,6 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 	fStepAct->SetEnableKryptonite(krypt);
     }
 
-    if( cmd == opticalCmd ){
-	G4bool optical = opticalCmd->GetNewBoolValue(newValue);
-	if( optical ){
-	    fPhysicsList->RegisterPhysics( new g4hrsOpticalPhysics() );
-	} else {
-	    fPhysicsList->RemovePhysics("Optical");
-	}
-    }
-
-    if( cmd == dumpGeometryCmd ){
-        G4bool overlap_check = dumpGeometryCmd->GetNewBoolValue(newValue);
-        fdetcon->DumpGeometricalTree(0,0,overlap_check);
-    }
 
     if( cmd == newfieldCmd ){
 	fField->AddNewField( newValue );
@@ -407,31 +380,6 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 	fIO->SetFilename(newValue);
     }
     
-    if( cmd == LUNDFileCmd ){//Dominic Lunde - linking LUND generator
-	g4hrsVEventGen *agen = fprigen->GetGenerator();
-	g4hrsGenLUND *aLUND = dynamic_cast<g4hrsGenLUND*>(agen);
-	if (aLUND) aLUND->SetLUNDFile(newValue);
-    }
-
-
-    if( cmd == pionCmd ){ 
-	g4hrsVEventGen *agen = fprigen->GetGenerator();
-	g4hrsGenPion *apion = dynamic_cast<g4hrsGenPion *>(agen);
-	if( apion ){
-		if( newValue.compareTo("pi-") == 0 ){
-			apion->SetPionType(g4hrsGenPion::kPiMinus);
-			
-		}
-		if( newValue.compareTo("pi+") == 0 ){
-			apion->SetPionType(g4hrsGenPion::kPiPlus);
-		}
-		if( newValue.compareTo("pi0") == 0 ){
-			apion->SetPionType(g4hrsGenPion::kPi0);
-		}
-	} else{
-		G4cerr << __FILE__ <<  "line" << __LINE__ << ": Can't set pion type for non-pion generator" << G4endl;
-	}
-    }
 
     if( cmd == EminCmd ){
 	G4double en = EminCmd->GetNewDoubleValue(newValue);
