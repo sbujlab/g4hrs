@@ -11,7 +11,6 @@
 // be stored as string in the map
 //	map<string,string> MapParam_s;
 /////////////////////////////////////////////////////////////////////////////
-#include "GlobalDebuger.hh"
 #include "g4hrsUsageManager.hh"
 
 //#define  USAGEMANAGER_DEBUG 1

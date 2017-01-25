@@ -3,7 +3,6 @@
 #include "g4hrsDetectorConstruction.hh"
 #include "g4hrsGenericDetector.hh"
 #include "g4hrsBeamTarget.hh"
-#include "g4hrsGlobalField.hh"
 #include "g4hrsRun.hh"
 #include "g4hrsRunData.hh"
 #include "g4hrsIO.hh"
@@ -49,7 +48,6 @@
 
 g4hrsDetectorConstruction::g4hrsDetectorConstruction() {
     // Default geometry file
-    CreateGlobalMagneticField();
 
     fWorldVolume = NULL;
 
@@ -1969,8 +1967,5 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 	return;
 
 }
-
-
-
 
 

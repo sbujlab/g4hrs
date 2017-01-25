@@ -15,7 +15,6 @@ class g4hrsIO;
 class g4hrsDetectorConstruction;
 class g4hrsEventAction;
 class g4hrsPrimaryGeneratorAction;
-class g4hrsGlobalField;
 class g4hrsBeamTarget;
 class g4hrsSteppingAction;
 
@@ -30,7 +29,6 @@ class g4hrsMessenger : public G4UImessenger {
        	~g4hrsMessenger();
 
 	void SetIO( g4hrsIO *io ){ fIO = io; }
-	void SetMagField( g4hrsGlobalField *f ){ fField = f; }
 	void SetPriGen( g4hrsPrimaryGeneratorAction *pg ){ fprigen = pg; }
 	void SetDetCon( g4hrsDetectorConstruction *dc ){ fdetcon= dc; }
 	void SetEvAct( g4hrsEventAction *ev ){ fevact = ev; }
@@ -44,7 +42,6 @@ class g4hrsMessenger : public G4UImessenger {
 	g4hrsDetectorConstruction *fdetcon;
 	g4hrsEventAction *fevact;
 	g4hrsPrimaryGeneratorAction *fprigen;
-	g4hrsGlobalField *fField;
 	g4hrsBeamTarget *fBeamTarg;
 	g4hrsSteppingAction *fStepAct;
 	G4VModularPhysicsList *fPhysicsList;

@@ -3,7 +3,6 @@
 
 #include "G4GDMLParser.hh"
 #include "G4VUserDetectorConstruction.hh"
-#include "g4hrsGlobalField.hh"
 #include <vector>
 
 class G4Tubs;
@@ -25,10 +24,6 @@ class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
 
     G4VPhysicalVolume* Construct();
 
-    void CreateGlobalMagneticField();
-
-    g4hrsGlobalField* GetGlobalField(){ return fGlobalField; }
-
   private:
       g4hrsIO *fIO;
     //----------------------
@@ -37,7 +32,6 @@ class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
     //
 
     G4FieldManager*         fGlobalFieldManager;
-    g4hrsGlobalField*       fGlobalField;
     G4String                fDetFileName;
 
     G4VPhysicalVolume*      fWorldVolume;

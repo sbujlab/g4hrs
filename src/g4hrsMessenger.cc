@@ -31,7 +31,6 @@ g4hrsMessenger::g4hrsMessenger(){
     fdetcon       = NULL;
     fevact        = NULL;
     fprigen       = NULL;
-    fField        = NULL;
     fBeamTarg     = NULL;
     fStepAct      = NULL;
     fPhysicsList  = NULL;
@@ -316,7 +315,7 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 
 
     if( cmd == newfieldCmd ){
-	fField->AddNewField( newValue );
+//	fField->AddNewField( newValue );
     }
 
     if( cmd == fieldScaleCmd ){
@@ -329,7 +328,7 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 	iss >> scalestr;
 
 	scaleval = atof(scalestr.data());
-	fField->SetFieldScale( scalefile, scaleval );
+//	fField->SetFieldScale( scalefile, scaleval );
     }
 
     if( cmd == fieldCurrCmd ){
@@ -349,7 +348,7 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 	}
 
 	scaleval = atof(scalestr.data());
-	fField->SetMagnetCurrent( scalefile, scaleval );
+//	fField->SetMagnetCurrent( scalefile, scaleval );
     }
 
     if( cmd == tgtLenCmd ){

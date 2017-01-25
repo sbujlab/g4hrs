@@ -99,7 +99,6 @@ int main(int argc, char** argv){
     G4VUserDetectorConstruction* detector = new g4hrsDetectorConstruction();
     runManager->SetUserInitialization(detector);
     rmmess->SetDetCon( ((g4hrsDetectorConstruction *) detector) );
-    rmmess->SetMagField( ((g4hrsDetectorConstruction *) detector)->GetGlobalField() );
 
     ((g4hrsDetectorConstruction *) detector)->SetIO(io);
 
