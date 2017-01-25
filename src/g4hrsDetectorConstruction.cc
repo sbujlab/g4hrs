@@ -110,24 +110,14 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 
 	// All G4VSensitiveDetector will be managed (deleted) by SDManager
 	//therefore no need to delete it at the end of this subroutine
-	G4VSensitiveDetector* sieveSlitSD=new g4hrsGenericDetector(SDname="sieveSlit");
-	G4VSensitiveDetector* septumWindowSD=new HRSStdSD(SDname="septumWindow");
+	G4VSensitiveDetector* sieveSlitSD=new g4hrsGenericDetector(SDname="sieveSlit", 1);
+	G4VSensitiveDetector* septumWindowSD=new g4hrsGenericDetector(SDname="septumWindow", 2);
 
 	G4SDManager* SDman = G4SDManager::GetSDMpointer();
 
+        // FIXME parameter
 	int pSeptum_UseUniformB=0;
-	gConfig->GetParameter("Septum_UseUniformB",pSeptum_UseUniformB); 
-	double pSeptumCurrentRatioL=1.0, pSeptumCurrentRatioR=1.0;  
-	gConfig->GetParameter("Septum_CurrentRatioL",pSeptumCurrentRatioL);
-	gConfig->GetParameter("Septum_CurrentRatioR",pSeptumCurrentRatioR);
-	int pUseSeptumField=(pSeptum_UseUniformB==0 && 
-		(fabs(pSeptumCurrentRatioL)>1.0E-08 || fabs(pSeptumCurrentRatioR)>1.0E-08) )?1:0;
-	//set up the septum only if there is an angle difference	
-	bool mSetupSeptumBlock=((mLHRSAngle-mLSeptumAngle)/deg>0.5)?true:false;
-	//cout << mLHRSAngle-mLSeptumAngle << " = " << mLHRSAngle << " - " << mLSeptumAngle << " divided by " << deg << endl;
-	//cout << mRHRSAngle-mRSeptumAngle << " = " << mRHRSAngle << " - " << mRSeptumAngle << " divided by " << deg << endl;
 
-	//cout << "True or false? " << mSetupSeptumBlock << endl;
 	/////////////////////////////////////////////////
 	//From Hall A NIM Paper, the standard sieve slit
 	//Each spectrometer is equipped with a set of collimators, positioned 1:109 +/- 0.005 
@@ -143,24 +133,26 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 	//and one horizontally, are 4 mm in diameter. The rest of the holes are 2 mm in diameter. 
 	//The sieve slits are positioned 75 mm further from the target than the other collimators.
 
-	//double mLHRSAngle=12.5*deg,mRHRSAngle=-12.5*deg;
-	//double mLSeptumAngle=5.69*deg,mRSeptumAngle=-5.69*deg;
+        // FIXME setable parameter
+	double mHRSAngle=12.5*deg;
+	double mSeptumAngle=5.0*deg;
+
 	G4RotationMatrix *pRotLHRS=new G4RotationMatrix();
-	pRotLHRS->rotateY(-mLHRSAngle); 
+	pRotLHRS->rotateY(mHRSAngle); 
 	G4RotationMatrix *pRotRHRS=new G4RotationMatrix();
-	pRotRHRS->rotateY(-mRHRSAngle); 
+	pRotRHRS->rotateY(-mHRSAngle); 
+
 	G4RotationMatrix *pRotLSeptum=new G4RotationMatrix();
-	pRotLSeptum->rotateY(-mLSeptumAngle); 
+	pRotLSeptum->rotateY(mSeptumAngle); 
 	G4RotationMatrix *pRotRSeptum=new G4RotationMatrix();
-	pRotRSeptum->rotateY(-mRSeptumAngle); 
+	pRotRSeptum->rotateY(-mSeptumAngle); 
 	G4RotationMatrix *pRotNone=new G4RotationMatrix();
 	pRotNone->rotateY(0); 
 
 	G4RotationMatrix *pRotX90deg=new G4RotationMatrix();
 	pRotX90deg->rotateX(-90*deg); 
 	/////////////////////////////////////////////////
-	G4VPhysicalVolume* theG2PSeptumPhys=0;
-
+        //
 	///////////////////////////////////////
 	//Sieve Slit for HRS-Angle=5.65
 	///////////////////////////////////////
@@ -199,35 +191,6 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 
 		pSieveSlitHolePosV[ii] = (ii==0)?pSieveSlitY/2.0:pSieveSlitHolePosV[ii-1];
 		pSieveSlitHolePosV[ii] -= pSieveSlitDeltaV[ii];
-	}
-
-	////////////////the following is for 12.5 degree sieve//////////////	
-	
-	if(!mSetupSeptumBlock)
-	{
-		//these 2 will be read from ini file, it is 80.0cm for 6 deg and 120 cm for 12.5 deg
-		//mPivot2LSieveFace=115.6*cm;
-		//mPivot2RSieveFace=116.39*cm;
-
-		pSieveSlitX=5.687*inch; //144.45*mm
-		pSieveSlitY=7.750*inch; //196.85*mm
-		pSieveSlitZ=0.25*inch;
-
-		pSieveSlitHoleR=1.0033*mm;           //radius of small hole 0.079/2 inch
-		pSieveSlitLargeHoleR=1.994*mm;       //radius of large hole 0.157/2 inch
-		pSieveSlitHoldL=pSieveSlitZ+0.1*mm;  //need to make it longer to avoid round off in the subtraction
-
-		double pFirstHole2Top=0.799*inch, pFirstHole2Left=1.306*inch;
-		double pHoleSpanH=0.513*inch, pHoleSpanV=1.025*inch;
-		for(int ii=0;ii<7;ii++)
-		{
-			pSieveSlitHolePosH[ii] = (ii==0)?pSieveSlitX/2.0-pFirstHole2Left:pSieveSlitHolePosH[ii-1]-pHoleSpanH;
-			pSieveSlitHolePosV[ii] = (ii==0)?pSieveSlitY/2.0-pFirstHole2Top:pSieveSlitHolePosV[ii-1]-pHoleSpanV;
-		}
-
-		//the big center hole horizontal and vertical offset, From Alan
-		pSieveSlitLargeHoleH=0.0;
-		pSieveSlitLargeHoleV=0.0;
 	}
 
 
@@ -307,166 +270,163 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 	/////////////////////////
 	//by Jixie: Allow one to setup septum without HRS
 	double col_distance = 1.38*m;//or is it 1.39?
-	if(mSetupSeptumBlock)
-	{
-		////////////////////////////////////////////////////////////////////
-		//Septum block, 140 cm width, 84.4 cm height and 74 cm in length, silicon steel
-		//Tunnel size: started from x=8.4cm, 30.4cm wide and 24.4 cm in height
-		//located at z=700 mm, no rotation
-		double pSeptumX=140.0*cm;
-		double pSeptumY=84.4*cm;
-		double pSeptumZ=74.0*cm;
-		double pSeptumTunnelX=30.4*cm;
-		double pSeptumTunnelY=24.4*cm;//-2.0*inch;  //By Jixie @20120205: Add 2 inches of iron
-		double pSeptumBeamHoleX=7.8*cm;
-		double pSeptumBeamHoleY=8.0*cm;
+        ////////////////////////////////////////////////////////////////////
+        //Septum block, 140 cm width, 84.4 cm height and 74 cm in length, silicon steel
+        //Tunnel size: started from x=8.4cm, 30.4cm wide and 24.4 cm in height
+        //located at z=700 mm, no rotation
+        double pSeptumX=140.0*cm;
+        double pSeptumY=84.4*cm;
+        double pSeptumZ=74.0*cm;
+        double pSeptumTunnelX=30.4*cm;
+        double pSeptumTunnelY=24.4*cm;//-2.0*inch;  //By Jixie @20120205: Add 2 inches of iron
+        double pSeptumBeamHoleX=7.8*cm;
+        double pSeptumBeamHoleY=8.0*cm;
 
 
 
-		double pSeptumTunnelPos_X=8.4*cm+pSeptumTunnelX/2.0;
-		double pSeptumPos_Z=70.0*cm;		
-		gConfig->GetParameter("Septum_OriginZ",pSeptumPos_Z); 
-		pSeptumPos_Z*=cm;
+        double pSeptumTunnelPos_X=8.4*cm+pSeptumTunnelX/2.0;
+        double pSeptumPos_Z=70.0*cm;		
+        gConfig->GetParameter("Septum_OriginZ",pSeptumPos_Z); 
+        pSeptumPos_Z*=cm;
 
-		G4VSolid* septumBlockSolid = new G4Box("septumBlockBox",pSeptumX/2.0,
-			pSeptumY/2.0,pSeptumZ/2.0);
+        G4VSolid* septumBlockSolid = new G4Box("septumBlockBox",pSeptumX/2.0,
+                pSeptumY/2.0,pSeptumZ/2.0);
 
-		//Left and right tunnels, treat the cu coils as part of the block
-		//By Jixie: I reduced this by 0.2cm for the Helium bag
-		G4VSolid* septumTunnelSolid = new G4Box("septumTunnelBox",pSeptumTunnelX/2.0-0.2*cm,
-			pSeptumTunnelY/2.0-0.2*cm,pSeptumZ/2.0+1.0*mm);
+        //Left and right tunnels, treat the cu coils as part of the block
+        //By Jixie: I reduced this by 0.2cm for the Helium bag
+        G4VSolid* septumTunnelSolid = new G4Box("septumTunnelBox",pSeptumTunnelX/2.0-0.2*cm,
+                pSeptumTunnelY/2.0-0.2*cm,pSeptumZ/2.0+1.0*mm);
 
-		//beam pine hole
-		G4VSolid* septumBeamHoleSolid = new G4Box("septumBeamHoleBox",pSeptumBeamHoleX/2.0,
-			pSeptumBeamHoleY/2.0,pSeptumZ/2.0+1.0*mm);
+        //beam pine hole
+        G4VSolid* septumBeamHoleSolid = new G4Box("septumBeamHoleBox",pSeptumBeamHoleX/2.0,
+                pSeptumBeamHoleY/2.0,pSeptumZ/2.0+1.0*mm);
 
-		//dig 3 holes, left, right tunnel and beam hole
-		G4SubtractionSolid* septumBlockSubLSolid=new G4SubtractionSolid("septumBlockSubL",
-			septumBlockSolid,septumTunnelSolid,0,G4ThreeVector(pSeptumTunnelPos_X,0,0));
-		G4SubtractionSolid* septumBlockSubLRSolid=new G4SubtractionSolid("septumBlockSubLR",
-			septumBlockSubLSolid,septumTunnelSolid,0,G4ThreeVector(-pSeptumTunnelPos_X,0,0));
-		G4SubtractionSolid* septumBlockSubLRCSolid=new G4SubtractionSolid("septumBlockSubLRC",
-			septumBlockSubLRSolid,septumBeamHoleSolid);
+        //dig 3 holes, left, right tunnel and beam hole
+        G4SubtractionSolid* septumBlockSubLSolid=new G4SubtractionSolid("septumBlockSubL",
+                septumBlockSolid,septumTunnelSolid,0,G4ThreeVector(pSeptumTunnelPos_X,0,0));
+        G4SubtractionSolid* septumBlockSubLRSolid=new G4SubtractionSolid("septumBlockSubLR",
+                septumBlockSubLSolid,septumTunnelSolid,0,G4ThreeVector(-pSeptumTunnelPos_X,0,0));
+        G4SubtractionSolid* septumBlockSubLRCSolid=new G4SubtractionSolid("septumBlockSubLRC",
+                septumBlockSubLRSolid,septumBeamHoleSolid);
 
-		G4LogicalVolume* septumLogical = new G4LogicalVolume(septumBlockSubLRCSolid,
-			mMaterialManager->siliconsteel,"septumLogical",0,0,0);
-		septumLogical->SetVisAttributes(IronVisAtt);
-
-
-		G4int placeseptum = 1;
-		//put it in the hall, no rotation
-		if( placeseptum ){
-		  new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPos_Z),
-				    septumLogical,"septumPhys",motherLogical,0,0,0);
-		}
-
-		double pSeptumCoilRadius = 22.06*cm;
-		double pSeptumCoilCenterX = 2.83*cm;
-		double pSeptumCoilCenterY = -10.25*cm;
-		double pSeptumCoilThickness = 4.5*cm;
-		G4VSolid* septumCoilCylinderSolid = new G4Tubs("septumCoilCylinderTub",
-			0,pSeptumCoilRadius,pSeptumCoilThickness/2.0,0,360*deg);
-	  //8
-		double septumCoilRecX = 25.0*cm;
-		double septumCoilRecY = 15.0*cm;
-		G4VSolid* septumCoilRecSolid = new G4Box("septumCoilRecBox",
-			septumCoilRecX/2.0,septumCoilRecY/2.0,pSeptumCoilThickness/2.0);
-
-		G4IntersectionSolid* septumCoilSolid = new G4IntersectionSolid("septumCoilSolid",
-			septumCoilCylinderSolid,septumCoilRecSolid,0,
-			G4ThreeVector(-pSeptumCoilCenterX-septumCoilRecX/2.0,-pSeptumCoilCenterY+septumCoilRecY/2.0,0));
-
-		G4LogicalVolume* septumCoilLogical = new G4LogicalVolume(septumCoilSolid,
-			mMaterialManager->copper,"septumCoilLogical",0,0,0);
-		septumCoilLogical->SetVisAttributes(CuBrownVisAtt);
-
-		//place 16 copies into the septum container
-		double pSeptumCoilPos_X_in   = pSeptumTunnelPos_X-pSeptumTunnelX/2.0-pSeptumCoilThickness/2.0;
-		double pSeptumCoilPos_X_out  = pSeptumTunnelPos_X+pSeptumTunnelX/2.0+pSeptumCoilThickness/2.0;
-		double pSeptumCoilPos_Y      = pSeptumCoilCenterY-pSeptumTunnelY/2.0;
-		double pSeptumCoilPos_Z_up   = pSeptumPos_Z-pSeptumZ/2.0+pSeptumCoilCenterX;
-		double pSeptumCoilPos_Z_down = pSeptumPos_Z+pSeptumZ/2.0-pSeptumCoilCenterX;
+        G4LogicalVolume* septumLogical = new G4LogicalVolume(septumBlockSubLRCSolid,
+                mMaterialManager->siliconsteel,"septumLogical",0,0,0);
+        septumLogical->SetVisAttributes(IronVisAtt);
 
 
-		//place up stream coils in the following order (looking downstream)
-		//#####2######1###7######6#####
-		//######      |###|      |#####
-		//######      |###|      |#####
-		//#####3######0###4######5#####
-		G4RotationMatrix* pSeptumCoilRotFrontDown = new G4RotationMatrix();
-		pSeptumCoilRotFrontDown->rotateY(90*deg);
-		G4RotationMatrix* pSeptumCoilRotFrontUp = new G4RotationMatrix();
-		pSeptumCoilRotFrontUp->rotateY(90*deg);
-		pSeptumCoilRotFrontUp->rotateX(180*deg);
+        G4int placeseptum = 1;
+        //put it in the hall, no rotation
+        if( placeseptum ){
+          new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPos_Z),
+                            septumLogical,"septumPhys",motherLogical,0,0,0);
+        }
 
-		if( placeseptum ){
-		new G4PVPlacement(pSeptumCoilRotFrontDown,
-			G4ThreeVector(pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
-			septumCoilLogical,"septumCoilPhys",motherLogical,true,0,0);
-		new G4PVPlacement(pSeptumCoilRotFrontUp,
-			G4ThreeVector(pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
-			septumCoilLogical,"septumCoilPhys",motherLogical,true,1,0);
-		new G4PVPlacement(pSeptumCoilRotFrontUp,
-			G4ThreeVector(pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
-			septumCoilLogical,"septumCoilPhys",motherLogical,true,2,0);
-		new G4PVPlacement(pSeptumCoilRotFrontDown,
-			G4ThreeVector(pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
-			septumCoilLogical,"septumCoilPhys",motherLogical,true,3,0);
+        double pSeptumCoilRadius = 22.06*cm;
+        double pSeptumCoilCenterX = 2.83*cm;
+        double pSeptumCoilCenterY = -10.25*cm;
+        double pSeptumCoilThickness = 4.5*cm;
+        G4VSolid* septumCoilCylinderSolid = new G4Tubs("septumCoilCylinderTub",
+                0,pSeptumCoilRadius,pSeptumCoilThickness/2.0,0,360*deg);
+  //8
+        double septumCoilRecX = 25.0*cm;
+        double septumCoilRecY = 15.0*cm;
+        G4VSolid* septumCoilRecSolid = new G4Box("septumCoilRecBox",
+                septumCoilRecX/2.0,septumCoilRecY/2.0,pSeptumCoilThickness/2.0);
 
-		new G4PVPlacement(pSeptumCoilRotFrontDown,
-			G4ThreeVector(-pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
-			septumCoilLogical,"septumCoilPhys",motherLogical,true,4,0);
-		new G4PVPlacement(pSeptumCoilRotFrontUp,
-			G4ThreeVector(-pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
-			septumCoilLogical,"septumCoilPhys",motherLogical,true,5,0);
-		new G4PVPlacement(pSeptumCoilRotFrontUp,
-			G4ThreeVector(-pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
-			septumCoilLogical,"septumCoilPhys",motherLogical,true,6,0);
-		new G4PVPlacement(pSeptumCoilRotFrontDown,
-			G4ThreeVector(-pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
-			septumCoilLogical,"septumCoilPhys",motherLogical,true,7,0);
-		}
+        G4IntersectionSolid* septumCoilSolid = new G4IntersectionSolid("septumCoilSolid",
+                septumCoilCylinderSolid,septumCoilRecSolid,0,
+                G4ThreeVector(-pSeptumCoilCenterX-septumCoilRecX/2.0,-pSeptumCoilCenterY+septumCoilRecY/2.0,0));
 
-		//place down stream coils in the following order (looking downstream)
-		//####10######9###15#####14####
-		//######      |###|      |#####
-		//######      |###|      |#####
-		//####11######8###12#####13####
-		G4RotationMatrix* pSeptumCoilRotBackDown = new G4RotationMatrix();
-		pSeptumCoilRotBackDown->rotateY(270*deg);
-		G4RotationMatrix* pSeptumCoilRotBackUp = new G4RotationMatrix();
-		pSeptumCoilRotBackUp->rotateY(270*deg);
-		pSeptumCoilRotBackUp->rotateX(180*deg);
+        G4LogicalVolume* septumCoilLogical = new G4LogicalVolume(septumCoilSolid,
+                mMaterialManager->copper,"septumCoilLogical",0,0,0);
+        septumCoilLogical->SetVisAttributes(CuBrownVisAtt);
 
-		if( placeseptum ){
-		new G4PVPlacement(pSeptumCoilRotBackDown,
-			G4ThreeVector(pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
-			septumCoilLogical,"septumCoilPhys",motherLogical,true,8,0);
-		new G4PVPlacement(pSeptumCoilRotBackUp,
-			G4ThreeVector(pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
-			septumCoilLogical,"septumCoilPhys",motherLogical,true,9,0);
-		new G4PVPlacement(pSeptumCoilRotBackUp,
-			G4ThreeVector(pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
-			septumCoilLogical,"septumCoilPhys",motherLogical,true,10,0);
-		new G4PVPlacement(pSeptumCoilRotBackDown,
-			G4ThreeVector(pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
-			septumCoilLogical,"septumCoilPhys",motherLogical,true,11,0);
+        //place 16 copies into the septum container
+        double pSeptumCoilPos_X_in   = pSeptumTunnelPos_X-pSeptumTunnelX/2.0-pSeptumCoilThickness/2.0;
+        double pSeptumCoilPos_X_out  = pSeptumTunnelPos_X+pSeptumTunnelX/2.0+pSeptumCoilThickness/2.0;
+        double pSeptumCoilPos_Y      = pSeptumCoilCenterY-pSeptumTunnelY/2.0;
+        double pSeptumCoilPos_Z_up   = pSeptumPos_Z-pSeptumZ/2.0+pSeptumCoilCenterX;
+        double pSeptumCoilPos_Z_down = pSeptumPos_Z+pSeptumZ/2.0-pSeptumCoilCenterX;
 
-		new G4PVPlacement(pSeptumCoilRotBackDown,
-			G4ThreeVector(-pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
-			septumCoilLogical,"septumCoilPhys",motherLogical,true,12,0);
-		new G4PVPlacement(pSeptumCoilRotBackUp,
-			G4ThreeVector(-pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
-			septumCoilLogical,"septumCoilPhys",motherLogical,true,13,0);
-		new G4PVPlacement(pSeptumCoilRotBackUp,
-			G4ThreeVector(-pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
-			septumCoilLogical,"septumCoilPhys",motherLogical,true,14,0);
-		new G4PVPlacement(pSeptumCoilRotBackDown,
-			G4ThreeVector(-pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
-			septumCoilLogical,"septumCoilPhys",motherLogical,true,15,0);
-		}
-	}
-	
+
+        //place up stream coils in the following order (looking downstream)
+        //#####2######1###7######6#####
+        //######      |###|      |#####
+        //######      |###|      |#####
+        //#####3######0###4######5#####
+        G4RotationMatrix* pSeptumCoilRotFrontDown = new G4RotationMatrix();
+        pSeptumCoilRotFrontDown->rotateY(90*deg);
+        G4RotationMatrix* pSeptumCoilRotFrontUp = new G4RotationMatrix();
+        pSeptumCoilRotFrontUp->rotateY(90*deg);
+        pSeptumCoilRotFrontUp->rotateX(180*deg);
+
+        if( placeseptum ){
+        new G4PVPlacement(pSeptumCoilRotFrontDown,
+                G4ThreeVector(pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
+                septumCoilLogical,"septumCoilPhys",motherLogical,true,0,0);
+        new G4PVPlacement(pSeptumCoilRotFrontUp,
+                G4ThreeVector(pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
+                septumCoilLogical,"septumCoilPhys",motherLogical,true,1,0);
+        new G4PVPlacement(pSeptumCoilRotFrontUp,
+                G4ThreeVector(pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
+                septumCoilLogical,"septumCoilPhys",motherLogical,true,2,0);
+        new G4PVPlacement(pSeptumCoilRotFrontDown,
+                G4ThreeVector(pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
+                septumCoilLogical,"septumCoilPhys",motherLogical,true,3,0);
+
+        new G4PVPlacement(pSeptumCoilRotFrontDown,
+                G4ThreeVector(-pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
+                septumCoilLogical,"septumCoilPhys",motherLogical,true,4,0);
+        new G4PVPlacement(pSeptumCoilRotFrontUp,
+                G4ThreeVector(-pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
+                septumCoilLogical,"septumCoilPhys",motherLogical,true,5,0);
+        new G4PVPlacement(pSeptumCoilRotFrontUp,
+                G4ThreeVector(-pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
+                septumCoilLogical,"septumCoilPhys",motherLogical,true,6,0);
+        new G4PVPlacement(pSeptumCoilRotFrontDown,
+                G4ThreeVector(-pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
+                septumCoilLogical,"septumCoilPhys",motherLogical,true,7,0);
+        }
+
+        //place down stream coils in the following order (looking downstream)
+        //####10######9###15#####14####
+        //######      |###|      |#####
+        //######      |###|      |#####
+        //####11######8###12#####13####
+        G4RotationMatrix* pSeptumCoilRotBackDown = new G4RotationMatrix();
+        pSeptumCoilRotBackDown->rotateY(270*deg);
+        G4RotationMatrix* pSeptumCoilRotBackUp = new G4RotationMatrix();
+        pSeptumCoilRotBackUp->rotateY(270*deg);
+        pSeptumCoilRotBackUp->rotateX(180*deg);
+
+        if( placeseptum ){
+        new G4PVPlacement(pSeptumCoilRotBackDown,
+                G4ThreeVector(pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
+                septumCoilLogical,"septumCoilPhys",motherLogical,true,8,0);
+        new G4PVPlacement(pSeptumCoilRotBackUp,
+                G4ThreeVector(pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
+                septumCoilLogical,"septumCoilPhys",motherLogical,true,9,0);
+        new G4PVPlacement(pSeptumCoilRotBackUp,
+                G4ThreeVector(pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
+                septumCoilLogical,"septumCoilPhys",motherLogical,true,10,0);
+        new G4PVPlacement(pSeptumCoilRotBackDown,
+                G4ThreeVector(pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
+                septumCoilLogical,"septumCoilPhys",motherLogical,true,11,0);
+
+        new G4PVPlacement(pSeptumCoilRotBackDown,
+                G4ThreeVector(-pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
+                septumCoilLogical,"septumCoilPhys",motherLogical,true,12,0);
+        new G4PVPlacement(pSeptumCoilRotBackUp,
+                G4ThreeVector(-pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
+                septumCoilLogical,"septumCoilPhys",motherLogical,true,13,0);
+        new G4PVPlacement(pSeptumCoilRotBackUp,
+                G4ThreeVector(-pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
+                septumCoilLogical,"septumCoilPhys",motherLogical,true,14,0);
+        new G4PVPlacement(pSeptumCoilRotBackDown,
+                G4ThreeVector(-pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
+                septumCoilLogical,"septumCoilPhys",motherLogical,true,15,0);
+        }
+    
 	/////////////////////////
 	// HRS Virtual Boundary, 
 	/////////////////////////
@@ -475,87 +435,19 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 	//otherwise will place the VB at the position given by the Detector.ini
 	//For 12.5 degrees, always place VB 1.40m away from the hall center
 
+        // FIXME
 	int pUseSeptumPlusStdHRS=0;
-	gConfig->GetArgument("UseSeptumPlusStdHRS",pUseSeptumPlusStdHRS);
-	//bool nickietest = false;
-	int    mSnakeModel;
-	gConfig->GetArgument("SnakeModel",mSnakeModel);
-	if( mSnakeModel == 49494949){
-	  //do nothing
-	}else if( ( (pUseSeptumField && pUseSeptumPlusStdHRS) || !mSetupSeptumBlock ) )//&& ( nickietest ) ) 
-	{
-	  cout << "THIS IS NICKIE'S TEST: " << pUseSeptumField << " " << pUseSeptumPlusStdHRS << " " << mSetupSeptumBlock << endl;
-	  //bool nickietest = ((pUseSeptumField && pUseSeptumPlusStdHRS) || !mSetupSeptumBlock);
-	  //cout << nickietest << endl;
-		//this part is trying to place a virtual boundary 1 cm in front of the HRSContainer
-		//It is for the case that we use the septum field to propogate electrons to Q1 entrance 
-		//and then use the STD HRS transportation other than use 5.69 degrees HRS transportation
+	int    mSnakeModel = 49;
 
-		//Place both left and right VB for HRS, which is pHRSContainerRin-6.0*cm away from the 
-		//hall center(1.40m). This aperture is a round disk of 30 cm diameter
-		//The real Q1 vacumn entrance to hall center is 1.312m, 
-	  //G4VSolid* HRSVBSolid = new G4Tubs("HRSVBTub",0.0,15*cm,
-	  G4VSolid* HRSVBSolid = new G4Tubs("HRSVBTub",0.0,20*cm,//I am enlarging the size of the disk (Nickie)
-			mHRSVBThick/2.0,0.0,360.0*deg);
-		G4LogicalVolume* HRSVBLogical = new G4LogicalVolume(HRSVBSolid,
-			mMaterialManager->mylar,"HRSVBLogical",0,0,0);
-		SDman->AddNewDetector(septumWindowSD);
-		HRSVBLogical->SetSensitiveDetector(septumWindowSD);
-		HRSVBLogical->SetVisAttributes(LightYellowVisAtt); 
+        //
+        
+        //#SetupHRS have the following candidates: 
+        //# 0: do nothing; 1: will build septum, sieve and VB; 
+        //# 2: add Q1; 3: add Q2 ; 4: add Dipole and Q3  
+	int    mSetupLHRS = 4;
+	int    mSetupRHRS = 4;
 
-
-
-		G4VSolid* TargetSolid = new G4Tubs("TargetTub",0.0,50*cm,
-			mHRSVBThick/2.0,0.0,360.0*deg);
-		G4LogicalVolume* TargetLogical = new G4LogicalVolume(TargetSolid,
-			mMaterialManager->mylar,"TargetLogical",0,0,0);
-		SDman->AddNewDetector(septumWindowSD);
-		TargetLogical->SetSensitiveDetector(septumWindowSD);
-		TargetLogical->SetVisAttributes(LightYellowVisAtt); 
-
-		//double pHallCenter2VB=1.40*m;
-
-		//double pHallCenter2VB=1.34717*m;//This was activated orginally.
-		double pHallCenter2VB=col_distance;//This is Nickie's correction: 30 cm from Q1 entrance
-		//double pHallCenter2VB=1.24717*m;
-		gConfig->SetParameter("Pivot2LHRSVBFace",pHallCenter2VB-mPivotZOffset*cos(mLHRSAngle));
-		gConfig->SetParameter("Pivot2RHRSVBFace",pHallCenter2VB-mPivotZOffset*cos(mRHRSAngle)); 
-
-		if(mSetupLHRS)
-		{
-			double pLHRSVBPos_X=(pHallCenter2VB-mHRSVBThick/2)*sin(mLHRSAngle)+mPivotXOffset;
-			double pLHRSVBPos_Y=mPivotYOffset;
-			//no need to correct for pivot since the distance is from the hall center
-			double pLHRSVBPos_Z=(pHallCenter2VB-mHRSVBThick/2.0)*cos(mLHRSAngle);
-			new G4PVPlacement(pRotLHRS,G4ThreeVector(pLHRSVBPos_X,pLHRSVBPos_Y,pLHRSVBPos_Z),
-				HRSVBLogical,"virtualBoundaryPhys_LHRS_vb",motherLogical,0,0,0);
-		}
-		if(mSetupRHRS)
-		{
-			double pRHRSVBPos_X=(pHallCenter2VB-mHRSVBThick/2)*sin(mRHRSAngle)+mPivotXOffset;
-			double pRHRSVBPos_Y=mPivotYOffset;
-			//no need to correct for pivot since the distance is from the hall center
-			double pRHRSVBPos_Z=(pHallCenter2VB-mHRSVBThick/2)*cos(mRHRSAngle); 
-			new G4PVPlacement(pRotRHRS,G4ThreeVector(pRHRSVBPos_X,pRHRSVBPos_Y,pRHRSVBPos_Z),
-				HRSVBLogical,"virtualBoundaryPhys_RHRS_vb",motherLogical,0,0,0);
-		}
-		//cout << "Snake model " << mSnakeModel << endl;
-		//cout << "Snake model " << mSnakeModel << endl;
-		//cout << "Snake model " << mSnakeModel << endl;
-		//cout << "Snake model " << mSnakeModel << endl;
-
-
-		//if(mSnakeModel==47){
-		//double pCHRSVBPos_X=mPivotXOffset;// + mHRSVBThick/2.0 * cos(mLSeptumAngle);
-		// double pCHRSVBPos_Y=mPivotYOffset;
-		  //no need to correct for pivot since thdistance is from the hall center
-		  //double pCHRSVBPos_Z=(mHRSVBThick/2.0 - 110 * cm);
-		  //double pCHRSVBPos_Z=( - 100 * cm );//DANGER IN PLACEMENT
-		  //new G4PVPlacement(pRotNone,G4ThreeVector(pCHRSVBPos_X,pCHRSVBPos_Y,pCHRSVBPos_Z),
-		  //TargetLogical,"virtualBoundaryPhys_C",motherLogical,0,0,0);
-		  //cout << "The angle of the HRS is: " << -mLHRSAngle << endl;
-		  //}
-	}else if( mSnakeModel == 49 || mSnakeModel == 48 || mSnakeModel == 51 || mSnakeModel == 53){
+        if( mSnakeModel == 49 || mSnakeModel == 48 || mSnakeModel == 51 || mSnakeModel == 53){
 
 	  /////////////////////////
 	  // HRS Q1              // Nickie is also adding the Q1 collimator here
@@ -918,8 +810,13 @@ void g4hrsDetectorConstruction::CreateTargetChamber(G4LogicalVolume *pMotherLogV
 
 void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 {
-	int mSnakeModel;
-	gConfig->GetArgument("SnakeModel",mSnakeModel);
+	int mSnakeModel = 49;
+        // FIXME
+        //#SetupHRS have the following candidates: 
+        //# 0: do nothing; 1: will build septum, sieve and VB; 
+        //# 2: add Q1; 3: add Q2 ; 4: add Dipole and Q3  
+	int    mSetupLHRS = 4;
+	int    mSetupRHRS = 4;
 
 	int IS_NIM = 0;//if it's 0, then we go by SNAKE, if it is 1, we go by NIM.
 	//As it turns out, I think we want to go by SNAKE, so that is why it is zero right now.
@@ -940,7 +837,7 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 
 	G4SDManager* SDman = G4SDManager::GetSDMpointer();
 	G4String SDname;
-	G4VSensitiveDetector* Q1WindowSD=new HRSStdSD(SDname="Q1Window");
+	G4VSensitiveDetector* Q1WindowSD=new g4hrsGenericDetector(SDname="Q1Window", 2);
 	//Build the HRS, positions were taken fron the NIM paper
 	//The Apertures are defined as:
 	//Q1 exit is a circle of radius 0.15m

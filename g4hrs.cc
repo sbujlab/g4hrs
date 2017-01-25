@@ -1,5 +1,5 @@
 /*!
-  remoll - 12 GeV Moller Simluation
+  g4hrs - PREX/CREX Optics Simluation
 
   Seamus Riordan, et al.
   riordan@jlab.org
@@ -8,16 +8,16 @@
 
 #include "CLHEP/Random/Random.h"
 
-#include "remollRunAction.hh"
-#include "remollRun.hh"
-#include "remollRunData.hh"
-#include "remollPrimaryGeneratorAction.hh"
-#include "remollEventAction.hh"
-#include "remollSteppingAction.hh"
-#include "remollDetectorConstruction.hh"
+#include "g4hrsRunAction.hh"
+#include "g4hrsRun.hh"
+#include "g4hrsRunData.hh"
+#include "g4hrsPrimaryGeneratorAction.hh"
+#include "g4hrsEventAction.hh"
+#include "g4hrsSteppingAction.hh"
+#include "g4hrsDetectorConstruction.hh"
 
-#include "remollIO.hh"
-#include "remollMessenger.hh"
+#include "g4hrsIO.hh"
+#include "g4hrsMessenger.hh"
 
 //  Standard physics list
 #include "G4Version.hh"
@@ -82,9 +82,9 @@ int main(int argc, char** argv){
     CLHEP::HepRandom::createInstance();
     CLHEP::HepRandom::setTheSeed(seed);
 
-    remollRun::GetRun()->GetData()->SetSeed(seed);
+    g4hrsRun::GetRun()->GetData()->SetSeed(seed);
 
-    remollIO *io = new remollIO();
+    g4hrsIO *io = new g4hrsIO();
 
     //-------------------------------
     // Initialization of Run manager
@@ -92,16 +92,16 @@ int main(int argc, char** argv){
     G4cout << "RunManager construction starting...." << G4endl;
     G4RunManager * runManager = new G4RunManager;
 
-    remollMessenger *rmmess = new remollMessenger();
+    g4hrsMessenger *rmmess = new g4hrsMessenger();
     rmmess->SetIO(io);
 
     // Detector geometry
-    G4VUserDetectorConstruction* detector = new remollDetectorConstruction();
+    G4VUserDetectorConstruction* detector = new g4hrsDetectorConstruction();
     runManager->SetUserInitialization(detector);
-    rmmess->SetDetCon( ((remollDetectorConstruction *) detector) );
-    rmmess->SetMagField( ((remollDetectorConstruction *) detector)->GetGlobalField() );
+    rmmess->SetDetCon( ((g4hrsDetectorConstruction *) detector) );
+    rmmess->SetMagField( ((g4hrsDetectorConstruction *) detector)->GetGlobalField() );
 
-    ((remollDetectorConstruction *) detector)->SetIO(io);
+    ((g4hrsDetectorConstruction *) detector)->SetIO(io);
 
     // Physics we want to use
     G4int verbose = 0;
@@ -119,22 +119,22 @@ int main(int argc, char** argv){
     //-------------------------------
     // UserAction classes
     //-------------------------------
-    G4UserRunAction* run_action = new remollRunAction;
-    ((remollRunAction *) run_action)->SetIO(io);
+    G4UserRunAction* run_action = new g4hrsRunAction;
+    ((g4hrsRunAction *) run_action)->SetIO(io);
     runManager->SetUserAction(run_action);
 
-    G4VUserPrimaryGeneratorAction* gen_action = new remollPrimaryGeneratorAction;
-    ((remollPrimaryGeneratorAction *) gen_action)->SetIO(io);
-    rmmess->SetPriGen((remollPrimaryGeneratorAction *)gen_action);
+    G4VUserPrimaryGeneratorAction* gen_action = new g4hrsPrimaryGeneratorAction;
+    ((g4hrsPrimaryGeneratorAction *) gen_action)->SetIO(io);
+    rmmess->SetPriGen((g4hrsPrimaryGeneratorAction *)gen_action);
     runManager->SetUserAction(gen_action);
 
-    G4UserEventAction* event_action = new remollEventAction;
-    ((remollEventAction *) event_action)->SetIO(io);
+    G4UserEventAction* event_action = new g4hrsEventAction;
+    ((g4hrsEventAction *) event_action)->SetIO(io);
 
     runManager->SetUserAction(event_action);
-    G4UserSteppingAction* stepping_action = new remollSteppingAction;
+    G4UserSteppingAction* stepping_action = new g4hrsSteppingAction;
     runManager->SetUserAction(stepping_action);
-    rmmess->SetStepAct((remollSteppingAction *) stepping_action);
+    rmmess->SetStepAct((g4hrsSteppingAction *) stepping_action);
 
     // New units
 
@@ -163,7 +163,7 @@ int main(int argc, char** argv){
 
     }
 
-    remollRunData *rundata = remollRun::GetRun()->GetData();
+    g4hrsRunData *rundata = g4hrsRun::GetRun()->GetData();
 
 #ifdef G4VIS_USE
     // Visualization, if you choose to have it!
