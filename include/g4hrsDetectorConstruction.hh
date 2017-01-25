@@ -12,6 +12,7 @@ class G4VPhysicalVolume;
 class G4VSensitiveDetector;
 
 class g4hrsIO;
+class g4hrsEMFieldSetup;
 
 class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
 {
@@ -29,6 +30,7 @@ class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
     g4hrsGlobalField* GetGlobalField(){ return fGlobalField; }
 
   private:
+      g4hrsIO *fIO;
     //----------------------
     // global magnet section
     //----------------------
@@ -41,6 +43,7 @@ class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
     G4VPhysicalVolume*      fWorldVolume;
 
   public:
+    void SetIO(g4hrsIO *io){ fIO = io; }
 
 
   private:
@@ -49,6 +52,45 @@ class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
       void CreateSeptum(G4LogicalVolume *);
       void CreateHRS(G4LogicalVolume *);
 
+      double fHRSAngle;
+      double fSeptumAngle;
+
+      double fTargetW;
+      double fTargetH;
+      double fTargetL;
+
+      double fTargetX;
+      double fTargetY;
+      double fTargetZ;
+
+      int fSeptuf_UseUniformB;
+      int fUseSeptumPlusStdHRS;
+
+      double fPivot2SieveFace;
+      double fPivotXOffset;
+      double fPivotYOffset;
+      double fPivotZOffset;
+
+      bool fSetupSieveSlit;
+      bool fSetupCREXGeometry;
+      bool fSeptum_UseUniformB;
+
+      int fUseSeptufPlusStdHRS;
+      int    fSnakeModel;
+
+      int fSetupStdScatChamber;
+
+      int    fSetupHRS;
+
+      double fScatChamberRin;
+      double fScatChamberRout;
+      double fScatChamberL;
+
+      double fScatChamberXOffset;
+      double fScatChamberYOffset;
+      double fScatChamberZOffset;
+
+      g4hrsEMFieldSetup *fEMFieldSetup;
 
 };
 

@@ -9,21 +9,21 @@
    This is implemented in the soliton model
  */
 
-#include "remollRunData.hh"
+#include "g4hrsRunData.hh"
 
-class remollRun {
+class g4hrsRun {
 
 private:
-    static remollRun *gSingleton;
-    remollRun();
+    static g4hrsRun *gSingleton;
+    g4hrsRun();
 
-    remollRunData *fRunData;
+    g4hrsRunData *fRunData;
 
 public:
-    static remollRun *GetRun();
-    ~remollRun();
+    static g4hrsRun *GetRun();
+    ~g4hrsRun();
 
-    remollRunData *GetData() {
+    g4hrsRunData *GetData() {
         return fRunData;
     }
 };

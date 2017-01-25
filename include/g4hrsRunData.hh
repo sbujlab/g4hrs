@@ -6,8 +6,8 @@
 #include <vector>
 #include <string>
 
-#include "remolltypes.hh"
-#include "remollTextFile.hh"
+#include "g4hrstypes.hh"
+#include "g4hrsTextFile.hh"
 
 /*!
  * All the information on the run
@@ -17,11 +17,11 @@
 
 class TGeoManager;
 
-class remollRunData : public TObject {
+class g4hrsRunData : public TObject {
   using TObject::Print;
     public:
-	 remollRunData();
-	~remollRunData();
+	 g4hrsRunData();
+	~g4hrsRunData();
 
 	unsigned long long int GetNthrown(){ return fNthrown; }
 	void SetNthrown(unsigned long long int n){ fNthrown = n; }
@@ -35,13 +35,13 @@ class remollRunData : public TObject {
 	void SetSeed(unsigned int seed){ fSeed = seed; }
 
 	void AddMagData(filedata_t d){fMagData.push_back(d);}
-	void SetMacroFile(const char *fn){ fMacro = remollTextFile(fn); }
+	void SetMacroFile(const char *fn){ fMacro = g4hrsTextFile(fn); }
 	void AddGDMLFile(const char *fn);
 	void ClearGDMLFiles(){ fGDMLFiles.clear(); }
 
 	void RecreateGDML(const char *adir = NULL, bool clobber = false);
 
-	remollTextFile GetGDMLFile(int i){ return fGDMLFiles[i]; }
+	g4hrsTextFile GetGDMLFile(int i){ return fGDMLFiles[i]; }
 
 	void Print();
 
@@ -55,12 +55,12 @@ class remollRunData : public TObject {
 	char fHostName[__RUNSTR_LEN];
 	char fRunPath[__RUNSTR_LEN];
 
-	remollTextFile              fMacro;
-	std::vector<remollTextFile> fGDMLFiles;
+	g4hrsTextFile              fMacro;
+	std::vector<g4hrsTextFile> fGDMLFiles;
 
 	std::vector<filedata_t> fMagData;
 
-	ClassDef(remollRunData, 1);
+	ClassDef(g4hrsRunData, 1);
 };
 
 #endif//__REMOLLRUNDATA_HH

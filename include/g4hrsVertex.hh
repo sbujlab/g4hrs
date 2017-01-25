@@ -10,10 +10,10 @@
 
 class G4Material;
 
-class remollVertex {
+class g4hrsVertex {
     public:
-	 remollVertex();
-	~remollVertex();
+	 g4hrsVertex();
+	~g4hrsVertex();
 
 	G4double    GetBeamE(){ return fBeamE; }
 	G4double    GetRadLen(){ return fRadLen; }

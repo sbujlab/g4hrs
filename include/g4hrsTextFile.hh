@@ -5,14 +5,14 @@
 
 #include "TObject.h"
 
-class remollTextFile : public TObject {
+class g4hrsTextFile : public TObject {
   using TObject::Print;
      public:       
-	 remollTextFile();
-	 remollTextFile(const remollTextFile &);
-	 const remollTextFile& operator=(const remollTextFile &);
-	 remollTextFile(const char *);
-	~remollTextFile();
+	 g4hrsTextFile();
+	 g4hrsTextFile(const g4hrsTextFile &);
+	 const g4hrsTextFile& operator=(const g4hrsTextFile &);
+	 g4hrsTextFile(const char *);
+	~g4hrsTextFile();
 
 	 void copyFileIn(const char *);
 
@@ -33,7 +33,7 @@ class remollTextFile : public TObject {
 
 	const char *GetBaseFile(const char *fp = NULL);
 
-	ClassDef(remollTextFile, 1);
+	ClassDef(g4hrsTextFile, 1);
 };
 
 #endif//__REMOLLTEXTFILE_HH

@@ -1,30 +1,30 @@
 
-#ifndef remollRunAction_h
-#define remollRunAction_h 1
+#ifndef g4hrsRunAction_h
+#define g4hrsRunAction_h 1
 
 #include "globals.hh"
 #include "G4UserRunAction.hh"
 
 class G4Timer;
 class G4Run;
-class remollIO;
+class g4hrsIO;
 
-class remollRunAction : public G4UserRunAction
+class g4hrsRunAction : public G4UserRunAction
 {
   public:
-    remollRunAction();
-    ~remollRunAction();
+    g4hrsRunAction();
+    ~g4hrsRunAction();
 
   public:
     void BeginOfRunAction(const G4Run* aRun);
     void EndOfRunAction(const G4Run* aRun);
 
-    void SetIO( remollIO *io ){ fIO = io; }
+    void SetIO( g4hrsIO *io ){ fIO = io; }
 
   private:
     G4Timer* timer;
 
-    remollIO *fIO;
+    g4hrsIO *fIO;
 };
 
 #endif

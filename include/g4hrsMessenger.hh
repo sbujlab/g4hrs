@@ -1,8 +1,8 @@
-#ifndef remollMessenger_HH
-#define remollMessenger_HH
+#ifndef g4hrsMessenger_HH
+#define g4hrsMessenger_HH
 
 #include "globals.hh"
-#include "remolltypes.hh"
+#include "g4hrstypes.hh"
 #include "G4UImessenger.hh"
 #include "G4UIcommand.hh"
 #include "G4VModularPhysicsList.hh"
@@ -11,42 +11,42 @@
  *   Global messenger class
  */
 
-class remollIO;
-class remollDetectorConstruction;
-class remollEventAction;
-class remollPrimaryGeneratorAction;
-class remollGlobalField;
-class remollBeamTarget;
-class remollSteppingAction;
+class g4hrsIO;
+class g4hrsDetectorConstruction;
+class g4hrsEventAction;
+class g4hrsPrimaryGeneratorAction;
+class g4hrsGlobalField;
+class g4hrsBeamTarget;
+class g4hrsSteppingAction;
 
 class G4UIcmdWithAnInteger;
 class G4UIcmdWithADoubleAndUnit;
 class G4UIcmdWithAString;
 class G4UIcmdWithABool;
 
-class remollMessenger : public G4UImessenger {
+class g4hrsMessenger : public G4UImessenger {
     public:
-       	remollMessenger();
-       	~remollMessenger();
+       	g4hrsMessenger();
+       	~g4hrsMessenger();
 
-	void SetIO( remollIO *io ){ fIO = io; }
-	void SetMagField( remollGlobalField *f ){ fField = f; }
-	void SetPriGen( remollPrimaryGeneratorAction *pg ){ fprigen = pg; }
-	void SetDetCon( remollDetectorConstruction *dc ){ fdetcon= dc; }
-	void SetEvAct( remollEventAction *ev ){ fevact = ev; }
-	void SetStepAct( remollSteppingAction *st ){ fStepAct = st; }
+	void SetIO( g4hrsIO *io ){ fIO = io; }
+	void SetMagField( g4hrsGlobalField *f ){ fField = f; }
+	void SetPriGen( g4hrsPrimaryGeneratorAction *pg ){ fprigen = pg; }
+	void SetDetCon( g4hrsDetectorConstruction *dc ){ fdetcon= dc; }
+	void SetEvAct( g4hrsEventAction *ev ){ fevact = ev; }
+	void SetStepAct( g4hrsSteppingAction *st ){ fStepAct = st; }
 	void SetPhysList( G4VModularPhysicsList *l ){ fPhysicsList = l; }
 
 	void SetNewValue(G4UIcommand* cmd, G4String newValue);
 
     private:
-	remollIO *fIO;
-	remollDetectorConstruction *fdetcon;
-	remollEventAction *fevact;
-	remollPrimaryGeneratorAction *fprigen;
-	remollGlobalField *fField;
-	remollBeamTarget *fBeamTarg;
-	remollSteppingAction *fStepAct;
+	g4hrsIO *fIO;
+	g4hrsDetectorConstruction *fdetcon;
+	g4hrsEventAction *fevact;
+	g4hrsPrimaryGeneratorAction *fprigen;
+	g4hrsGlobalField *fField;
+	g4hrsBeamTarget *fBeamTarg;
+	g4hrsSteppingAction *fStepAct;
 	G4VModularPhysicsList *fPhysicsList;
 
 	G4UIcmdWithAnInteger *seedCmd;
@@ -99,7 +99,7 @@ class remollMessenger : public G4UImessenger {
 
 };
 
-#endif//remollMessenger_HH
+#endif//g4hrsMessenger_HH
 
 
 

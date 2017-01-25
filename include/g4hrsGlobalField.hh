@@ -2,19 +2,19 @@
 #define __REMOLLGLOBALFIELD_HH
 
 /*!
-   \class remollGlobalField
+   \class g4hrsGlobalField
    \brief Global field interface
 */
 
 #include "G4MagneticField.hh"
 #include "G4UImanager.hh"
 
-class remollMagneticField;
+class g4hrsMagneticField;
 
-class remollGlobalField : public G4MagneticField {
+class g4hrsGlobalField : public G4MagneticField {
     public: 
-	 remollGlobalField();
-	~remollGlobalField();
+	 g4hrsGlobalField();
+	~g4hrsGlobalField();
 
 	void AddNewField( G4String file );
 	void SetFieldScale( G4String file, G4double scale  );
@@ -23,9 +23,9 @@ class remollGlobalField : public G4MagneticField {
 	void GetFieldValue( const G4double[], G4double *) const;
 
     private:
-	std::vector<remollMagneticField *> fFields;
+	std::vector<g4hrsMagneticField *> fFields;
 
-	remollMagneticField *GetFieldByName( G4String file );
+	g4hrsMagneticField *GetFieldByName( G4String file );
 
 };
 

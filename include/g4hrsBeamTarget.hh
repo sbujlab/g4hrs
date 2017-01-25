@@ -1,9 +1,9 @@
 #ifndef __REMOLLBEAMTARGET_HH
 #define __REMOLLBEAMTARGET_HH
 
-#include "remolltypes.hh"
-#include "remollglobs.hh"
-#include "remollVertex.hh"
+#include "g4hrstypes.hh"
+#include "g4hrsglobs.hh"
+#include "g4hrsVertex.hh"
 #include "G4ThreeVector.hh"
 #include <vector>
 
@@ -26,16 +26,16 @@
 
 class G4VPhysicalVolume;
 class G4Material;
-class remollMultScatt;
+class g4hrsMultScatt;
 
-class remollBeamTarget {
+class g4hrsBeamTarget {
     private: 
-	static remollBeamTarget *gSingleton;
-	remollBeamTarget();
+	static g4hrsBeamTarget *gSingleton;
+	g4hrsBeamTarget();
 
     public:
-	static remollBeamTarget *GetBeamTarget();
-	~remollBeamTarget();
+	static g4hrsBeamTarget *GetBeamTarget();
+	~g4hrsBeamTarget();
 
 	G4double GetEffLumin();
 
@@ -47,7 +47,7 @@ class remollBeamTarget {
 
 	void SetBeamCurrent(G4double I){ fBeamCurr = I; }
 
-	remollVertex SampleVertex(SampType_t);
+	g4hrsVertex SampleVertex(SampType_t);
 
 	G4double fBeamE;
 	G4double fBeamCurr;
@@ -55,7 +55,7 @@ class remollBeamTarget {
 
 	std::vector <G4VPhysicalVolume *> GetTargVols(){ return fTargVols; }
 
-	remollMultScatt *fMS;
+	g4hrsMultScatt *fMS;
 
     private:
 	std::vector <G4VPhysicalVolume *> fTargVols;

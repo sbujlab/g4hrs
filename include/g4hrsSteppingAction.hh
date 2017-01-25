@@ -5,11 +5,11 @@
 #include "G4UserSteppingAction.hh"
 #include "globals.hh"
 
-class remollSteppingAction : public G4UserSteppingAction
+class g4hrsSteppingAction : public G4UserSteppingAction
 {
   public:
-    remollSteppingAction();
-    virtual ~remollSteppingAction(){};
+    g4hrsSteppingAction();
+    virtual ~g4hrsSteppingAction(){};
 
     virtual void UserSteppingAction(const G4Step*);
 

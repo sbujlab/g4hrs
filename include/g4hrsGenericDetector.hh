@@ -2,9 +2,9 @@
 #define __REMOLLGENERICDETECTOR_HH
 
 #include "G4VSensitiveDetector.hh"
-#include "remollGenericDetectorHit.hh"
-#include "remollGenericDetectorSum.hh"
-#include "remollSteppingAction.hh"
+#include "g4hrsGenericDetectorHit.hh"
+#include "g4hrsGenericDetectorSum.hh"
+#include "g4hrsSteppingAction.hh"
 
 #include <map>
 
@@ -23,21 +23,21 @@ class G4HCofThisEvent;
 class G4Step;
 class G4TouchableHistory;
 
-class remollGenericDetector : public G4VSensitiveDetector {
+class g4hrsGenericDetector : public G4VSensitiveDetector {
     public:
-	remollGenericDetector( G4String name, G4int detnum );
-	virtual ~remollGenericDetector();
+	g4hrsGenericDetector( G4String name, G4int detnum );
+	virtual ~g4hrsGenericDetector();
 
 	virtual void Initialize(G4HCofThisEvent*);
 	virtual G4bool ProcessHits(G4Step*,G4TouchableHistory*);
 	virtual void EndOfEvent(G4HCofThisEvent*);
 
     private:
-	remollGenericDetectorHitsCollection *fHitColl;
-	remollGenericDetectorSumCollection  *fSumColl;
+	g4hrsGenericDetectorHitsCollection *fHitColl;
+	g4hrsGenericDetectorSumCollection  *fSumColl;
 	G4int fHCID, fSCID;
 
-	std::map<int, remollGenericDetectorSum *> fSumMap;
+	std::map<int, g4hrsGenericDetectorSum *> fSumMap;
 
 	G4bool fTrackSecondaries;
 	G4int fDetNo;

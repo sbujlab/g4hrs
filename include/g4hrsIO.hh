@@ -1,19 +1,19 @@
-#ifndef remollIO_HH
-#define remollIO_HH
+#ifndef g4hrsIO_HH
+#define g4hrsIO_HH
 
 #include "TROOT.h"
 #include "TObject.h"
 #include "G4Run.hh"
-#include "remolltypes.hh"
+#include "g4hrstypes.hh"
 
 #include "G4String.hh"
 
 class TFile;
 class TTree;
 
-class remollGenericDetectorHit;
-class remollGenericDetectorSum;
-class remollEvent;
+class g4hrsGenericDetectorHit;
+class g4hrsGenericDetectorSum;
+class g4hrsEvent;
 
 #include <xercesc/dom/DOMElement.hpp>
 
@@ -28,10 +28,10 @@ class remollEvent;
 #define __ANG_UNIT rad
 #define __ASYMM_SCALE 1e-9 // ppb
 
-class remollIO {
+class g4hrsIO {
     public:
-	 remollIO();
-	~remollIO();
+	 g4hrsIO();
+	~g4hrsIO();
 
 	void SetFilename(G4String  fn);
 	G4String GetFilename(){return fFilename;}
@@ -62,7 +62,7 @@ class remollIO {
 
 	// Event data
     public:
-	void SetEventData(remollEvent *);
+	void SetEventData(g4hrsEvent *);
     private:
 	Int_t fNEvPart;
 
@@ -102,7 +102,7 @@ class remollIO {
 
 	//  GenericDetectorHit
     public:
-	void AddGenericDetectorHit(remollGenericDetectorHit *);
+	void AddGenericDetectorHit(g4hrsGenericDetectorHit *);
     private:
 	Int_t fNGenDetHit;
 	Int_t fGenDetHit_det[__IO_MAXHIT];
@@ -134,7 +134,7 @@ class remollIO {
 
 	//  GenericDetectorSum
     public:
-	void AddGenericDetectorSum(remollGenericDetectorSum *);
+	void AddGenericDetectorSum(g4hrsGenericDetectorSum *);
     private:
 	Int_t fNGenDetSum;
 	Int_t fGenDetSum_det[__IO_MAXHIT];
@@ -142,4 +142,4 @@ class remollIO {
 	Double_t fGenDetSum_edep[__IO_MAXHIT];
 };
 
-#endif//remollIO_HH
+#endif//g4hrsIO_HH

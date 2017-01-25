@@ -7,11 +7,17 @@
 #include "g4hrsRun.hh"
 #include "g4hrsRunData.hh"
 #include "g4hrsIO.hh"
+#include "g4hrsMaterial.hh"
+#include "g4hrsEMFieldSetup.hh"
 
 
 #include "G4FieldManager.hh"
 #include "G4TransportationManager.hh"
 #include "G4RunManager.hh"
+
+#include "G4SubtractionSolid.hh"
+#include "G4IntersectionSolid.hh"
+#include "G4UnionSolid.hh"
 
 #include "G4Material.hh"
 #include "G4Element.hh"
@@ -46,13 +52,67 @@ g4hrsDetectorConstruction::g4hrsDetectorConstruction() {
     CreateGlobalMagneticField();
 
     fWorldVolume = NULL;
+
+    // FIXME parameter
+    fHRSAngle=12.5*deg;
+    fSeptumAngle=5.0*deg;
+
+    fTargetW = 2.0*2.54*cm;
+    fTargetH = 2.0*2.54*cm;
+    fTargetL = 5*mm;
+
+    fTargetX = 0.0;
+    fTargetY = 0.0;
+    fTargetZ = 0.0;
+
+    fSeptum_UseUniformB=0;
+
+    fPivot2SieveFace = 800*mm;
+    fPivotXOffset =  0.0*deg;
+    fPivotYOffset =  0.0*deg;
+    fPivotZOffset =  1053.79*deg;
+
+    fSetupSieveSlit = false;
+
+    fUseSeptumPlusStdHRS=0;
+    fSnakeModel = 49;
+
+    fSetupStdScatChamber = 0;
+
+
+    //#SetupHRS have the following candidates: 
+    //# 0: do nothing; 1: will build septum, sieve and VB; 
+    //# 2: add Q1; 3: add Q2 ; 4: add Dipole and Q3  
+    int    fSetupHRS = 4;
+
+
+    fScatChamberRin   =  484.025*mm;
+    fScatChamberRout  =  509.425*mm;
+    fScatChamberL     =  692.15*mm;
+
+    fScatChamberXOffset = 0.0;
+    fScatChamberYOffset = 0.0;
+    fScatChamberZOffset = -1053.79*mm;
+    fSetupCREXGeometry = true;
+
+    fEMFieldSetup = NULL;
 }
 
 g4hrsDetectorConstruction::~g4hrsDetectorConstruction() {
+        if(fEMFieldSetup){ 
+            delete fEMFieldSetup;
+            fEMFieldSetup = NULL;
+        }
+
 }
 
 G4VPhysicalVolume* g4hrsDetectorConstruction::Construct() {
     G4VPhysicalVolume *worldVolume;
+
+    fEMFieldSetup = new g4hrsEMFieldSetup();
+
+    int z, nelements;
+    double a, density;
 
      // Air
     G4Element* N = new G4Element("Nitrogen", "N", z=7 , a=14.01*g/mole);
@@ -73,32 +133,28 @@ G4VPhysicalVolume* g4hrsDetectorConstruction::Construct() {
 }
 
 void g4hrsDetectorConstruction::CreateTarget(G4LogicalVolume *pMotherLogVol){
+    int z, nelements;
+    double a, density;
+
+
     G4Element* Pb = new G4Element("Lead", "Pb", z=82 , a=208.0*g/mole);
     G4Material* Pb_Mat = new G4Material("Pb_Mat", 11.34*g/cm3, nelements=1);
     Pb_Mat->AddElement(Pb, 1);
 
-    remollBeamTarget *beamtarg = remollBeamTarget::GetBeamTarget();
+    g4hrsBeamTarget *beamtarg = g4hrsBeamTarget::GetBeamTarget();
     beamtarg->Reset();
 
-    //  FIXME placeholder numbers
-    double mTargetW = 2.0*2.54*cm;
-    double mTargetH = 2.0*2.54*cm;
-    double mTargetL = 2*mm;
-
-    double mTargetX = 0.0;
-    double mTargetY = 0.0;
-    double mTargetZ = 0.0;
 
 
 
 
-    G4VSolid* targetSolid  = new G4Box("targetBox", mTargetW / 2.0, mTargetH / 2.0, mTargetL / 2.0 );
+    G4VSolid* targetSolid  = new G4Box("targetBox", fTargetW / 2.0, fTargetH / 2.0, fTargetL / 2.0 );
     G4LogicalVolume* targetLogical = new G4LogicalVolume(targetSolid,Pb_Mat,"targetLogical",0,0,0);
 
-    new G4PVPlacement(0,G4ThreeVector(mTargetX, mTargetY, mTargetZ),
+    G4VPhysicalVolume *phystarg = new G4PVPlacement(0,G4ThreeVector(fTargetX, fTargetY, fTargetZ),
         targetLogical,"targetPhys",pMotherLogVol,0,0);
 
-    beamtarg->AddVolume(targetLogical);
+    beamtarg->AddVolume(phystarg);
 
     return;
 }
@@ -115,8 +171,8 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 
 	G4SDManager* SDman = G4SDManager::GetSDMpointer();
 
-        // FIXME parameter
-	int pSeptum_UseUniformB=0;
+        g4hrsMaterial* mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
+
 
 	/////////////////////////////////////////////////
 	//From Hall A NIM Paper, the standard sieve slit
@@ -133,19 +189,16 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 	//and one horizontally, are 4 mm in diameter. The rest of the holes are 2 mm in diameter. 
 	//The sieve slits are positioned 75 mm further from the target than the other collimators.
 
-        // FIXME setable parameter
-	double mHRSAngle=12.5*deg;
-	double mSeptumAngle=5.0*deg;
-
+       
 	G4RotationMatrix *pRotLHRS=new G4RotationMatrix();
-	pRotLHRS->rotateY(mHRSAngle); 
+	pRotLHRS->rotateY(fHRSAngle); 
 	G4RotationMatrix *pRotRHRS=new G4RotationMatrix();
-	pRotRHRS->rotateY(-mHRSAngle); 
+	pRotRHRS->rotateY(-fHRSAngle); 
 
 	G4RotationMatrix *pRotLSeptum=new G4RotationMatrix();
-	pRotLSeptum->rotateY(mSeptumAngle); 
+	pRotLSeptum->rotateY(fSeptumAngle); 
 	G4RotationMatrix *pRotRSeptum=new G4RotationMatrix();
-	pRotRSeptum->rotateY(-mSeptumAngle); 
+	pRotRSeptum->rotateY(-fSeptumAngle); 
 	G4RotationMatrix *pRotNone=new G4RotationMatrix();
 	pRotNone->rotateY(0); 
 
@@ -160,8 +213,6 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 	////////////////the following is for 6 degree sieve//////////////
 
 	//these 2 will be read from ini file, it is 80.0cm for 6 deg and 120 cm for 12.5 deg
-	//double mPivot2LSieveFace=79.96*cm;
-	//double mPivot2RSieveFace=79.96*cm;
 
 	double pSieveSlitX=2.205*inch; //33.13*mm
 	double pSieveSlitY=5.134*inch; //130.40*mm
@@ -227,6 +278,8 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 	}
 	sieveSlitSolid->SetName("sieveSlitSolid");
 
+        G4VisAttributes *LeadVisAtt = new G4VisAttributes(G4Colour(204/255.,204./255.,255./255.));
+
 	G4LogicalVolume* sieveSlitLogical = new G4LogicalVolume(sieveSlitSolid,
 		mMaterialManager->tungsten,"sieveSlitLogical",0,0,0);
 	sieveSlitLogical->SetVisAttributes(LeadVisAtt); 
@@ -239,30 +292,29 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 	double pSieveSlitCenterHOffset=pSieveSlitLargeHoleH-pSieveSlitHolePosH[3];
 	double pSieveSlitCenterVOffset=pSieveSlitLargeHoleV-pSieveSlitHolePosV[3];
 
-
 	//place the sieve slits in the hall
-	double pLSieveSlitPos_X=(mPivot2LSieveFace+pSieveSlitZ/2.0)*sin(mLSeptumAngle)+
-		pSieveSlitCenterHOffset+mPivotXOffset;
-	double pLSieveSlitPos_Y=pSieveSlitCenterVOffset+mPivotYOffset;
-	double pLSieveSlitPos_Z=(mPivot2LSieveFace+pSieveSlitZ/2.0)*cos(mLSeptumAngle)+mPivotZOffset;
-	double pRSieveSlitPos_X=(mPivot2RSieveFace+pSieveSlitZ/2.0)*sin(mRSeptumAngle)-
-		pSieveSlitCenterHOffset+mPivotXOffset;
-	double pRSieveSlitPos_Y=pSieveSlitCenterVOffset+mPivotYOffset;
-	double pRSieveSlitPos_Z=(mPivot2RSieveFace+pSieveSlitZ/2.0)*cos(mRSeptumAngle)+mPivotZOffset;
+	double pLSieveSlitPos_X=(fPivot2SieveFace+pSieveSlitZ/2.0)*sin(fSeptumAngle)+
+		pSieveSlitCenterHOffset+fPivotXOffset;
+	double pLSieveSlitPos_Y=pSieveSlitCenterVOffset+fPivotYOffset;
+	double pLSieveSlitPos_Z=(fPivot2SieveFace+pSieveSlitZ/2.0)*cos(fSeptumAngle)+fPivotZOffset;
+	double pRSieveSlitPos_X=(fPivot2SieveFace+pSieveSlitZ/2.0)*sin(-fSeptumAngle)-
+		pSieveSlitCenterHOffset+fPivotXOffset;
+	double pRSieveSlitPos_Y=pSieveSlitCenterVOffset+fPivotYOffset;
+	double pRSieveSlitPos_Z=(fPivot2SieveFace+pSieveSlitZ/2.0)*cos(-fSeptumAngle)+fPivotZOffset;
 
-	if(mSetupLSieveSlit)
+	if(fSetupSieveSlit)
 	{ 
 		G4RotationMatrix *pRotLSieve=new G4RotationMatrix();
-		pRotLSieve->rotateY(-mLSeptumAngle-180*deg);
+		pRotLSieve->rotateY(-fSeptumAngle-180*deg);
 		new G4PVPlacement(pRotLSieve,
 		G4ThreeVector(pLSieveSlitPos_X,pLSieveSlitPos_Y,pLSieveSlitPos_Z),
-		sieveSlitLogical,"leftSieveSlitPhys",motherLogical,0,0);
+		sieveSlitLogical,"leftSieveSlitPhys",pMotherLogVol,0,0);
 	}
-	if(mSetupRSieveSlit)
+	if(fSetupSieveSlit)
 	{
 	  new G4PVPlacement(pRotRSeptum,
 	  G4ThreeVector(pRSieveSlitPos_X,pRSieveSlitPos_Y,pRSieveSlitPos_Z),
-	  sieveSlitLogical,"rightSieveSlitPhys",motherLogical,0,0);
+	  sieveSlitLogical,"rightSieveSlitPhys",pMotherLogVol,0,0);
 	}
 
 	/////////////////////////
@@ -285,9 +337,10 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 
 
         double pSeptumTunnelPos_X=8.4*cm+pSeptumTunnelX/2.0;
-        double pSeptumPos_Z=70.0*cm;		
-        gConfig->GetParameter("Septum_OriginZ",pSeptumPos_Z); 
-        pSeptumPos_Z*=cm;
+        double pSeptumPos_Z=69.99937*cm;		
+
+
+
 
         G4VSolid* septumBlockSolid = new G4Box("septumBlockBox",pSeptumX/2.0,
                 pSeptumY/2.0,pSeptumZ/2.0);
@@ -309,6 +362,9 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
         G4SubtractionSolid* septumBlockSubLRCSolid=new G4SubtractionSolid("septumBlockSubLRC",
                 septumBlockSubLRSolid,septumBeamHoleSolid);
 
+
+        G4VisAttributes *IronVisAtt = new G4VisAttributes(G4Colour(100./255.,149./255.,237./255.));
+
         G4LogicalVolume* septumLogical = new G4LogicalVolume(septumBlockSubLRCSolid,
                 mMaterialManager->siliconsteel,"septumLogical",0,0,0);
         septumLogical->SetVisAttributes(IronVisAtt);
@@ -318,7 +374,7 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
         //put it in the hall, no rotation
         if( placeseptum ){
           new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPos_Z),
-                            septumLogical,"septumPhys",motherLogical,0,0,0);
+                            septumLogical,"septumPhys",pMotherLogVol,0,0,0);
         }
 
         double pSeptumCoilRadius = 22.06*cm;
@@ -339,6 +395,9 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 
         G4LogicalVolume* septumCoilLogical = new G4LogicalVolume(septumCoilSolid,
                 mMaterialManager->copper,"septumCoilLogical",0,0,0);
+
+        G4VisAttributes *CuBrownVisAtt = new G4VisAttributes(G4Colour(1.0,0.5,0.5));
+
         septumCoilLogical->SetVisAttributes(CuBrownVisAtt);
 
         //place 16 copies into the septum container
@@ -363,29 +422,29 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
         if( placeseptum ){
         new G4PVPlacement(pSeptumCoilRotFrontDown,
                 G4ThreeVector(pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
-                septumCoilLogical,"septumCoilPhys",motherLogical,true,0,0);
+                septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,0,0);
         new G4PVPlacement(pSeptumCoilRotFrontUp,
                 G4ThreeVector(pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
-                septumCoilLogical,"septumCoilPhys",motherLogical,true,1,0);
+                septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,1,0);
         new G4PVPlacement(pSeptumCoilRotFrontUp,
                 G4ThreeVector(pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
-                septumCoilLogical,"septumCoilPhys",motherLogical,true,2,0);
+                septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,2,0);
         new G4PVPlacement(pSeptumCoilRotFrontDown,
                 G4ThreeVector(pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
-                septumCoilLogical,"septumCoilPhys",motherLogical,true,3,0);
+                septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,3,0);
 
         new G4PVPlacement(pSeptumCoilRotFrontDown,
                 G4ThreeVector(-pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
-                septumCoilLogical,"septumCoilPhys",motherLogical,true,4,0);
+                septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,4,0);
         new G4PVPlacement(pSeptumCoilRotFrontUp,
                 G4ThreeVector(-pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
-                septumCoilLogical,"septumCoilPhys",motherLogical,true,5,0);
+                septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,5,0);
         new G4PVPlacement(pSeptumCoilRotFrontUp,
                 G4ThreeVector(-pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
-                septumCoilLogical,"septumCoilPhys",motherLogical,true,6,0);
+                septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,6,0);
         new G4PVPlacement(pSeptumCoilRotFrontDown,
                 G4ThreeVector(-pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
-                septumCoilLogical,"septumCoilPhys",motherLogical,true,7,0);
+                septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,7,0);
         }
 
         //place down stream coils in the following order (looking downstream)
@@ -402,29 +461,29 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
         if( placeseptum ){
         new G4PVPlacement(pSeptumCoilRotBackDown,
                 G4ThreeVector(pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
-                septumCoilLogical,"septumCoilPhys",motherLogical,true,8,0);
+                septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,8,0);
         new G4PVPlacement(pSeptumCoilRotBackUp,
                 G4ThreeVector(pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
-                septumCoilLogical,"septumCoilPhys",motherLogical,true,9,0);
+                septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,9,0);
         new G4PVPlacement(pSeptumCoilRotBackUp,
                 G4ThreeVector(pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
-                septumCoilLogical,"septumCoilPhys",motherLogical,true,10,0);
+                septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,10,0);
         new G4PVPlacement(pSeptumCoilRotBackDown,
                 G4ThreeVector(pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
-                septumCoilLogical,"septumCoilPhys",motherLogical,true,11,0);
+                septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,11,0);
 
         new G4PVPlacement(pSeptumCoilRotBackDown,
                 G4ThreeVector(-pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
-                septumCoilLogical,"septumCoilPhys",motherLogical,true,12,0);
+                septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,12,0);
         new G4PVPlacement(pSeptumCoilRotBackUp,
                 G4ThreeVector(-pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
-                septumCoilLogical,"septumCoilPhys",motherLogical,true,13,0);
+                septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,13,0);
         new G4PVPlacement(pSeptumCoilRotBackUp,
                 G4ThreeVector(-pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
-                septumCoilLogical,"septumCoilPhys",motherLogical,true,14,0);
+                septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,14,0);
         new G4PVPlacement(pSeptumCoilRotBackDown,
                 G4ThreeVector(-pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
-                septumCoilLogical,"septumCoilPhys",motherLogical,true,15,0);
+                septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,15,0);
         }
     
 	/////////////////////////
@@ -435,19 +494,11 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 	//otherwise will place the VB at the position given by the Detector.ini
 	//For 12.5 degrees, always place VB 1.40m away from the hall center
 
-        // FIXME
-	int pUseSeptumPlusStdHRS=0;
-	int    mSnakeModel = 49;
 
         //
         
-        //#SetupHRS have the following candidates: 
-        //# 0: do nothing; 1: will build septum, sieve and VB; 
-        //# 2: add Q1; 3: add Q2 ; 4: add Dipole and Q3  
-	int    mSetupLHRS = 4;
-	int    mSetupRHRS = 4;
 
-        if( mSnakeModel == 49 || mSnakeModel == 48 || mSnakeModel == 51 || mSnakeModel == 53){
+        if( fSnakeModel == 49 || fSnakeModel == 48 || fSnakeModel == 51 || fSnakeModel == 53){
 
 	  /////////////////////////
 	  // HRS Q1              // Nickie is also adding the Q1 collimator here
@@ -470,8 +521,8 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 	  double box3deg   = 28.0 * deg;
 
 	  double pHallCenter2Col=col_distance;//This is Nickie's correction: 30 cm from Q1 entrance
-	  double pHRSVBPos_X=(pHallCenter2Col+PaulColT/2) * cos(-mRHRSAngle);
-	  double pHRSVBPos_Y=(pHallCenter2Col+PaulColT/2) * sin(-mRHRSAngle);
+	  double pHRSVBPos_X=(pHallCenter2Col+PaulColT/2) * cos(fHRSAngle);
+	  double pHRSVBPos_Y=(pHallCenter2Col+PaulColT/2) * sin(fHRSAngle);
 
 	  G4RotationMatrix *rot28=new G4RotationMatrix();
 	  rot28->rotateY( 90 * deg);
@@ -523,11 +574,11 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 	  G4LogicalVolume* PaulLogical = new G4LogicalVolume(subtraction7, mMaterialManager->tungsten, "PaulLogical", 0, 0, 0);
 	  G4RotationMatrix *pRotLHRScol=new G4RotationMatrix();
 	  //pRotLHRScol->rotateZ(180 * deg);
-	  pRotLHRScol->rotateY(-mLHRSAngle); 
+	  pRotLHRScol->rotateY(-fHRSAngle); 
 	  G4RotationMatrix *pRotRHRScol=new G4RotationMatrix();
 	  
 	  pRotRHRScol->rotateZ(180 * deg);
-	  pRotRHRScol->rotateY(mRHRSAngle); 
+	  pRotRHRScol->rotateY(-fHRSAngle); 
 	  //pRotRHRScol->rotateX(90. * deg); 
 
 	  PaulLogical->SetVisAttributes(G4VisAttributes(G4Colour::Red()));
@@ -539,7 +590,7 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 	  //End of Paul's collimator////////////////////////////////////////////////////////////////////////   	  
 	  
 	}
-	else if( mSnakeModel != 49 || mSnakeModel > 50)
+	else if( fSnakeModel != 49 || fSnakeModel > 50)
 	{
 		//place VB @ Septum entrance window, 10.4cm width and 24.4cm height, 
 		//The following declared as module variales already
@@ -550,6 +601,8 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 		double mHRSVBHeight=800*mm;
 		double mHRSVBThick=0.0508*mm; 
 		//acceptance is 20 mrad
+
+                G4VisAttributes *LightYellowVisAtt = new G4VisAttributes(G4Colour(0.8,0.8,0.2)); 
 	  
 		G4VSolid* septumWindowSolid = new G4Box("septumWindowBox",mHRSVBWidth/2.0,
 			mHRSVBHeight/2.0,mHRSVBThick/2.0);
@@ -567,88 +620,37 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 		TargetLogical->SetSensitiveDetector(septumWindowSD);
 		TargetLogical->SetVisAttributes(LightYellowVisAtt); 
 
+                double mPivot2HRSVBFace = 1347.17*mm;
+
 		double pTunnel2Beam_X=8.4*cm;
 		//put both left and right septum entrance window, which should not less than pTunnel2Beam_X
-		if(mSetupLHRS){
-		  double pLSeptumWindowPos_X=(mPivot2LHRSVBFace+mHRSVBThick/2.0)*
-		    sin(mLSeptumAngle)+mPivotXOffset;
-		  if(mPivot2LHRSVBFace>1190*mm){
+		if(fSetupHRS){
+		  double pLSeptumWindowPos_X=(mPivot2HRSVBFace+mHRSVBThick/2.0)*
+		    sin(fSeptumAngle)+fPivotXOffset;
+		  if(mPivot2HRSVBFace>1190*mm){
 		    //need to shift it in X to make it barely touch the septum tunnel		
-		    pLSeptumWindowPos_X=mHRSVBWidth/2*cos(mLSeptumAngle)+pTunnel2Beam_X;
+		    pLSeptumWindowPos_X=mHRSVBWidth/2*cos(fSeptumAngle)+pTunnel2Beam_X;
 		  }
-		  double pLSeptumWindowPos_Y=mPivotYOffset;
-		  double pLSeptumWindowPos_Z=(mPivot2LHRSVBFace+mHRSVBThick/2.0)*
-		    cos(mLSeptumAngle)+mPivotZOffset;
+		  double pLSeptumWindowPos_Y=fPivotYOffset;
+		  double pLSeptumWindowPos_Z=(mPivot2HRSVBFace+mHRSVBThick/2.0)*
+		    cos(fSeptumAngle)+fPivotZOffset;
 		  //new G4PVPlacement(pRotLSeptum,
 		  //G4ThreeVector(pLSeptumWindowPos_X,pLSeptumWindowPos_Y,pLSeptumWindowPos_Z),
 		  //septumWindowLogical,"virtualBoundaryPhys_LHRS",motherLogical,0,0,0);
-		}if(mSetupRHRS){
-		  double pRSeptumWindowPos_X=(mPivot2RHRSVBFace+mHRSVBThick/2.)*
-		    sin(mRSeptumAngle)+mPivotXOffset;			
-		  if(mPivot2LHRSVBFace>1190*mm){
+		}if(fSetupHRS){
+		  double pRSeptumWindowPos_X=(mPivot2HRSVBFace+mHRSVBThick/2.)*
+		    sin(-fSeptumAngle)+fPivotXOffset;			
+		  if(mPivot2HRSVBFace>1190*mm){
 		    //need to shift it in X to make it barely touch the septum tunnel		
-		    pRSeptumWindowPos_X=-mHRSVBWidth/2*cos(mRSeptumAngle)-pTunnel2Beam_X;
+		    pRSeptumWindowPos_X=-mHRSVBWidth/2*cos(-fSeptumAngle)-pTunnel2Beam_X;
 		  }
-		  double pRSeptumWindowPos_Y=mPivotYOffset;
-		  double pRSeptumWindowPos_Z=(mPivot2RHRSVBFace+mHRSVBThick/2.0)*
-		    cos(mRSeptumAngle)+mPivotZOffset;
+		  double pRSeptumWindowPos_Y=fPivotYOffset;
+		  double pRSeptumWindowPos_Z=(mPivot2HRSVBFace+mHRSVBThick/2.0)*
+		    cos(-fSeptumAngle)+fPivotZOffset;
 		  //new G4PVPlacement(pRotRSeptum,
 		  //G4ThreeVector(pRSeptumWindowPos_X,pRSeptumWindowPos_Y,pRSeptumWindowPos_Z),
 		  //septumWindowLogical,"virtualBoundaryPhys_RHRS",motherLogical,0,0,0);
 		}
-		//NICKIE ADDED ALL OF THIS
-		/*
-		G4VSolid* HRSVBSolid = new G4Tubs("HRSVBTub",0.0,15*cm,
-			mHRSVBThick/2.0,0.0,360.0*deg);
-		G4LogicalVolume* HRSVBLogical = new G4LogicalVolume(HRSVBSolid,
-			mMaterialManager->mylar,"HRSVBLogical",0,0,0);
-		SDman->AddNewDetector(septumWindowSD);
-		HRSVBLogical->SetSensitiveDetector(septumWindowSD);
-		HRSVBLogical->SetVisAttributes(LightYellowVisAtt); 
-		*/
-		double pHallCenter2VB=1.40*m;
-		//gConfig->SetParameter("Pivot2CHRSVBFace",pHallCenter2VB-mPivotZOffset);
-		gConfig->SetParameter("Pivot2CHRSVBFace",pHallCenter2VB-mPivotZOffset); 
-
-		int    mSnakeModel;
-		gConfig->GetArgument("SnakeModel",mSnakeModel);
-		/*
-		cout << "Snake model " << mSnakeModel << endl;
-		cout << "Snake model " << mSnakeModel << endl;
-		cout << "Snake model " << mSnakeModel << endl;
-		cout << "Snake model " << mSnakeModel << endl;
-		
-		if(mSnakeModel==47){
-		  double pCHRSVBPos_X=mPivotXOffset;
-		  double pCHRSVBPos_Y=mPivotYOffset;
-		  //no need to correct for pivot since the distance is from the hall center
-		  //double pCHRSVBPos_Z=(mHRSVBThick/2.0 - 110 * cm);
-		  double pCHRSVBPos_Z=( - 100 * cm ); // DANGER IN PLACEMENT
-		  new G4PVPlacement(pRotNone,G4ThreeVector(pCHRSVBPos_X,pCHRSVBPos_Y,pCHRSVBPos_Z),
-				    TargetLogical,"virtualBoundaryPhys_C",motherLogical,0,0,0);
-		  //cout << "The angle of the HRS is: " << -mLHRSAngle << endl;
-		}
-		*/
-		/*
-		//THIS IS THE NICKIE ADDITION FOR THE PREX TUNE FUNCTIONS STARTING AT THE TARGET CENTER
-		G4VSolid* HRSVBSolid = new G4Tubs("HRSVBTub",0.0,15*cm,
-			mHRSVBThick/2.0,0.0,360.0*deg);
-		G4LogicalVolume* HRSVBLogical = new G4LogicalVolume(HRSVBSolid,
-			mMaterialManager->mylar,"HRSVBLogical",0,0,0);
-		SDman->AddNewDetector(septumWindowSD);
-		HRSVBLogical->SetSensitiveDetector(septumWindowSD);
-		HRSVBLogical->SetVisAttributes(LightYellowVisAtt); 
-
-		double pHallCenter2VB=1.40*m;
-		gConfig->SetParameter("Pivot2LHRSVBFace",pHallCenter2VB-mPivotZOffset);
-		gConfig->SetParameter("Pivot2RHRSVBFace",pHallCenter2VB-mPivotZOffset); 
-		double pLHRSVBPos_X=mPivotXOffset;
-		double pLHRSVBPos_Y=mPivotYOffset;
-		//no need to correct for pivot since the distance is from the hall center
-		double pLHRSVBPos_Z=(pHallCenter2VB-mHRSVBThick/2.0);
-		new G4PVPlacement(pRotLHRS,G4ThreeVector(pLHRSVBPos_X,pLHRSVBPos_Y,pLHRSVBPos_Z),
-				  HRSVBLogical,"virtualBoundaryPhys_LHRS",motherLogical,0,0,0);
-		*/
 	}
 
 
@@ -661,6 +663,7 @@ void g4hrsDetectorConstruction::CreateTargetChamber(G4LogicalVolume *pMotherLogV
 	G4RotationMatrix *pRotScatInHall=new G4RotationMatrix();
 	pRotScatInHall->rotateX(90.*deg);
 
+        g4hrsMaterial* mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
 	double startphi=0.*deg, deltaphi=360.*deg;
 	/////////////////////////////////////////////////////////
 	//scattering chamber container
@@ -669,11 +672,11 @@ void g4hrsDetectorConstruction::CreateTargetChamber(G4LogicalVolume *pMotherLogV
 	//scattering chamber itself.
 	//With this container, all stuff inside do not need a rotation
 	
-	//The scattering chamber containner is made of helium gas, 
 
-	double pScatChamberContainerRin=mScatChamberRin-1*cm;      
-	double pScatChamberContainerRout=mScatChamberRout+1*cm;
-	double pScatChamberContainerL=mScatChamberL+(3.50+17.0+1.25)*inch*2+10.0*mm;
+
+	double pScatChamberContainerRin=fScatChamberRin-1*cm;      
+	double pScatChamberContainerRout=fScatChamberRout+1*cm;
+	double pScatChamberContainerL=fScatChamberL+(3.50+17.0+1.25)*inch*2+10.0*mm;
 	G4VSolid* scatChamberContainerExtendedSolid = new G4Tubs("scatChamberContainerExtendedTubs",
 		pScatChamberContainerRin,pScatChamberContainerRout,
 		pScatChamberContainerL/2.0,0.,360.*deg);
@@ -681,14 +684,19 @@ void g4hrsDetectorConstruction::CreateTargetChamber(G4LogicalVolume *pMotherLogV
 		0,pScatChamberContainerRout+1*mm,17.25*inch/2.0,0.,360.*deg);
 	G4SubtractionSolid* scatChamberContainerSolid=new G4SubtractionSolid("scatChamberContainerSolid",
 		scatChamberContainerExtendedSolid,scatChamberContainerExtraSolid,
-		0,G4ThreeVector(0,0,-mScatChamberL/2-17.25*inch/2.0));
+		0,G4ThreeVector(0,0,-fScatChamberL/2-17.25*inch/2.0));
+
+
+        G4VisAttributes *HallVisAtt = new G4VisAttributes(G4Colour(1.0,1.0,1.0));
+        HallVisAtt->SetVisibility(false);
+
 
 	G4LogicalVolume* scatChamberContainerLogical = new G4LogicalVolume(scatChamberContainerSolid,
-		heliumGas,"scatChamberContainerLogical",0,0,0);
+		mMaterialManager->vacuum,"scatChamberContainerLogical",0,0,0);
 	scatChamberContainerLogical->SetVisAttributes(HallVisAtt); 
 
 	G4VPhysicalVolume* scatChamberContainerPhys=new G4PVPlacement(pRotScatInHall,
-		G4ThreeVector(mScatChamberXOffset,mScatChamberYOffset,mScatChamberZOffset),
+		G4ThreeVector(fScatChamberXOffset,fScatChamberYOffset,fScatChamberZOffset),
 		scatChamberContainerLogical,"scatChamberContainerPhys",pMotherLogVol,0,0);
 
 	//////////////////////////
@@ -696,36 +704,38 @@ void g4hrsDetectorConstruction::CreateTargetChamber(G4LogicalVolume *pMotherLogV
 	//////////////////////////
 	//Build the simplified scatter chamber,it contains 2 windows of rectangles 
 	//The following already defined in the config file
-	//double mScatChamberRin=17.875*inch,mScatChamberRout=18.875*inch,mScatChamberL=27.25*inch;
+	//double fScatChamberRin=17.875*inch,fScatChamberRout=18.875*inch,fScatChamberL=27.25*inch;
 
 	G4VSolid* scatChamberWholeSolid=0;
 	//If mSetupScatChamber==1, setup the body only, 
 	//If mSetupScatChamber==2, setup the body plus top flange and bottom flange, this
 	//will make the program slower
-	if(mSetupStdScatChamber==1)
+
+
+	if(fSetupStdScatChamber==1)
 	{
 	  scatChamberWholeSolid = new G4Tubs("scatChamberWholeTubs",
-					     mScatChamberRin,mScatChamberRout,mScatChamberL/2.0,0.,360.*deg);
+					     fScatChamberRin,fScatChamberRout,fScatChamberL/2.0,0.,360.*deg);
 	}
-	else if(mSetupStdScatChamber>=2)
+	else if(fSetupStdScatChamber>=2)
 	{
 		startphi=0.*deg; deltaphi=360.*deg;
 		const int kNPlane_SC=11;
-		double rInner_SC[] = {0,0,mScatChamberRin,
-			mScatChamberRin,mScatChamberRin,mScatChamberRin,
-			mScatChamberRin,mScatChamberRin,mScatChamberRin,
+		double rInner_SC[] = {0,0,fScatChamberRin,
+			fScatChamberRin,fScatChamberRin,fScatChamberRin,
+			fScatChamberRin,fScatChamberRin,fScatChamberRin,
 			0,0};
 		double rOuter_SC[] = {
-			mScatChamberRout+1.0*inch,mScatChamberRout+1.0*inch,mScatChamberRout+1.0*inch,
-			mScatChamberRout,mScatChamberRout,mScatChamberRout+1.0*inch,
-			mScatChamberRout+1.0*inch,mScatChamberRout,mScatChamberRout,
-			mScatChamberRout+1*inch,mScatChamberRout+1*inch
+			fScatChamberRout+1.0*inch,fScatChamberRout+1.0*inch,fScatChamberRout+1.0*inch,
+			fScatChamberRout,fScatChamberRout,fScatChamberRout+1.0*inch,
+			fScatChamberRout+1.0*inch,fScatChamberRout,fScatChamberRout,
+			fScatChamberRout+1*inch,fScatChamberRout+1*inch
 		};
 		double zPlane_SC[] = {
-			-mScatChamberL/2-4.50*inch,-mScatChamberL/2-3.25*inch,-mScatChamberL/2-1.0*inch,
-			-mScatChamberL/2,mScatChamberL/2+0.25*inch,mScatChamberL/2+1.25*inch,
-			mScatChamberL/2+3.50*inch,mScatChamberL/2+3.50*inch,mScatChamberL/2+20.5*inch,
-			mScatChamberL/2+20.5*inch,mScatChamberL/2+21.75*inch
+			-fScatChamberL/2-4.50*inch,-fScatChamberL/2-3.25*inch,-fScatChamberL/2-1.0*inch,
+			-fScatChamberL/2,fScatChamberL/2+0.25*inch,fScatChamberL/2+1.25*inch,
+			fScatChamberL/2+3.50*inch,fScatChamberL/2+3.50*inch,fScatChamberL/2+20.5*inch,
+			fScatChamberL/2+20.5*inch,fScatChamberL/2+21.75*inch
 		};
 
 		G4Polycone* SCWholeSolid = new G4Polycone("SCPolycone",startphi,deltaphi,
@@ -736,8 +746,8 @@ void g4hrsDetectorConstruction::CreateTargetChamber(G4LogicalVolume *pMotherLogV
 
 
 	//these are the subtraction part, not the scatter chamber itself
-	double pSCWindowRin=mScatChamberRin-1*mm;
-	double pSCWindowRout=mScatChamberRout+1*mm;
+	double pSCWindowRin=fScatChamberRin-1*mm;
+	double pSCWindowRout=fScatChamberRout+1*mm;
 	double pSCEntranceWindowH=6.44*inch;
 	double pSCDownCapH=15.0*inch;
 	
@@ -757,9 +767,11 @@ void g4hrsDetectorConstruction::CreateTargetChamber(G4LogicalVolume *pMotherLogV
 	G4SubtractionSolid* SCSubtractEntranceNExitSolid=new G4SubtractionSolid(
 		"SCSubtractEntranceNExit",SCSubtractEntranceSolid,SCDownCapSolid);
 
+        G4VisAttributes *WhiteVisAtt = new G4VisAttributes(G4Colour(1.0,1.0,1.0)); 
+
 	//setup the scatter chamber
 	G4LogicalVolume* scatChamberLogical = new G4LogicalVolume(
-		SCSubtractEntranceNExitSolid,aluminum,"scatChamberLogical",0,0,0);
+		SCSubtractEntranceNExitSolid,mMaterialManager->aluminum,"scatChamberLogical",0,0,0);
 	scatChamberLogical->SetVisAttributes(WhiteVisAtt); 
 
 	new G4PVPlacement(0,G4ThreeVector(),
@@ -771,9 +783,13 @@ void g4hrsDetectorConstruction::CreateTargetChamber(G4LogicalVolume *pMotherLogV
 	/////////////////////////
 	//Covers for EntranceWindow 
 
+        double mScatChamberEntranceWindowThick = 0.254*mm;
+        double mScatChamberExitWindowThick = 0.508*mm;
+        G4VisAttributes *LightYellowVisAtt = new G4VisAttributes(G4Colour(0.8,0.8,0.2)); 
+
 	//EntranceWindowCover
 	double pSCEntranceWindowCoverH=pSCEntranceWindowH+0.8*inch;
-	double pSCEntranceWindowCoverRin=mScatChamberRout;
+	double pSCEntranceWindowCoverRin=fScatChamberRout;
 	double pSCEntranceWindowCoverRout=pSCEntranceWindowCoverRin+mScatChamberEntranceWindowThick;
 
 	startphi=78*deg;deltaphi=24*deg;
@@ -781,7 +797,7 @@ void g4hrsDetectorConstruction::CreateTargetChamber(G4LogicalVolume *pMotherLogV
 		pSCEntranceWindowCoverRin,pSCEntranceWindowCoverRout,
 		pSCEntranceWindowCoverH/2.0,startphi,deltaphi);
 	G4LogicalVolume* SCEntranceWindowCoverLogical = new G4LogicalVolume(
-		SCEntranceWindowCoverSolid,aluminum,"SCEntranceWindowCoverLogical",0,0,0);
+		SCEntranceWindowCoverSolid,mMaterialManager->aluminum,"SCEntranceWindowCoverLogical",0,0,0);
 	SCEntranceWindowCoverLogical->SetVisAttributes(LightYellowVisAtt); 
 
 	new G4PVPlacement(0,G4ThreeVector(),SCEntranceWindowCoverLogical,
@@ -789,34 +805,30 @@ void g4hrsDetectorConstruction::CreateTargetChamber(G4LogicalVolume *pMotherLogV
 
 	//DownCapCover
 	double pSCDownCapCoverH=pSCDownCapH+0.8*inch;
-	double pSCDownCapCoverRin=mScatChamberRout;
-	double pSCDownCapCoverRout=mScatChamberRout+mScatChamberExitWindowThick;
+	double pSCDownCapCoverRin=fScatChamberRout;
+	double pSCDownCapCoverRout=fScatChamberRout+mScatChamberExitWindowThick;
 
 	startphi=-227*deg;deltaphi=274*deg;
 	G4VSolid* SCDownCapCoverSolid = new G4Tubs("SCDownCapCoverTubs",
 		pSCDownCapCoverRin,pSCDownCapCoverRout,pSCDownCapCoverH/2.0,startphi,deltaphi);
 	G4LogicalVolume* SCDownCapCoverLogical = new G4LogicalVolume(
-		SCDownCapCoverSolid,aluminum,"SCDownCapCoverLogical",0,0,0);
+		SCDownCapCoverSolid,mMaterialManager->aluminum,"SCDownCapCoverLogical",0,0,0);
 	SCDownCapCoverLogical->SetVisAttributes(LightYellowVisAtt); 
 
 	new G4PVPlacement(0,G4ThreeVector(),SCDownCapCoverLogical,
 		"SCDownCapCoverPhys",scatChamberContainerLogical,false,0);
 
 
-	return scatChamberContainerPhys;
+
+
+	return;
 
 }
 
 
-void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
+void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 {
-	int mSnakeModel = 49;
-        // FIXME
-        //#SetupHRS have the following candidates: 
-        //# 0: do nothing; 1: will build septum, sieve and VB; 
-        //# 2: add Q1; 3: add Q2 ; 4: add Dipole and Q3  
-	int    mSetupLHRS = 4;
-	int    mSetupRHRS = 4;
+        g4hrsMaterial* mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
 
 	int IS_NIM = 0;//if it's 0, then we go by SNAKE, if it is 1, we go by NIM.
 	//As it turns out, I think we want to go by SNAKE, so that is why it is zero right now.
@@ -831,9 +843,9 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 	G4RotationMatrix *pRotX105deg=new G4RotationMatrix();
 	pRotX105deg->rotateX(165*deg); 
 	G4RotationMatrix *pRotXLHRSdeg=new G4RotationMatrix();
-	pRotXLHRSdeg->rotateY(mLHRSAngle); 
+	pRotXLHRSdeg->rotateY(fHRSAngle); 
 	G4RotationMatrix *pRotXRHRSdeg=new G4RotationMatrix();
-	pRotXRHRSdeg->rotateY(mRHRSAngle); 
+	pRotXRHRSdeg->rotateY(-fHRSAngle); 
 
 	G4SDManager* SDman = G4SDManager::GetSDMpointer();
 	G4String SDname;
@@ -910,24 +922,28 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 
 	G4VisAttributes* MagFieldVisAtt = new G4VisAttributes(G4Colour(1., 0., 1.));	
 
+        G4VisAttributes *HallVisAtt = new G4VisAttributes(G4Colour(1.0,1.0,1.0));
+        HallVisAtt->SetVisibility(false);
+
+
 	LHRSContainerLogical->SetVisAttributes(HallVisAtt); 
 	RHRSContainerLogical->SetVisAttributes(HallVisAtt);
 	//RHRSContainerLogical->SetVisAttributes(MagFieldVisAtt); 
 
 	G4RotationMatrix *pRotLHRSContainer=new G4RotationMatrix();
 	pRotLHRSContainer->rotateX(-270*deg);
-	pRotLHRSContainer->rotateZ(-mLHRSAngle);  
+	pRotLHRSContainer->rotateZ(-fHRSAngle);  
 
 	G4RotationMatrix *pRotRHRSContainer=new G4RotationMatrix();
 	pRotRHRSContainer->rotateX(-270*deg);
-	pRotRHRSContainer->rotateZ(-mRHRSAngle);  
+	pRotRHRSContainer->rotateZ(fHRSAngle);  
 
-	if(mSetupLHRS>=2)
+	if(fSetupHRS>=2)
 	{
 		new G4PVPlacement(pRotLHRSContainer,G4ThreeVector(0,0,0),
 			LHRSContainerLogical,"LHRSContainerPhys",motherLogical,0,0,0);
 	}
-	if(mSetupRHRS>=2)
+	if(fSetupHRS>=2)
 	{
 		new G4PVPlacement(pRotRHRSContainer,G4ThreeVector(0,0,0),
 			RHRSContainerLogical,"RHRSContainerPhys",motherLogical,0,0,0);
@@ -939,7 +955,7 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 	//////////////////////////
 	bool pSetupQ1EntranceWindow=true;
 	//G2P and CREX have their own VB defined at a different location
-	if( mSetupCREXGeometry)  pSetupQ1EntranceWindow=false;
+	if( fSetupCREXGeometry)  pSetupQ1EntranceWindow=false;
 	if(pSetupQ1EntranceWindow) 
 	{
 
@@ -956,20 +972,20 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 			mMaterialManager->mylar,"HRSQ1WinLogical",0,0,0);
 		SDman->AddNewDetector(Q1WindowSD);
 		HRSQ1WinLogical->SetSensitiveDetector(Q1WindowSD);
+
+                G4VisAttributes *LightYellowVisAtt = new G4VisAttributes(G4Colour(0.8,0.8,0.2)); 
 		HRSQ1WinLogical->SetVisAttributes(LightYellowVisAtt); 
 
 		//since the container has been rotated by 90 deg about x axis,
 		//y'=z  z'=-y ==> I have to put this offset as -y
 		double pHallCenter2Q1Win=pHRSContainerRin+4*mm;  //place it at the first 1.464 m
-		gConfig->SetParameter("Pivot2LHRSVBFace",pHallCenter2Q1Win-mPivotZOffset*cos(mLHRSAngle));
-		gConfig->SetParameter("Pivot2RHRSVBFace",pHallCenter2Q1Win-mPivotZOffset*cos(mRHRSAngle)); 
 
-		if(mSetupLHRS)
+		if(fSetupHRS)
 		{
 			new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pHallCenter2Q1Win,0),
 				HRSQ1WinLogical,"virtualBoundaryPhys_LHRSQ1Win",LHRSContainerLogical,0,0,0);
 		}
-		if(mSetupRHRS)
+		if(fSetupHRS)
 		{
 			new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pHallCenter2Q1Win,0),
 				HRSQ1WinLogical,"virtualBoundaryPhys_RHRSQ1Win",RHRSContainerLogical,0,0,0);
@@ -1004,7 +1020,7 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 	//Radius to Pole Tip = 12.827  cm
 	
 	int    sos   = 1;
-	if( mSnakeModel >= 52){
+	if( fSnakeModel >= 52){
 	  sos = 1;
 	}
 	double q1shift = sos ? 0.0 * m : 0.0 * m;
@@ -1028,10 +1044,11 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 	G4LogicalVolume* RQ1Logical = new G4LogicalVolume(Q1Solid,
 		mMaterialManager->siliconsteel,"RQ1Logical",0,0,0);
 
+        G4VisAttributes *IronVisAtt = new G4VisAttributes(G4Colour(100./255.,149./255.,237./255.));
 	LQ1Logical->SetVisAttributes(IronVisAtt); 
 	RQ1Logical->SetVisAttributes(IronVisAtt); 
 
-	if(mSetupLHRS>=2){
+	if(fSetupHRS>=2){
 	  //put it in the container, which also center at the hall center
 	  //therefore only the z_at_lab position need to be considered
 	  double pLQ1Pos_Z=(pHallCenter2LQ1Face+pQ1PosAct/2.0) + q1shift;
@@ -1039,7 +1056,7 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 	  new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pLQ1Pos_Z,0),
 			    LQ1Logical,"LQ1Phys",LHRSContainerLogical,0,0,0);
 	}
-	if(mSetupRHRS>=2){
+	if(fSetupHRS>=2){
 	  double pRQ1Pos_Z=(pHallCenter2RQ1Face+pQ1PosAct/2.0) + q1shift;
 	  //double pRQ1Pos_Z=pQ1PosAct + q1shift;
 	  new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pRQ1Pos_Z,0),
@@ -1065,13 +1082,13 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 	G4RotationMatrix *pRotQ1vacInContainer=new G4RotationMatrix();
 	pRotQ1vacInContainer->rotateX(90*deg); 
 	
-	if(mSetupLHRS>=4)
+	if(fSetupHRS>=4)
 	{
 		//put it in the container, which also center at the hall center
 		new G4PVPlacement(pRotQ1vacInContainer,G4ThreeVector(0, -pQ1vacCenterZ,pQ1vacCenterY),
 			LQ1vacLogical,"LQ1vacPhys",LHRSContainerLogical,0,0,0);
 	}
-	if(mSetupRHRS>=4)
+	if(fSetupHRS>=4)
 	{
 		new G4PVPlacement(pRotQ1vacInContainer,G4ThreeVector(0, -pQ1vacCenterZ,pQ1vacCenterY),
 			RQ1vacLogical,"RQ1vacPhys",RHRSContainerLogical,0,0,0);
@@ -1108,14 +1125,14 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 	LQ2Logical->SetVisAttributes(IronVisAtt); 
 	RQ2Logical->SetVisAttributes(IronVisAtt); 
 
-	if(mSetupLHRS>=3)
+	if(fSetupHRS>=3)
 	{
 		//put it in the container, which also center at the hall center
 		double pLQ2Pos_Z=(pHallCenter2LQ2Face+pQ2Length/2.0);
 		new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pLQ2Pos_Z,0),
 			LQ2Logical,"LQ2Phys",LHRSContainerLogical,0,0,0);
 	}
-	if(mSetupRHRS>=3)
+	if(fSetupHRS>=3)
 	{
 		double pRQ2Pos_Z=(pHallCenter2RQ2Face+pQ2Length/2.0);
 		new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pRQ2Pos_Z,0),
@@ -1141,13 +1158,13 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 
 	G4RotationMatrix *pRotQ2vacInContainer=new G4RotationMatrix();
 	pRotQ2vacInContainer->rotateX(90*deg); 
-	if(mSetupLHRS>=4)
+	if(fSetupHRS>=4)
 	{
 		//put it in the container, which also center at the hall center
 		new G4PVPlacement(pRotQ2vacInContainer,G4ThreeVector(0, -pQ2vacCenterZ,pQ2vacCenterY),
 			LQ2vacLogical,"LQ2vacPhys",LHRSContainerLogical,0,0,0);
 	}
-	if(mSetupRHRS>=4)
+	if(fSetupHRS>=4)
 	{
 		new G4PVPlacement(pRotQ2vacInContainer,G4ThreeVector(0, -pQ2vacCenterZ,pQ2vacCenterY),
 			RQ2vacLogical,"RQ2vacPhys",RHRSContainerLogical,0,0,0);
@@ -1172,13 +1189,13 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 
 	G4RotationMatrix *pRotQ2vac2InContainer=new G4RotationMatrix();
 	pRotQ2vac2InContainer->rotateX(90*deg); 
-	if(mSetupLHRS>=4)
+	if(fSetupHRS>=4)
 	{
 		//put it in the container, which also center at the hall center
 		new G4PVPlacement(pRotQ2vac2InContainer,G4ThreeVector(0, -pQ2vac2CenterZ,pQ2vac2CenterY),
 			LQ2vac2Logical,"LQ2vac2Phys",LHRSContainerLogical,0,0,0);
 	}
-	if(mSetupRHRS>=4)
+	if(fSetupHRS>=4)
 	{
 		new G4PVPlacement(pRotQ2vac2InContainer,G4ThreeVector(0, -pQ2vac2CenterZ,pQ2vac2CenterY),
 			RQ2vac2Logical,"RQ2vac2Phys",RHRSContainerLogical,0,0,0);
@@ -1271,7 +1288,7 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 
 	//pRotDipoleFringe2InContainer->rotateX(90*deg); 
 	//if(0)
-	if(mSetupLHRS>=4)
+	if(fSetupHRS>=4)
 	{
 	  //put it in the container, which also center at the hall center
 	  new G4PVPlacement(pRotDipoleInContainer,
@@ -1279,7 +1296,7 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 			    LDipoleLogical,"LDipolePhys",LHRSContainerLogical,0,0,0);
 	}
 	//if(0)
-	if(mSetupRHRS>=4)
+	if(fSetupHRS>=4)
 	{
 	  new G4PVPlacement(pRotDipoleInContainer,
 			    G4ThreeVector(0,-pDipoleRCenterZ,pDipoleRCenterY),
@@ -1320,13 +1337,13 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 
 	G4RotationMatrix *pRotQ3InContainer=new G4RotationMatrix();
 	pRotQ3InContainer->rotateX(-45*deg); 
-	if(mSetupLHRS>=4)
+	if(fSetupHRS>=4)
 	{
 		//put it in the container, which also center at the hall center
 		new G4PVPlacement(pRotQ3InContainer,G4ThreeVector(0,-pQ3CenterZ,pQ3CenterY),
 			LQ3Logical,"LQ3Phys",LHRSContainerLogical,0,0,0);
 	}
-	if(mSetupRHRS>=4)
+	if(fSetupHRS>=4)
 	{
 		new G4PVPlacement(pRotQ3InContainer,G4ThreeVector(0,-pQ3CenterZ,pQ3CenterY),
 			RQ3Logical,"RQ3Phys",RHRSContainerLogical,0,0,0);
@@ -1351,13 +1368,13 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 
 	G4RotationMatrix *pRotQ3vacInContainer=new G4RotationMatrix();
 	pRotQ3vacInContainer->rotateX(-45*deg); 
-	if(mSetupLHRS>=4)
+	if(fSetupHRS>=4)
 	{
 		//put it in the container, which also center at the hall center
 		new G4PVPlacement(pRotQ3vacInContainer,G4ThreeVector(0,-pQ3vacCenterZ,pQ3vacCenterY),
 			LQ3vacLogical,"LQ3vacPhys",LHRSContainerLogical,0,0,0);
 	}
-	if(mSetupRHRS>=4)
+	if(fSetupHRS>=4)
 	{
 		new G4PVPlacement(pRotQ3vacInContainer,G4ThreeVector(0,-pQ3vacCenterZ,pQ3vacCenterY),
 			RQ3vacLogical,"RQ3vacPhys",RHRSContainerLogical,0,0,0);
@@ -1377,13 +1394,13 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 
 	G4RotationMatrix *pRotQ3vac2InContainer=new G4RotationMatrix();
 	pRotQ3vac2InContainer->rotateX(-45*deg); 
-	if(mSetupLHRS>=4)
+	if(fSetupHRS>=4)
 	{
 		//put it in the container, which also center at the hall center
 		new G4PVPlacement(pRotQ3vac2InContainer,G4ThreeVector(0,-pQ3vac2CenterZ,pQ3vac2CenterY),
 			LQ3vac2Logical,"LQ3vac2Phys",LHRSContainerLogical,0,0,0);
 	}
-	if(mSetupRHRS>=4)
+	if(fSetupHRS>=4)
 	{
 		new G4PVPlacement(pRotQ3vac2InContainer,G4ThreeVector(0,-pQ3vac2CenterZ,pQ3vac2CenterY),
 			RQ3vac2Logical,"RQ3vac2Phys",RHRSContainerLogical,0,0,0);
@@ -1411,16 +1428,17 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 	G4LogicalVolume* RQ1Q2TunnelLogical = new G4LogicalVolume(Q1Q2TunnelSolid,
 		mMaterialManager->vacuum,"RQ1Q2TunnelLogical",0,0,0);
 
+        G4VisAttributes *LightYellowVisAtt = new G4VisAttributes(G4Colour(0.8,0.8,0.2)); 
 
 	LQ1Q2TunnelLogical->SetVisAttributes(LightYellowVisAtt); 
 	RQ1Q2TunnelLogical->SetVisAttributes(LightYellowVisAtt); 
 	/*
-	if(mSetupLHRS>=3){//This is the old Jixie way
+	if(fSetupHRS>=3){//This is the old Jixie way
 	  //put it in the container, which also center at the hall center
 	  new G4PVPlacement(pRotX90deg,G4ThreeVector(0,0,0),
 			    LQ1Q2TunnelLogical,"LQ1Q2TunnelPhys",LHRSContainerLogical,0,0,0);
 	}
-	if(mSetupRHRS>=3){//This is the old Jixie way
+	if(fSetupHRS>=3){//This is the old Jixie way
 	  new G4PVPlacement(pRotX90deg,G4ThreeVector(0,0,0),
 			    RQ1Q2TunnelLogical,"RQ1Q2TunnelPhys",RHRSContainerLogical,0,0,0);
 	}
@@ -1436,8 +1454,8 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 		mMaterialManager->vacuum,"RQ1MagLogical",0,0,0);
 
 	//Nickie's Q1 field
-	G4FieldManager* LQ1FieldManager = mEMFieldSetup->GetFieldManagerFZBL1();
-	G4FieldManager* RQ1FieldManager = mEMFieldSetup->GetFieldManagerFZBR1();
+	G4FieldManager* LQ1FieldManager = fEMFieldSetup->GetFieldManagerFZBL1();
+	G4FieldManager* RQ1FieldManager = fEMFieldSetup->GetFieldManagerFZBR1();
 	G4bool allLocal = true;
 	//G4bool allLocal = false;
 	LQ1MagLogical->SetFieldManager(LQ1FieldManager,allLocal);
@@ -1448,7 +1466,7 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 
 
 	//Nickie's old way
-	if(mSetupLHRS>=2){
+	if(fSetupHRS>=2){
 	  //put it in the container, which also center at the hall center
 	  //therefore only the z_at_lab position need to be considered
 	  double pLQ1Pos_Z=(pHallCenter2LQ1Face+pQ1PosAct/2.0 + q1shift);//NIM
@@ -1456,7 +1474,7 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 	  //double pLQ1Pos_Z=(pHallCenter2LQ1FaceMag+pQ1LengthMag/2.0);//SNAKE
 	  new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pLQ1Pos_Z,0),
 			    LQ1MagLogical,"LQ1MagPhys",LHRSContainerLogical,0,0,0);
-	}if(mSetupRHRS>=2){
+	}if(fSetupHRS>=2){
 	  double pRQ1Pos_Z=(pHallCenter2RQ1Face+pQ1PosAct/2.0 + q1shift);//NIM
 	  //double pRQ1Pos_Z=(pQ1PosAct + q1shift);//NIM
 	  //double pRQ1Pos_Z=(pHallCenter2RQ1FaceMag+pQ1LengthMag/2.0);//SNAKE
@@ -1473,8 +1491,8 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 		mMaterialManager->vacuum,"RQ2MagLogical",0,0,0);
 
 	//Nickie's Q2 field
-	G4FieldManager* LQ2FieldManager = mEMFieldSetup->GetFieldManagerFZBL2();
-	G4FieldManager* RQ2FieldManager = mEMFieldSetup->GetFieldManagerFZBR2();
+	G4FieldManager* LQ2FieldManager = fEMFieldSetup->GetFieldManagerFZBL2();
+	G4FieldManager* RQ2FieldManager = fEMFieldSetup->GetFieldManagerFZBR2();
 	
 	LQ2MagLogical->SetFieldManager(LQ2FieldManager,allLocal);
 	RQ2MagLogical->SetFieldManager(RQ2FieldManager,allLocal);
@@ -1483,13 +1501,13 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 	RQ2MagLogical->SetVisAttributes(LightYellowVisAtt); 
 
 	 //Nickie's old way
-	if(mSetupLHRS>=3){
+	if(fSetupHRS>=3){
 	  //put it in the container, which also center at the hall center
 	  double pLQ2Pos_Z=(pHallCenter2LQ2Face+pQ2Length/2.0);//NIM
 	  //double pLQ2Pos_Z=(pHallCenter2LQ2FaceMag+pQ2LengthMag/2.0);//SNAKE
 	  new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pLQ2Pos_Z,0),
 			    LQ2MagLogical,"LQ2MagPhys",LHRSContainerLogical,0,0,0);
-	}if(mSetupRHRS>=3){
+	}if(fSetupHRS>=3){
 	  double pRQ2Pos_Z=(pHallCenter2RQ2Face+pQ2Length/2.0);//NIM
 	  //double pRQ2Pos_Z=(pHallCenter2RQ2FaceMag+pQ2LengthMag/2.0);//SNAKE
 	  new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pRQ2Pos_Z,0),
@@ -1593,8 +1611,8 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 	LDipoleFringe2Logical->SetVisAttributes(YellowVisAtt);
 	RDipoleFringe2Logical->SetVisAttributes(YellowVisAtt); 
 	//Nickie's dipole field
-	G4FieldManager* LdipoleFieldManager = mEMFieldSetup->GetFieldManagerFZBL3();
-	G4FieldManager* RdipoleFieldManager = mEMFieldSetup->GetFieldManagerFZBR3();
+	G4FieldManager* LdipoleFieldManager = fEMFieldSetup->GetFieldManagerFZBL3();
+	G4FieldManager* RdipoleFieldManager = fEMFieldSetup->GetFieldManagerFZBR3();
 	//G4double minEps= 1.0e-9;  //   Minimum & value for smallest steps
 	//G4double maxEps= 1.0e-8;  //   Maximum & value for largest steps
 
@@ -1608,7 +1626,7 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
         //double pFringeX_ex = ( IS_NIM == 1 ) ?  pQ3CenterY - pQ3Length / sqrt(2.) / 2. - 1.5 * m / sqrt(2) + 0.75 * m / sqrt( 2 ) :   2.4603032 * m + 0.75 * m / sqrt( 2 );
         //double pFringeZ_ex = ( IS_NIM == 1 ) ? -pQ3CenterZ + pQ3Length / sqrt(2.) / 2. + 1.5 * m / sqrt(2) - 0.75 * m / sqrt( 2 ) : -15.9006973 * m - 0.75 * m / sqrt( 2 );
 
-	if(mSetupLHRS>=4)
+	if(fSetupHRS>=4)
 	{
 	  //put it in the container, which also center at the hall center
 	  new G4PVPlacement(pRotDipoleInContainer,
@@ -1623,7 +1641,7 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 			    LDipoleFringe2Logical,"LDipoleFringe2Phys",LHRSContainerLogical,0,0,0);
 	  */
 	}
-	if(mSetupRHRS>=4)
+	if(fSetupHRS>=4)
 	{
 	  new G4PVPlacement(pRotDipoleInContainer,
 			    G4ThreeVector(0,-pDipoleRCenterZ,pDipoleRCenterY),
@@ -1658,13 +1676,13 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 	//double pQ3TunnelPos_Z=9.96*m+pDipoleR*sin(pDipoleBendAngle)+2.0*m*cos(pDipoleBendAngle);
 	//double pQ3TunnelPos_Z=pDipoleR*sin(pDipoleBendAngle)+2.0*m*cos(pDipoleBendAngle);
 	//pQ3TunnelPos_Z += ( IS_NIM == 1 ) ? 9.96*m : pDipoleRCenterZ; 
-	//if(mSetupLHRS>=4)
+	//if(fSetupHRS>=4)
 	//{
 		//put it in the container, which also center at the hall center
 		//new G4PVPlacement(pRotQ3InContainer,G4ThreeVector(0,-pQ3TunnelPos_Z,pQ3TunnelPos_Y),
 				  //LQ3TunnelLogical,"LQ1Q2TunnelPhys",LHRSContainerLogical,0,0,0);
 	//}
-	//if(mSetupRHRS>=4)
+	//if(fSetupHRS>=4)
 	//{
 	  //new G4PVPlacement(pRotQ3InContainer,G4ThreeVector(0,-pQ3TunnelPos_Z,pQ3TunnelPos_Y),
 	  //RQ3TunnelLogical,"RQ1Q2TunnelPhys",RHRSContainerLogical,0,0,0);
@@ -1680,8 +1698,8 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 		mMaterialManager->vacuum,"RQ3MagLogical",0,0,0);
 
 	//Nickie's Q3 field
-	G4FieldManager* LQ3FieldManager = mEMFieldSetup->GetFieldManagerFZBL4();
-	G4FieldManager* RQ3FieldManager = mEMFieldSetup->GetFieldManagerFZBR4();
+	G4FieldManager* LQ3FieldManager = fEMFieldSetup->GetFieldManagerFZBL4();
+	G4FieldManager* RQ3FieldManager = fEMFieldSetup->GetFieldManagerFZBR4();
 	LQ3MagLogical->SetFieldManager(LQ3FieldManager,allLocal);
 	RQ3MagLogical->SetFieldManager(RQ3FieldManager,allLocal);
 
@@ -1690,7 +1708,7 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 
 	G4RotationMatrix *pRotQ3MagInContainer=new G4RotationMatrix();
 	pRotQ3MagInContainer->rotateX(-45*deg); 
-	if(mSetupLHRS>=4)
+	if(fSetupHRS>=4)
 	{
 	  //put it in the container, which also center at the hall center
 	  //new G4PVPlacement(pRotQ3MagInContainer,G4ThreeVector(0,-pQ3CenterZMag,pQ3CenterYMag),//SNAKE
@@ -1698,7 +1716,7 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 	  new G4PVPlacement(pRotQ3MagInContainer,G4ThreeVector(0,-pQ3CenterZ,pQ3CenterY),//NIM
 			    LQ3MagLogical,"LQ3MagPhys",LHRSContainerLogical,0,0,0);//NIM
 	}
-	if(mSetupRHRS>=4)
+	if(fSetupHRS>=4)
 	{
 	  //new G4PVPlacement(pRotQ3MagInContainer,G4ThreeVector(0,-pQ3CenterZMag,pQ3CenterYMag),//SNAKE
 	  //RQ3MagLogical,"RQ3MagPhys",RHRSContainerLogical,0,0,0);//SNAKE
@@ -1794,8 +1812,8 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 	pRotVDCInContainer->rotateX(0.*deg); 
 	G4RotationMatrix *pRotFPInContainer=new G4RotationMatrix();
 	pRotFPInContainer->rotateX(-45*deg); 
-	//if(mSetupLHRS>=4){
-	if(mSnakeModel == 49 || mSnakeModel == 48 || mSnakeModel > 51 ){
+	//if(fSetupHRS>=4){
+	if(fSnakeModel == 49 || fSnakeModel == 48 || fSnakeModel > 51 ){
 	  double pSeptumX      = 140.0  * cm;
 	  double pSeptumY      = 84.4   * cm;
 	  double pSeptumZ      = 74.0   * cm;
@@ -1830,9 +1848,9 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 
 	double pHallCenter2Col = 1.38 * m;
 	double pPaulColT        = 0.01 * m;
-	double pPaulX = ( - pHallCenter2Col - pPaulColT * 2. ) * cos(mLHRSAngle) ;
-	double pPaulY = ( - pHallCenter2Col - pPaulColT * 2. ) * sin(mLHRSAngle);
-	if(mSnakeModel == 49 || mSnakeModel == 48 || mSnakeModel > 50 ){
+	double pPaulX = ( - pHallCenter2Col - pPaulColT * 2. ) * cos(fHRSAngle) ;
+	double pPaulY = ( - pHallCenter2Col - pPaulColT * 2. ) * sin(fHRSAngle);
+	if(fSnakeModel == 49 || fSnakeModel == 48 || fSnakeModel > 50 ){
 	  //double pLQ1Pos_Z=(pHallCenter2LQ1FaceMag+pQ1LengthMag/1.0);//SNAKE
 	  new G4PVPlacement(pRotXLHRSdeg,G4ThreeVector(pPaulY,0,-pPaulX),
 			    LPlaneLogical1,"virtualBoundaryPhys_col_LHRS",motherLogical,0,0,0);//q1en
@@ -1882,8 +1900,8 @@ void g4hrsDetectorConstruction::ConstructHRS(G4LogicalVolume* motherLogical)
 			    LFPLogical,"virtualBoundaryPhys_qz2_LHRS",LHRSContainerLogical,0,0,0);
 
 	}
-	//if(mSetupRHRS>=4){
-	if(mSnakeModel == 49 || mSnakeModel == 48 || mSnakeModel > 50 ){
+	//if(fSetupHRS>=4){
+	if(fSnakeModel == 49 || fSnakeModel == 48 || fSnakeModel > 50 ){
 	  new G4PVPlacement(pRotXRHRSdeg,G4ThreeVector(-pPaulY, 0, -pPaulX),
 			    LPlaneLogical1,"virtualBoundaryPhys_col_RHRS",motherLogical,0,0,0);//q1en
 

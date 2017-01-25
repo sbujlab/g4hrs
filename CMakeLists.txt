@@ -36,19 +36,6 @@ ROOT_GENERATE_DICTIONARY(
     LINKDEF "include/g4hrsLinkDef.h"  # ROOT linkDef file
 )
 
-#----------------------------------------------------------------------------
-# Find Boost libraries, in particular iostreams
-
-if(USE_BOOST)
-    find_package(Boost COMPONENTS iostreams)
-    include_directories(${Boost_INCLUDE_DIRS})
-    link_directories(${Boost_LIBRARY_DIR})
-    ADD_DEFINITIONS(-D__USE_BOOST)
-    if(Boost_IOSTREAMS_FOUND)
-        ADD_DEFINITIONS(-D__USE_BOOST_IOSTREAMS)
-    endif()
-endif()
-
 
 #----------------------------------------------------------------------------
 # Find Geant4 package, activating all available UI and Vis drivers by default
@@ -98,19 +85,19 @@ include_directories(${PROJECT_SOURCE_DIR}/include ${ROOT_INCLUDE_DIR} ${CMAKE_CU
 # Locate sources and headers for this project
 # NB: headers are included so they will show up in IDEs
 #
-file(GLOB sources ${PROJECT_SOURCE_DIR}/src/g4hrs*.cc)
-file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh ${CMAKE_CURRENT_BINARY_DIR}/include/gitinfo.hh)
+file(GLOB sources ${PROJECT_SOURCE_DIR}/src/g4hrs*.cc ${PROJECT_SOURCE_DIR}/src/fields/*.cc)
+file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh ${PROJECT_SOURCE_DIR}/src/fields/*.hh ${CMAKE_CURRENT_BINARY_DIR}/include/gitinfo.hh)
 
 file(GLOB libsources ${PROJECT_SOURCE_DIR}/src/g4hrsRunData.cc ${PROJECT_SOURCE_DIR}/src/g4hrsTextFile.cc)
-file(GLOB libheaders ${PROJECT_SOURCE_DIR}/include/*.hh ${CMAKE_CURRENT_BINARY_DIR}/include/gitinfo.hh)
+file(GLOB libheaders ${PROJECT_SOURCE_DIR}/include/*.hh ${PROJECT_SOURCE_DIR}/src/fields/*.hh  ${CMAKE_CURRENT_BINARY_DIR}/include/gitinfo.hh)
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 #
 add_executable(g4hrs g4hrs.cc ${sources} ${headers} g4hrsDict.cxx)
 add_library(g4hrsroot SHARED ${libsources} ${libheaders} g4hrsDict.cxx)
-target_link_libraries(g4hrs ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} ${Boost_LIBRARIES} )
-target_link_libraries(g4hrsroot ${ROOT_LIBRARIES} ${Boost_LIBRARIES} )
+target_link_libraries(g4hrs ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} )
+target_link_libraries(g4hrsroot ${ROOT_LIBRARIES} )
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we
