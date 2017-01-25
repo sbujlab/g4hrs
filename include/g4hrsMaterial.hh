@@ -9,6 +9,9 @@
 #include <map>
 #include "globals.hh"	//for units and g4io 
 
+#include <G4SystemOfUnits.hh>
+#include <G4PhysicalConstants.hh>
+
 #include "G4NistManager.hh"
 #include "G4Material.hh"
 #include "G4Element.hh"

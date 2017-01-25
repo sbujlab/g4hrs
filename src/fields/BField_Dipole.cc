@@ -28,6 +28,7 @@
 //
 // -------------------------------------------------------------------
 
+#include "G4SystemOfUnits.hh"
 #include "BField_Dipole.hh"
 #include "G4RotationMatrix.hh"
 #include <math.h>

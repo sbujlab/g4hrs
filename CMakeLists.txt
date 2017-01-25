@@ -80,7 +80,12 @@ endif()
 #----------------------------------------------------------------------------
 # Generate dictionaries as well (so we can write objects to ROOT files
 
-include_directories(${PROJECT_SOURCE_DIR}/include ${ROOT_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${PROJECT_SOURCE_DIR}/src/fields)
+include_directories(${PROJECT_SOURCE_DIR}/include ${ROOT_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include 
+     ${PROJECT_SOURCE_DIR}/src/fields
+     ${PROJECT_SOURCE_DIR}/HRSTransport
+     ${PROJECT_SOURCE_DIR}/HRSTransport/hamcPREXTrans
+     ${PROJECT_SOURCE_DIR}/HRSTransport/hamcCREXTrans
+     ${PROJECT_SOURCE_DIR}/HRSTransport/HRSTransSTD )
 
 
 #----------------------------------------------------------------------------
@@ -90,6 +95,24 @@ include_directories(${PROJECT_SOURCE_DIR}/include ${ROOT_INCLUDE_DIR} ${CMAKE_CU
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/g4hrs*.cc ${PROJECT_SOURCE_DIR}/src/fields/*.cc src/fortran/*.f)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh ${PROJECT_SOURCE_DIR}/src/fields/*.hh ${CMAKE_CURRENT_BINARY_DIR}/include/gitinfo.hh)
 
+file(GLOB transsources ${PROJECT_SOURCE_DIR}/HRSTransport/*.cc 
+    ${PROJECT_SOURCE_DIR}/HRSTransport/hamcPREXTrans/*.cc
+    ${PROJECT_SOURCE_DIR}/HRSTransport/hamcPREXTrans/*.f
+
+    ${PROJECT_SOURCE_DIR}/HRSTransport/hamcCREXTrans/*.cc
+    ${PROJECT_SOURCE_DIR}/HRSTransport/hamcCREXTrans/*.f
+
+    ${PROJECT_SOURCE_DIR}/HRSTransport/HRSTransSTD/*.cc
+    ${PROJECT_SOURCE_DIR}/HRSTransport/HRSTransSTD/*.f
+    )
+
+file(GLOB transheaders ${PROJECT_SOURCE_DIR}/HRSTransport/*.hh
+    ${PROJECT_SOURCE_DIR}/HRSTransport/hamcPREXTrans/*.hh
+    ${PROJECT_SOURCE_DIR}/HRSTransport/hamcCREXTrans/*.hh
+    ${PROJECT_SOURCE_DIR}/HRSTransport/HRSTransSTD/*.hh
+    )
+
+
 file(GLOB libsources ${PROJECT_SOURCE_DIR}/src/g4hrsRunData.cc ${PROJECT_SOURCE_DIR}/src/g4hrsTextFile.cc)
 file(GLOB libheaders ${PROJECT_SOURCE_DIR}/include/*.hh ${CMAKE_CURRENT_BINARY_DIR}/include/gitinfo.hh)
 
@@ -98,7 +121,9 @@ file(GLOB libheaders ${PROJECT_SOURCE_DIR}/include/*.hh ${CMAKE_CURRENT_BINARY_D
 #
 add_executable(g4hrs g4hrs.cc ${sources} ${headers} g4hrsDict.cxx)
 add_library(g4hrsroot SHARED ${libsources} ${libheaders} g4hrsDict.cxx)
-target_link_libraries(g4hrs ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} )
+add_library(HRSTransport ${transsources} ${transheaders})
+
+target_link_libraries(g4hrs ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} HRSTransport )
 target_link_libraries(g4hrsroot ${ROOT_LIBRARIES} )
 
 #----------------------------------------------------------------------------

@@ -30,6 +30,8 @@
 
 #include "BField_Dipole_Fringe.hh"
 #include "G4RotationMatrix.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4PhysicalConstants.hh"
 #include <math.h>
 #define DEBUG_BFIELD_DIPOLE_FRINGE 1
 
