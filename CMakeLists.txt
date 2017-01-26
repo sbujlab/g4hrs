@@ -132,8 +132,6 @@ target_link_libraries(g4hrsroot ${ROOT_LIBRARIES} )
 # relies on these scripts being in the current working directory.
 #
 
-FILE( GLOB G4HRS_GEO "geometry/*" )
-
 set(G4HRS_SCRIPTS
     vis/OIX.mac
     vis/Qt.mac
@@ -142,6 +140,7 @@ set(G4HRS_SCRIPTS
     macros/runexample.mac
     macros/gui.mac
     macros/vis.mac
+    scripts/BField_Septum.ini
     rootlogon.C
   )
 

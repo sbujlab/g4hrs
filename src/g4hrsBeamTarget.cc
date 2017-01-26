@@ -239,6 +239,8 @@ g4hrsVertex g4hrsBeamTarget::SampleVertex(SampType_t samp){
 	} 
 
 	len = ((G4Tubs *) (*it)->GetLogicalVolume()->GetSolid())->GetZHalfLength()*2.0*mat->GetDensity();
+
+        printf("Legnth of target = %f m\n", len/m);
 	switch( samp ){
 	    case kCryogen: 
 		/*

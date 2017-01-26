@@ -164,6 +164,8 @@ int main(int argc, char** argv){
 
     g4hrsRunData *rundata = g4hrsRun::GetRun()->GetData();
 
+    runManager->Initialize();
+
 #ifdef G4VIS_USE
     // Visualization, if you choose to have it!
     //
