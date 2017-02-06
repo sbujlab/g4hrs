@@ -13,6 +13,7 @@
 #include "g4hrsBeamTarget.hh"
 #include "g4hrsMultScatt.hh"
 #include "g4hrstypes.hh"
+#include "g4hrsDatabase.hh"
 
 #include <math.h>
 
@@ -185,6 +186,10 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
 
     ////////////////////////////////////////////////////////////////////////////////////////////
 
+	// Tyler: creating g4hrsDatabase to look up cross section, asymmetry
+	g4hrsDatabase *fDatabase = new g4hrsDatabase(0);
+		
+
 
     // sample with 1.0/(1-cos)^2
 
@@ -239,18 +244,22 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
     //  Multiply by Z because we have Z protons 
     //  value for uneven weighting
 
+	// Tyler: use th, ef to interpolate cross section
+	sigma = fDatabase->Interpolate(ef,th,0,0); 	
+
     double thisZ;
 
     thisZ = vert->GetMaterial()->GetZ();
 
-    evt->SetEffCrossSection(sigma*V*thisZ*thisZ*value);
+    //evt->SetEffCrossSection(sigma*V*thisZ*thisZ*value);
+	evt->SetEffCrossSection(sigma);
 
     if( vert->GetMaterial()->GetNumberOfElements() != 1 ){
 	G4cerr << __FILE__ << " line " << __LINE__ << 
 	    ": Error!  Some lazy programmer didn't account for complex materials in the moller process!" << G4endl;
 	exit(1);
     }
-
+	
     G4double APV_base = -GF*q2/(4.0*sqrt(2.0)*pi*alpha);
 
     G4double eps = pow(1.0 + 2.0*(1.0+tau)*tan(th/2.0)*tan(th/2.0), -1.0);
@@ -260,6 +269,9 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
 
     G4double APV = APV_base*(QWp - apvffnum/apvffden);
 
+	// Tyler: use th, ef to interpolate asymmetry
+	APV = fDatabase->Interpolate(ef,th,0,1);
+		
     evt->SetAsymmetry(APV);
 
     evt->SetQ2( q2 );
