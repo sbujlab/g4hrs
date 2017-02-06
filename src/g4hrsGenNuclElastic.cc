@@ -245,7 +245,8 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
     //  value for uneven weighting
 
 	// Tyler: use th, ef to interpolate cross section
-	sigma = fDatabase->Interpolate(ef,th,0,0); 	
+	// divide by 1000 to convert from millibarns/str
+	sigma = fDatabase->Interpolate(ef,th,0,0)/1000.;  	
 
     double thisZ;
 
