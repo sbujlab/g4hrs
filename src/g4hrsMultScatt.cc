@@ -338,7 +338,7 @@ double g4hrsMultScatt::intsimpson_fn( double th, int n ){
 
     double bess_step = 1e9;
     
-    if( fabs(bess_step) < 1e-9 ){
+    if( fabs(th) > 1e-6 ){
         bess_step = 2.4/2.0/th;
     }
 

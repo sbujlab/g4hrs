@@ -39,6 +39,8 @@ g4hrsGenNuclElastic::g4hrsGenNuclElastic(){
 }
 
 g4hrsGenNuclElastic::~g4hrsGenNuclElastic(){
+    delete fDatabase;
+    fDatabase = NULL;
 }
 
 void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
