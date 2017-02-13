@@ -1,4 +1,5 @@
 #include "G4Tubs.hh"
+#include "G4Box.hh"
 #include "G4VPhysicalVolume.hh"
 #include "G4LogicalVolume.hh"
 #include "G4VSolid.hh"
@@ -23,7 +24,6 @@ g4hrsBeamTarget *g4hrsBeamTarget::gSingleton = NULL;
 
 g4hrsBeamTarget::g4hrsBeamTarget(){
     gSingleton = this;
-    fMother = NULL;
     UpdateInfo();
 
     fOldRaster = true;
@@ -65,38 +65,86 @@ G4double g4hrsBeamTarget::GetEffLumin(){
 void g4hrsBeamTarget::UpdateInfo(){
     std::vector<G4VPhysicalVolume *>::iterator it;
 
-    fLH2Length   = -1e9;
-    fZpos        = -1e9;
-    fLH2pos      = -1e9;
-    fTotalLength = 0.0;
+    fTargLength   = 0.0;
+    fTotalLength   = 0.0;
 
-    // Can't calculate anything without mother
-    if( !fMother ) return;
-    fZpos = fMother->GetFrameTranslation().z();
+    double thiszlen = -1e9;
 
-    for(it = fTargVols.begin(); it != fTargVols.end(); it++ ){
+    if( fTargVol ){
+        if( !dynamic_cast<G4Tubs *>( fTargVol->GetLogicalVolume()->GetSolid() )  ||
+                !dynamic_cast<G4Box *>( fTargVol->GetLogicalVolume()->GetSolid() ) 
+          ){
+            G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
+                ":  Target volume not made of G4Tubs or G4Box" << G4endl; 
+            exit(1);
+        } 
+
+        if( dynamic_cast<G4Tubs *>( fTargVol->GetLogicalVolume()->GetSolid() ) ){
+            thiszlen = ((G4Tubs *) fTargVol->GetLogicalVolume()->GetSolid())->GetZHalfLength()*2.0;
+        }
+        if( dynamic_cast<G4Box *>( fTargVol->GetLogicalVolume()->GetSolid() ) ){
+            thiszlen = ((G4Box *) fTargVol->GetLogicalVolume()->GetSolid())->GetZHalfLength()*2.0;
+        }
+
+        printf("[g4hrsBeamTarget::UpdateInfo] Target volume material %s\n", (*it)->GetLogicalVolume()->GetMaterial()->GetName().c_str() );
+
+        fTargLength  = thiszlen*fTargVol->GetLogicalVolume()->GetMaterial()->GetDensity();
+        fTotalLength += thiszlen*fTargVol->GetLogicalVolume()->GetMaterial()->GetDensity();
+    }
+
+    // First upstream
+    for(it = fUpstreamVols.begin(); it != fUpstreamVols.end(); it++ ){
 	// Assume everything is non-nested tubes
-	if( !dynamic_cast<G4Tubs *>( (*it)->GetLogicalVolume()->GetSolid() ) ){
+	if( !dynamic_cast<G4Tubs *>( (*it)->GetLogicalVolume()->GetSolid() )  ||
+            !dynamic_cast<G4Box *>( (*it)->GetLogicalVolume()->GetSolid() ) 
+            ){
 	    G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
-		":  Target volume not made of G4Tubs" << G4endl; 
+		":  Target volume not made of G4Tubs or G4Box" << G4endl; 
 	    exit(1);
 	}
 
-	if( (*it)->GetLogicalVolume()->GetMaterial()->GetName() == "LiquidHydrogen" ){
-	    if( fLH2Length >= 0.0 ){
-		G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
-		    ":  Multiply defined LH2 volumes" << G4endl; 
-		exit(1);
-	    }
+	if( dynamic_cast<G4Tubs *>( (*it)->GetLogicalVolume()->GetSolid() ) ){
+            thiszlen = ((G4Tubs *) (*it)->GetLogicalVolume()->GetSolid())->GetZHalfLength()*2.0;
+        }
+	if( dynamic_cast<G4Box *>( (*it)->GetLogicalVolume()->GetSolid() ) ){
+            thiszlen = ((G4Box *) (*it)->GetLogicalVolume()->GetSolid())->GetZHalfLength()*2.0;
+        }
 
-	    fLH2Length = ((G4Tubs *) (*it)->GetLogicalVolume()->GetSolid())->GetZHalfLength()*2.0
-		*(*it)->GetLogicalVolume()->GetMaterial()->GetDensity();
+        printf("[g4hrsBeamTarget::UpdateInfo] Target volume material %s\n", (*it)->GetLogicalVolume()->GetMaterial()->GetName().c_str() );
 
-	    fLH2pos    = (*it)->GetFrameTranslation().z();
+        fTotalLength  += thiszlen*(*it)->GetLogicalVolume()->GetMaterial()->GetDensity();
 
-	    fTotalLength += ((G4Tubs *) (*it)->GetLogicalVolume()->GetSolid())->GetZHalfLength()*2.0
-		*(*it)->GetLogicalVolume()->GetMaterial()->GetDensity();
+        fAllVols.push_back(*it);
+    }
+
+    if( fTargVol ){
+        fAllVols.push_back(fTargVol);
+    }
+
+    // Finally Downstream
+    for(it = fDownstreamVols.begin(); it != fDownstreamVols.end(); it++ ){
+
+	// Assume everything is non-nested tubes
+	if( !dynamic_cast<G4Tubs *>( (*it)->GetLogicalVolume()->GetSolid() )  ||
+            !dynamic_cast<G4Box *>( (*it)->GetLogicalVolume()->GetSolid() ) 
+            ){
+	    G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
+		":  Target volume not made of G4Tubs or G4Box" << G4endl; 
+	    exit(1);
 	}
+
+	if( dynamic_cast<G4Tubs *>( (*it)->GetLogicalVolume()->GetSolid() ) ){
+            thiszlen = ((G4Tubs *) (*it)->GetLogicalVolume()->GetSolid())->GetZHalfLength()*2.0;
+        }
+	if( dynamic_cast<G4Box *>( (*it)->GetLogicalVolume()->GetSolid() ) ){
+            thiszlen = ((G4Box *) (*it)->GetLogicalVolume()->GetSolid())->GetZHalfLength()*2.0;
+        }
+
+        printf("[g4hrsBeamTarget::UpdateInfo] Target volume material %s\n", (*it)->GetLogicalVolume()->GetMaterial()->GetName().c_str() );
+
+        fTotalLength  += thiszlen*(*it)->GetLogicalVolume()->GetMaterial()->GetDensity();
+        
+        fAllVols.push_back(*it);
     }
 
     return;
@@ -106,32 +154,41 @@ void g4hrsBeamTarget::UpdateInfo(){
 void g4hrsBeamTarget::SetTargetLen(G4double z){
     std::vector<G4VPhysicalVolume *>::iterator it;
 
-    for(it = fTargVols.begin(); it != fTargVols.end(); it++ ){
-	G4GeometryManager::GetInstance()->OpenGeometry((*it));
-	if( (*it)->GetLogicalVolume()->GetMaterial()->GetName() == "LiquidHydrogen" ){
-	    // Change the length of the target volume
-	    ((G4Tubs *) (*it)->GetLogicalVolume()->GetSolid())->SetZHalfLength(z/2.0);
-	} else {
+    if( fTargVol ){
+        if( !dynamic_cast<G4Tubs *>( fTargVol->GetLogicalVolume()->GetSolid() )  ||
+                !dynamic_cast<G4Box *>( fTargVol->GetLogicalVolume()->GetSolid() ) 
+          ){
+            G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
+                ":  Target volume not made of G4Tubs or G4Box" << G4endl; 
+            exit(1);
+        } 
 
-	    G4cerr << "WARNING " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
-		": volume other than cryogen has been specified, but handling not implemented" << G4endl;
-	    // Move position of all other volumes based on half length change
 
-	    /*
-	    G4ThreeVector pos = (*it)->GetFrameTranslation();
-
-	    if( pos.z() < fLH2pos ){
-		pos = pos + G4ThreeVector(0.0, 0.0, (fLH2Length-z)/2.0 );
-	    } else {
-		pos = pos - G4ThreeVector(0.0, 0.0, (fLH2Length-z)/2.0 );
-	    }
-
-	    (*it)->SetTranslation(pos);
-	    */
-	}
-	G4GeometryManager::GetInstance()->CloseGeometry(true, false, (*it));
+	G4GeometryManager::GetInstance()->OpenGeometry(fTargVol);
+        if( dynamic_cast<G4Tubs *>( fTargVol->GetLogicalVolume()->GetSolid() ) ){
+            ((G4Tubs *) fTargVol->GetLogicalVolume()->GetSolid())->SetZHalfLength(z/2.0);
+        }
+        if( dynamic_cast<G4Box *>( fTargVol->GetLogicalVolume()->GetSolid() ) ){
+            ((G4Box *) fTargVol->GetLogicalVolume()->GetSolid())->SetZHalfLength(z/2.0);
+        }
+	G4GeometryManager::GetInstance()->CloseGeometry(true, false, fTargVol);
     }
 
+    // Move positions of upstream and downstream volumes
+    for(it = fUpstreamVols.begin(); it != fUpstreamVols.end(); it++ ){
+	G4GeometryManager::GetInstance()->OpenGeometry((*it));
+
+        double zpos = (*it)->GetFrameTranslation().z();
+        (*it)->SetTranslation( G4ThreeVector(0.0, 0.0, zpos-z/2.0) );
+	G4GeometryManager::GetInstance()->CloseGeometry(true, false, (*it));
+    }
+    for(it = fDownstreamVols.begin(); it != fDownstreamVols.end(); it++ ){
+	G4GeometryManager::GetInstance()->OpenGeometry((*it));
+
+        double zpos = (*it)->GetFrameTranslation().z();
+        (*it)->SetTranslation( G4ThreeVector(0.0, 0.0, zpos+z/2.0) );
+	G4GeometryManager::GetInstance()->CloseGeometry(true, false, (*it));
+    }
 
     G4RunManager* runManager = G4RunManager::GetRunManager();
     runManager->GeometryHasBeenModified();
@@ -142,30 +199,27 @@ void g4hrsBeamTarget::SetTargetLen(G4double z){
 void g4hrsBeamTarget::SetTargetPos(G4double z){
     std::vector<G4VPhysicalVolume *>::iterator it;
 
-    //G4double zshift = z-(fZpos+fLH2pos);
+    double targz = -1e9;
+    if( fTargVol ){
+        targz = fTargVol->GetFrameTranslation().z();
+        (*it)->SetTranslation( G4ThreeVector(0.0, 0.0, z ) );
+    }
 
-
-    for(it = fTargVols.begin(); it != fTargVols.end(); it++ ){
+    for(it = fUpstreamVols.begin(); it != fUpstreamVols.end(); it++ ){
 	G4GeometryManager::GetInstance()->OpenGeometry((*it));
-	if( (*it)->GetLogicalVolume()->GetMaterial()->GetName() == "LiquidHydrogen" ){
-	    // Change the length of the target volume
-	    (*it)->SetTranslation( G4ThreeVector(0.0, 0.0, z-fZpos) );
-	} else {
-	    G4cerr << "WARNING " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
-		": volume other than cryogen has been specified, but handling not implemented" << G4endl;
 
-	    // Move position of all other volumes based on half length change
-
-	    /*
-	    G4ThreeVector prespos = (*it)->GetFrameTranslation();
-
-	    G4ThreeVector pos = prespos + G4ThreeVector(0.0, 0.0, zshift );
-
-	    (*it)->SetTranslation(prespos);
-	    */
-	}
+        double zpos = (*it)->GetFrameTranslation().z();
+        (*it)->SetTranslation( G4ThreeVector(0.0, 0.0, z+(zpos-targz) ) );
 	G4GeometryManager::GetInstance()->CloseGeometry(true, false, (*it));
     }
+    for(it = fDownstreamVols.begin(); it != fDownstreamVols.end(); it++ ){
+	G4GeometryManager::GetInstance()->OpenGeometry((*it));
+
+        double zpos = (*it)->GetFrameTranslation().z();
+        (*it)->SetTranslation( G4ThreeVector(0.0, 0.0, z+(zpos-targz)) );
+	G4GeometryManager::GetInstance()->CloseGeometry(true, false, (*it));
+    }
+
 
     G4RunManager* runManager = G4RunManager::GetRunManager();
     runManager->GeometryHasBeenModified();
@@ -189,8 +243,8 @@ g4hrsVertex g4hrsBeamTarget::SampleVertex(SampType_t samp){
 
     // Figure out how far along the target we got
     switch( samp ){
-	case kCryogen: 
-	    fSampLen = fLH2Length;
+	case kMainTarget: 
+	    fSampLen = fTargLength;
 	    break;
 
     case kWalls:
@@ -212,8 +266,6 @@ g4hrsVertex g4hrsBeamTarget::SampleVertex(SampType_t samp){
     ztrav = CLHEP::RandFlat::shoot(0.0, fSampLen);
 
 
-    G4bool isLH2;
-    G4bool foundvol = false;
     G4Material *mat;
     G4double zinvol;
 
@@ -227,160 +279,153 @@ g4hrsVertex g4hrsBeamTarget::SampleVertex(SampType_t samp){
 
     // Figure out the material we are in and the radiation length we traversed
     std::vector<G4VPhysicalVolume *>::iterator it;
-    for(it = fTargVols.begin(); it != fTargVols.end() && !foundvol; it++ ){
-	mat = (*it)->GetLogicalVolume()->GetMaterial();
-	if( mat->GetName() == "LiquidHydrogen" ) { 
-	    isLH2 = true; 
-	} else { 
-	    isLH2 = false;
-	    G4cerr << "WARNING " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
-		": volume not LH2 has been specified, but handling not implemented" << G4endl;
 
-	} 
+    bool foundvol = false;
 
-	len = ((G4Tubs *) (*it)->GetLogicalVolume()->GetSolid())->GetZHalfLength()*2.0*mat->GetDensity();
+    for(it = fAllVols.begin(); it != fAllVols.end() && !foundvol; it++ ){
+        mat = (*it)->GetLogicalVolume()->GetMaterial();
 
-        printf("Legnth of target = %f m\n", len/m);
-	switch( samp ){
-	    case kCryogen: 
-		/*
-		if( !isLH2 ){
-		    radsum += len/mat->GetDensity()/mat->GetRadlen();
-		} else {
-		*/
-		foundvol = true;
-		zinvol = ztrav/mat->GetDensity();
-		radsum += zinvol/mat->GetRadlen();
-		//}
-		break;
+        len = ((G4Tubs *) (*it)->GetLogicalVolume()->GetSolid())->GetZHalfLength()*2.0*mat->GetDensity();
+        switch( samp ){
+            case kMainTarget: 
+                /*
+                   if( !isLH2 ){
+                   radsum += len/mat->GetDensity()/mat->GetRadlen();
+                   } else {
+                   */
+                foundvol = true;
+                zinvol = ztrav/mat->GetDensity();
+                radsum += zinvol/mat->GetRadlen();
+                //}
+                break;
 
-	    case kWalls:
+            case kWalls:
 
-		G4cerr << "WARNING " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
-		": scattering from cell walls has been specified, but handling not implemented" << G4endl;
-		/*
-		if( isLH2 ){
-		    radsum += len/mat->GetDensity()/mat->GetRadlen();
-		} else {
-		    if( ztrav - cumz < len ){
-			foundvol = true;
-			zinvol = (ztrav - cumz)/mat->GetDensity();
-			radsum += zinvol/mat->GetRadlen();
-		    } else {
-			radsum += len/mat->GetDensity()/mat->GetRadlen();
-			cumz   += len;
-		    }
-		}
-		*/
-		break;
+                G4cerr << "WARNING " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
+                    ": scattering from cell walls has been specified, but handling not implemented" << G4endl;
+                /*
+                   if( isLH2 ){
+                   radsum += len/mat->GetDensity()/mat->GetRadlen();
+                   } else {
+                   if( ztrav - cumz < len ){
+                   foundvol = true;
+                   zinvol = (ztrav - cumz)/mat->GetDensity();
+                   radsum += zinvol/mat->GetRadlen();
+                   } else {
+                   radsum += len/mat->GetDensity()/mat->GetRadlen();
+                   cumz   += len;
+                   }
+                   }
+                   */
+                break;
 
-	    case kFullTarget:
-		if( ztrav - cumz < len ){
-		    foundvol = true;
-		    zinvol = (ztrav - cumz)/mat->GetDensity();
-		    radsum += zinvol/mat->GetRadlen();
-		} else {
-		    radsum += len/mat->GetDensity()/mat->GetRadlen();
-		    cumz   += len;
-		}
-		break;
-	}
+            case kFullTarget:
+                if( ztrav - cumz < len ){
+                    foundvol = true;
+                    zinvol = (ztrav - cumz)/mat->GetDensity();
+                    radsum += zinvol/mat->GetRadlen();
+                } else {
+                    radsum += len/mat->GetDensity()/mat->GetRadlen();
+                    cumz   += len;
+                }
+                break;
+        }
 
-	if( mat->GetBaseMaterial() ){
-	    G4cerr << __FILE__ << " " << __PRETTY_FUNCTION__ << ":  The material you're using isn't" <<
-		" defined in a way we can use for multiple scattering calculations" << G4endl;
-	    G4cerr << "Aborting" << G4endl; 
-	    exit(1);
-	}
+        if( mat->GetBaseMaterial() ){
+            G4cerr << __FILE__ << " " << __PRETTY_FUNCTION__ << ":  The material you're using isn't" <<
+                " defined in a way we can use for multiple scattering calculations" << G4endl;
+            G4cerr << "Aborting" << G4endl; 
+            exit(1);
+        }
 
-	if( foundvol ){
-	    // For our vertex
-	    thisvert.fMaterial = mat;
-	    thisvert.fRadLen   = radsum;
+        if( foundvol ){
+            // For our vertex
+            thisvert.fMaterial = mat;
+            thisvert.fRadLen   = radsum;
 
-	    // For our own info
-	    fTravLen = zinvol;
-	    fRadLen = radsum;
-	    fVer    = G4ThreeVector( rasx, rasy, 
-		      zinvol - (*it)->GetFrameTranslation().z() + fZpos 
-		       - ((G4Tubs *) (*it)->GetLogicalVolume()->GetSolid())->GetZHalfLength() );
+            // For our own info
+            fTravLen = zinvol;
+            fRadLen = radsum;
+            fVer    = G4ThreeVector( rasx, rasy, 
+                    zinvol + (*it)->GetFrameTranslation().z()  
+                    - ((G4Tubs *) (*it)->GetLogicalVolume()->GetSolid())->GetZHalfLength() );
 
-	    G4double masssum = 0.0;
-	    const G4int *atomvec = mat->GetAtomsVector();
-	    const G4ElementVector *elvec = mat->GetElementVector();
-	    const G4double *fracvec = mat->GetFractionVector();
+            G4double masssum = 0.0;
+            const G4int *atomvec = mat->GetAtomsVector();
+            const G4ElementVector *elvec = mat->GetElementVector();
+            const G4double *fracvec = mat->GetFractionVector();
 
-	    for( unsigned int i = 0; i < elvec->size(); i++ ){
-		// FIXME:  Not sure why AtomsVector would ever return null
-		// but it does - SPR 2/5/13.  Just going to assume unit
-		// weighting for now if that is the case
-		if( atomvec ){
-		    masssum += (*elvec)[i]->GetA()*atomvec[i];
-		} else {
-		    masssum += (*elvec)[i]->GetA();
-		}
-		msthick[nmsmat] = mat->GetDensity()*zinvol*fracvec[i];
-		msA[nmsmat] = (*elvec)[i]->GetA()*mole/g;
-		msZ[nmsmat] = (*elvec)[i]->GetZ();
+            for( unsigned int i = 0; i < elvec->size(); i++ ){
+                // FIXME:  Not sure why AtomsVector would ever return null
+                // but it does - SPR 2/5/13.  Just going to assume unit
+                // weighting for now if that is the case
+                if( atomvec ){
+                    masssum += (*elvec)[i]->GetA()*atomvec[i];
+                } else {
+                    masssum += (*elvec)[i]->GetA();
+                }
+                msthick[nmsmat] = mat->GetDensity()*zinvol*fracvec[i];
+                msA[nmsmat] = (*elvec)[i]->GetA()*mole/g;
+                msZ[nmsmat] = (*elvec)[i]->GetZ();
 
-		nmsmat++;
-	    }
+                nmsmat++;
+            }
 
-	    fEffMatLen = (fSampLen/len)* // Sample weighting
-	      mat->GetDensity()*((G4Tubs *) (*it)->GetLogicalVolume()->GetSolid())->GetZHalfLength()*2.0*Avogadro/masssum; // material thickness
-	} else {
-	    const G4ElementVector *elvec = mat->GetElementVector();
-	    const G4double *fracvec = mat->GetFractionVector();
-	    for( unsigned int i = 0; i < elvec->size(); i++ ){
+            fEffMatLen = (fSampLen/len)* // Sample weighting
+                mat->GetDensity()*((G4Tubs *) (*it)->GetLogicalVolume()->GetSolid())->GetZHalfLength()*2.0*Avogadro/masssum; // material thickness
+        } else {
+            const G4ElementVector *elvec = mat->GetElementVector();
+            const G4double *fracvec = mat->GetFractionVector();
+            for( unsigned int i = 0; i < elvec->size(); i++ ){
 
-		msthick[nmsmat] = len*fracvec[i];
-		msA[nmsmat] = (*elvec)[i]->GetA()*mole/g;
-		msZ[nmsmat] = (*elvec)[i]->GetZ();
-		nmsmat++;
-	    }
-	}
+                msthick[nmsmat] = len*fracvec[i];
+                msA[nmsmat] = (*elvec)[i]->GetA()*mole/g;
+                msZ[nmsmat] = (*elvec)[i]->GetZ();
+                nmsmat++;
+            }
+        }
     }
 
     if( !foundvol ){
-	if( !fAlreadyWarned ){
-	    G4cerr << "WARNING: " << __PRETTY_FUNCTION__ << " line " << __LINE__ << ": Could not find sampling volume" << G4endl;
-	    fAlreadyWarned = true;
-	}
+        if( !fAlreadyWarned ){
+            G4cerr << "WARNING: " << __PRETTY_FUNCTION__ << " line " << __LINE__ << ": Could not find sampling volume" << G4endl;
+            fAlreadyWarned = true;
+        }
 
-	thisvert.fMaterial = fDefaultMat;
-	thisvert.fRadLen   = 0.0;
+        thisvert.fMaterial = fDefaultMat;
+        thisvert.fRadLen   = 0.0;
     }
-    
+
     // Sample multiple scattering + angles
     G4double msth, msph;
     G4double bmth, bmph;
 
     if( nmsmat > 0 ){
-	fMS->Init( fBeamE, nmsmat, msthick, msA, msZ );
-	msth = fMS->GenerateMSPlane();
-	msph = fMS->GenerateMSPlane();
+        fMS->Init( fBeamE, nmsmat, msthick, msA, msZ );
+        msth = fMS->GenerateMSPlane();
+        msph = fMS->GenerateMSPlane();
     } else {
-	msth = 0.0;
-	msph = 0.0;
+        msth = 0.0;
+        msph = 0.0;
     }
 
     assert( !std::isnan(msth) && !std::isnan(msph) );
 
     if(fOldRaster){
-      bmth = CLHEP::RandGauss::shoot(fTh0, fdTh);
-      bmph = CLHEP::RandGauss::shoot(fPh0, fdPh);
-      
-      if( fRasterX > 0 ){ bmth += fCorrTh*(rasx-fX0)/fRasterX/2; }
-      if( fRasterY > 0 ){ bmph += fCorrPh*(rasy-fY0)/fRasterY/2; }
-      
-      // Initial direction
-      fDir = G4ThreeVector(0.0, 0.0, 1.0);
-      
-      fDir.rotateY( bmth); // Positive th pushes to positive X (around Y-axis)
-      fDir.rotateX(-bmph); // Positive ph pushes to positive Y (around X-axis)
+        bmth = CLHEP::RandGauss::shoot(fTh0, fdTh);
+        bmph = CLHEP::RandGauss::shoot(fPh0, fdPh);
+
+        if( fRasterX > 0 ){ bmth += fCorrTh*(rasx-fX0)/fRasterX/2; }
+        if( fRasterY > 0 ){ bmph += fCorrPh*(rasy-fY0)/fRasterY/2; }
+
+        // Initial direction
+        fDir = G4ThreeVector(0.0, 0.0, 1.0);
+
+        fDir.rotateY( bmth); // Positive th pushes to positive X (around Y-axis)
+        fDir.rotateX(-bmph); // Positive ph pushes to positive Y (around X-axis)
     } else{
-      G4ThreeVector bmVec = G4ThreeVector(fVer.x(),fVer.y(),-1*(-8000.0*mm-fVer.z())); // in mm
-      fDir = G4ThreeVector(bmVec.unit());
+        G4ThreeVector bmVec = G4ThreeVector(fVer.x(),fVer.y(),-1*(-8000.0*mm-fVer.z())); // in mm
+        fDir = G4ThreeVector(bmVec.unit());
     }
 
     fDir.rotateY(msth);
@@ -396,26 +441,26 @@ g4hrsVertex g4hrsBeamTarget::SampleVertex(SampType_t samp){
     G4double  prob_sample, eloss, sample, env, value, ref;
 
     G4double prob = 1.- pow(fEcut/Ekin,bt) - bt/(bt+1.)*(1.- pow(fEcut/Ekin,bt+1.))
-	+ 0.75*bt/(2.+bt)*(1.- pow(fEcut/Ekin,bt+2.));
+        + 0.75*bt/(2.+bt)*(1.- pow(fEcut/Ekin,bt+2.));
     prob = prob/(1.- bt*Euler + bt*bt/2.*(Euler*Euler+pi*pi/6.)); /* Gamma function */
 
     prob_sample = G4UniformRand();
 
     if (prob_sample <= prob) {
-	do {
-	    sample = G4UniformRand();
-	    eloss = fEcut*pow(Ekin/fEcut,sample);
-	    env = 1./eloss;
-	    value = 1./eloss*(1.-eloss/Ekin+0.75*pow(eloss/Ekin,2))*pow(eloss/Ekin,bt);
+        do {
+            sample = G4UniformRand();
+            eloss = fEcut*pow(Ekin/fEcut,sample);
+            env = 1./eloss;
+            value = 1./eloss*(1.-eloss/Ekin+0.75*pow(eloss/Ekin,2))*pow(eloss/Ekin,bt);
 
-	    sample = G4UniformRand();
-	    ref = value/env;
-	} while (sample > ref);
+            sample = G4UniformRand();
+            ref = value/env;
+        } while (sample > ref);
 
-	fSampE = fBeamE - eloss;
-	assert( fSampE > electron_mass_c2 );
+        fSampE = fBeamE - eloss;
+        assert( fSampE > electron_mass_c2 );
     } else {
-	fSampE = fBeamE;
+        fSampE = fBeamE;
     }
 
 
@@ -425,33 +470,3 @@ g4hrsVertex g4hrsBeamTarget::SampleVertex(SampType_t samp){
 
     return thisvert;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

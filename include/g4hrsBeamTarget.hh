@@ -33,15 +33,24 @@ class g4hrsBeamTarget {
 	static g4hrsBeamTarget *gSingleton;
 	g4hrsBeamTarget();
 
+
+	std::vector <G4VPhysicalVolume *> fUpstreamVols;
+	std::vector <G4VPhysicalVolume *> fDownstreamVols;
+	std::vector <G4VPhysicalVolume *> fAllVols;
+	G4VPhysicalVolume *fTargVol;
+
+
+
     public:
 	static g4hrsBeamTarget *GetBeamTarget();
 	~g4hrsBeamTarget();
 
 	G4double GetEffLumin();
 
-	void Reset(){ fTargVols.clear(); fMother = NULL; UpdateInfo(); }
-	void SetMotherVolume( G4VPhysicalVolume *v ){ fMother = v; UpdateInfo(); }
-	void AddVolume( G4VPhysicalVolume *v ){ fTargVols.push_back(v);  UpdateInfo(); }
+	void Reset(){ fUpstreamVols.clear(); fDownstreamVols.clear(); fTargVol = NULL; UpdateInfo(); }
+	void AddUpstreamWall( G4VPhysicalVolume *v ){ fUpstreamVols.push_back(v);  UpdateInfo(); }
+	void AddDownstreamWall( G4VPhysicalVolume *v ){ fDownstreamVols.push_back(v);  UpdateInfo(); }
+	void SetTargetVolume( G4VPhysicalVolume *v ){ fTargVol = v;  UpdateInfo(); }
 	void SetTargetPos(G4double z);
 	void SetTargetLen(G4double l);
 
@@ -53,19 +62,16 @@ class g4hrsBeamTarget {
 	G4double fBeamCurr;
 	G4double fBeamPol;
 
-	std::vector <G4VPhysicalVolume *> GetTargVols(){ return fTargVols; }
+	G4VPhysicalVolume * GetTargVol(){ return fTargVol; }
 
 	g4hrsMultScatt *fMS;
-
     private:
-	std::vector <G4VPhysicalVolume *> fTargVols;
-	G4VPhysicalVolume *fMother;
-
 	void UpdateInfo();
 
-
+	G4double fTargLength;
 	G4double fTotalLength;
-	G4double fLH2Length, fZpos, fLH2pos;
+
+	G4double fTargRad;
 
 	G4Material *fDefaultMat;
 

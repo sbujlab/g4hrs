@@ -129,6 +129,7 @@ G4VPhysicalVolume* g4hrsDetectorConstruction::Construct() {
 
     fWorldVolume = new G4PVPlacement(0, G4ThreeVector(), worldLog, "world", 0, false, 0);
 
+
     CreateTarget(worldLog);
 
     return fWorldVolume;
@@ -147,9 +148,6 @@ void g4hrsDetectorConstruction::CreateTarget(G4LogicalVolume *pMotherLogVol){
     beamtarg->Reset();
 
 
-
-
-
 //    G4VSolid* targetSolid  = new G4Box("targetBox", fTargetW / 2.0, fTargetH / 2.0, fTargetL / 2.0 );
     G4VSolid* targetSolid  = new G4Tubs("targetBox", 0.0, fTargetW, fTargetL / 2.0, 0, 360*deg );
     G4LogicalVolume* targetLogical = new G4LogicalVolume(targetSolid,Pb_Mat,"targetLogical",0,0,0);
@@ -157,7 +155,7 @@ void g4hrsDetectorConstruction::CreateTarget(G4LogicalVolume *pMotherLogVol){
     G4VPhysicalVolume *phystarg = new G4PVPlacement(0,G4ThreeVector(fTargetX, fTargetY, fTargetZ),
         targetLogical,"targetPhys",pMotherLogVol,0,0);
 
-    beamtarg->AddVolume(phystarg);
+    beamtarg->SetTargetVolume(phystarg);
 
     return;
 }
