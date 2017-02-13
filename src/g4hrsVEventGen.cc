@@ -12,7 +12,7 @@ g4hrsVEventGen::g4hrsVEventGen() {
     fBeamTarg = g4hrsBeamTarget::GetBeamTarget();
     fRunData  = g4hrsRun::GetRun()->GetData();
 
-    fSampType       = kCryogen;
+    fSampType       = kMainTarget;
     fApplyMultScatt = false;
 }
 

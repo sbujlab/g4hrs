@@ -49,33 +49,36 @@ void g4hrsEventAction::EndOfEventAction(const G4Event* evt ) {
 
   G4VHitsCollection *thiscol;
 
-  // Traverse all hit collections, sort by output type
-  for( int hcidx = 0; hcidx < HCE->GetCapacity(); hcidx++ ){
-    thiscol = HCE->GetHC(hcidx);
-    if(thiscol){ // This is NULL if nothing is stored
-      // Dyanmic cast to test types, process however see fit and feed to IO
-      
-      ////  Generic Detector Hits ///////////////////////////////////
-      if( g4hrsGenericDetectorHitsCollection *thiscast = 
-	  dynamic_cast<g4hrsGenericDetectorHitsCollection *>(thiscol)){
-	for( unsigned int hidx = 0; hidx < thiscast->GetSize(); hidx++ ){
-	  fIO->AddGenericDetectorHit((g4hrsGenericDetectorHit *) 
-				     thiscast->GetHit(hidx) );	  
-	}
-      }
-      
-      ////  Generic Detector Sum ////////////////////////////////////
-      if( g4hrsGenericDetectorSumCollection *thiscast = 
-	  dynamic_cast<g4hrsGenericDetectorSumCollection *>(thiscol)){
-	for( unsigned int hidx = 0; hidx < thiscast->GetSize(); hidx++ ){
-	  fIO->AddGenericDetectorSum((g4hrsGenericDetectorSum *) 
-				     thiscast->GetHit(hidx) );
-	}
-      }
-      
-    }
-  }
+  if( HCE ){
 
+      // Traverse all hit collections, sort by output type
+      for( int hcidx = 0; hcidx < HCE->GetCapacity(); hcidx++ ){
+          thiscol = HCE->GetHC(hcidx);
+          if(thiscol){ // This is NULL if nothing is stored
+              // Dyanmic cast to test types, process however see fit and feed to IO
+
+              ////  Generic Detector Hits ///////////////////////////////////
+              if( g4hrsGenericDetectorHitsCollection *thiscast = 
+                      dynamic_cast<g4hrsGenericDetectorHitsCollection *>(thiscol)){
+                  for( unsigned int hidx = 0; hidx < thiscast->GetSize(); hidx++ ){
+                      fIO->AddGenericDetectorHit((g4hrsGenericDetectorHit *) 
+                              thiscast->GetHit(hidx) );	  
+                  }
+              }
+
+              ////  Generic Detector Sum ////////////////////////////////////
+              if( g4hrsGenericDetectorSumCollection *thiscast = 
+                      dynamic_cast<g4hrsGenericDetectorSumCollection *>(thiscol)){
+                  for( unsigned int hidx = 0; hidx < thiscast->GetSize(); hidx++ ){
+                      fIO->AddGenericDetectorSum((g4hrsGenericDetectorSum *) 
+                              thiscast->GetHit(hidx) );
+                  }
+              }
+
+          }
+      }
+
+  }
   // Fill tree and reset buffers
   fIO->FillTree();
   fIO->Flush();

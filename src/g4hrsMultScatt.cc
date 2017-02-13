@@ -336,7 +336,11 @@ double g4hrsMultScatt::intsimpson_fn( double th, int n ){
     //  Zeros for J0 are spaced apart by at least  ~2.4
     //  so we will integrate at most in steps of 2.4/2
 
-    double bess_step = 2.4/2.0/th;
+    double bess_step = 1e9;
+    
+    if( fabs(th) > 1e-6 ){
+        bess_step = 2.4/2.0/th;
+    }
 
     //  We want to integrate over the gaussian term at 
     //  most in 0.2 unit steps

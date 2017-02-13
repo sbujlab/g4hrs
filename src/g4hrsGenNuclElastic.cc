@@ -29,9 +29,18 @@ g4hrsGenNuclElastic::g4hrsGenNuclElastic(){
 
     fApplyMultScatt = true;
     fBeamTarg = g4hrsBeamTarget::GetBeamTarget();
+
+    // Tyler: creating g4hrsDatabase to look up cross section, asymmetry
+    // FIXME:  This should not have magic numbers and should
+    // either pull target type from BeamTarget or load all targets
+    fDatabase = new g4hrsDatabase(0);
+
+
 }
 
 g4hrsGenNuclElastic::~g4hrsGenNuclElastic(){
+    delete fDatabase;
+    fDatabase = NULL;
 }
 
 void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
@@ -43,35 +52,19 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
     double beamE = fBeamTarg->fBeamE;
     double Ekin  = beamE - electron_mass_c2;
 
-    std::vector <G4VPhysicalVolume *> targVols = fBeamTarg->GetTargVols();
-
     bool bypass_target = false;
-
-    std::vector<G4VPhysicalVolume *>::iterator it = targVols.begin();
-    if( targVols.size() > 0 ){
-	while( (*it)->GetLogicalVolume()->GetMaterial()->GetName() != "LiquidHydrogen" 
-		&& it != targVols.end() ){ it++; }
-
-	if( (*it)->GetLogicalVolume()->GetMaterial()->GetName() != "LiquidHydrogen" ){
-	    G4cerr << __FILE__ << " line " << __LINE__ << ": WARNING could not find target" << G4endl;
-	    bypass_target = true;
-	}     
-    } else {
-	bypass_target = true;
-    }
 
     double bremcut = fBeamTarg->fEcut;
 
     // Approximation for Q2, just needs to be order of magnitude
-    double effQ2 = 2.0*beamE*beamE*(1.0-cos(0.5*deg));
+    double effQ2 = 2.0*beamE*beamE*(1.0-cos(5.0*deg));
 
-    // About ~1.5%
+    // Let's just do internal radiation
     double int_bt = 0.75*(alpha/pi)*( log( effQ2/(electron_mass_c2*electron_mass_c2) ) - 1.0 );
 
     double bt;
     if( !bypass_target ){
-	bt = (4.0/3.0)*(fBeamTarg->fTravLen/(*it)->GetLogicalVolume()->GetMaterial()->GetRadlen()
-		+ int_bt);
+	bt = (4.0/3.0)*(int_bt);
     } else {
 	bt = 0.0;
     }
@@ -83,93 +76,19 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
     prob = prob/(1.- bt*Euler + bt*bt/2.*(Euler*Euler+pi*pi/6.)); /* Gamma function */
     prob_sample = G4UniformRand();        /* Random sampling */
 
-    double Evlo[NINTERVAL] = {
-	bremcut,
-	(beamE-bremcut)*2.0*GeV/(11.0*GeV-bremcut),
-	(beamE-bremcut)*9.0*GeV/(11.0*GeV-bremcut),
-    };
-
-    double Evhi[NINTERVAL] = {
-	(beamE-bremcut)*2.0*GeV/(11.0*GeV-bremcut),
-	(beamE-bremcut)*9.0*GeV/(11.0*GeV-bremcut),
-	(beamE-bremcut)*(11.0*GeV-fE_min)/(11.0*GeV-bremcut),
-    };
-
-    assert( Evhi[NINTERVAL-1]-Evlo[NINTERVAL-1] > 0.0 );
-
-    double Eprob[NINTERVAL]  = { 0.40, 0.20, 0.40 };
-
-    double Enorm[NINTERVAL];
-    // Interval normalization
-    for( int idx = 0; idx < NINTERVAL; idx++ ){
-	Enorm[idx]  = ((Evhi[idx]-Evlo[idx])/(Evhi[NINTERVAL-1]-Evlo[0]))
-	    /Eprob[idx];
-    }
-
-    int    Evidx;
-    double evsum = 0.0;
-    double vweight = 0.0;
-    eloss = 0.0;
-	     
-    // Averages over the intervals
-    double vavg[NINTERVAL] = {
-	log(Evhi[0]/Evlo[0])/(Evhi[0]-Evlo[0]),
-	log((beamE-Evlo[1])/(beamE-Evhi[1]))/(Evhi[1]-Evlo[1]),
-	(1.0/(beamE-Evhi[2])-1.0/(beamE-Evlo[2]))/(Evhi[2]-Evlo[2])
-    };
+    double env, ref;
 
     if (prob_sample <= prob) {//Bremsstrahlung has taken place!
-	//  We break this into 4 seperate energy loss intervals
-	//  with total integrals roughly the size of
-	//  what the ep product looks like with 11 GeV beam
-	//   cut  -  2000 MeV, 1/x, 40%
-	//   2000 -  9000 MeV, 1/(E-x), 20%
-	//   9000 - 10990 MeV, 1/(E-x)^2, 40%
+	do {
+	    sample = G4UniformRand();
+	    eloss = fBeamTarg->fEcut*pow(Ekin/fBeamTarg->fEcut,sample);
+	    env = 1./eloss;
+	    value = 1./eloss*(1.-eloss/Ekin+0.75*pow(eloss/Ekin,2))*pow(eloss/Ekin,bt);
 
-	sample = G4UniformRand();
+	    sample = G4UniformRand();
+	    ref = value/env;
+	} while (sample > ref);
 
-	// Identify our region
-	// based on the probability distribution
-	Evidx = 0;
-	evsum  = Eprob[Evidx];
-	while( evsum < sample ){
-	    Evidx++;
-	    evsum += Eprob[Evidx];
-	}
-
-	sample = G4UniformRand();
-
-	if( Evidx == 0 ){
-	    eloss = Evlo[Evidx]*pow(Evhi[Evidx]/Evlo[Evidx],sample);
-	    vweight = eloss;
-	}
-
-	if( Evidx == 1 ){
-	    eloss = beamE - (beamE-Evhi[Evidx])*
-		pow((beamE-Evlo[Evidx])/(beamE-Evhi[Evidx]),sample);
-	    vweight = (beamE-eloss);
-	}
-
-	if( Evidx == 2 ){
-	    eloss = beamE - pow( (1.0/(beamE-Evhi[Evidx]) - 1.0/(beamE-Evlo[Evidx]))*sample
-		    + 1.0/(beamE-Evlo[Evidx]), -1.0 );
-	    vweight = (beamE-eloss)*(beamE-eloss);
-	}
-
-	if( !(eloss > 0.0 ) ){
-	    printf("idx = %d\n", Evidx );
-	}
-
-	assert( eloss > 0.0 );
-
-	assert( !std::isnan(eloss) && !std::isinf(eloss) );
-
-	vweight *= vavg[Evidx];
-	//  mult by beamE-bremcut for proper normalization
-	value = RadProfile( eloss, bt)*
-	    ((Evhi[NINTERVAL-1]-Evlo[0])/EnergNumInt(bt, Evlo[0], Evhi[NINTERVAL-1])) // average of RadProfile
-	    *vweight // sampling weighting (flat or ) / average value for normalization
-	    *Enorm[Evidx]; //  Weight given the region
 
 	beamE -= eloss;
     }
@@ -186,8 +105,6 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
 
     ////////////////////////////////////////////////////////////////////////////////////////////
 
-	// Tyler: creating g4hrsDatabase to look up cross section, asymmetry
-	g4hrsDatabase *fDatabase = new g4hrsDatabase(0);
 		
 
 
@@ -244,16 +161,16 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
     //  Multiply by Z because we have Z protons 
     //  value for uneven weighting
 
+    double thisZ = vert->GetMaterial()->GetZ();
+
+    if( fabs( thisZ - 82.0 ) < 1e-6 ){
 	// Tyler: use th, ef to interpolate cross section
-	// divide by 1000 to convert from millibarns/str
-	sigma = fDatabase->Interpolate(ef,th,0,0)/1000.;  	
+	sigma = fDatabase->Interpolate(ef,th,0,0)/(thisZ*thisZ);  	
+    }
 
-    double thisZ;
-
-    thisZ = vert->GetMaterial()->GetZ();
 
     //evt->SetEffCrossSection(sigma*V*thisZ*thisZ*value);
-	evt->SetEffCrossSection(sigma);
+	evt->SetEffCrossSection(sigma*V*thisZ*thisZ);
 
     if( vert->GetMaterial()->GetNumberOfElements() != 1 ){
 	G4cerr << __FILE__ << " line " << __LINE__ << 
@@ -283,7 +200,6 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
 
     int_bt = (alpha/pi)*( log( q2/(electron_mass_c2*electron_mass_c2) ) - 1.0 );
     Ekin = ef - electron_mass_c2;;
-    double env, ref;
 
     prob = 1.- pow(bremcut/Ekin, int_bt) - int_bt/(int_bt+1.)*(1.- pow(bremcut/Ekin,int_bt+1.))
 	+ 0.75*int_bt/(2.+int_bt)*(1.- pow(bremcut/Ekin,int_bt+2.));

@@ -8,10 +8,10 @@
 #define g4hrsEMField_H
 
 #include "G4ThreeVector.hh"
-#include "G4ElectroMagneticField.hh"
+#include "G4MagneticField.hh"
 #include "BField_Septum.hh" //Septum Field class
 
-class g4hrsEMField : public G4ElectroMagneticField
+class g4hrsEMField : public G4MagneticField
 {
 public:
 

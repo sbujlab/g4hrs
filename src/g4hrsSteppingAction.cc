@@ -22,7 +22,7 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 
     // Don't continue in these materials
     if( (   material->GetName()=="Tungsten" 
-        ||  material->GetName()=="Pb"
+//        ||  material->GetName()=="Pb"
 	||  material->GetName()=="Copper" )
 	    && fEnableKryptonite
 	){
