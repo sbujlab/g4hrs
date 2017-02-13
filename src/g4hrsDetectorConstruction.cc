@@ -131,6 +131,9 @@ G4VPhysicalVolume* g4hrsDetectorConstruction::Construct() {
 
 
     CreateTarget(worldLog);
+    CreateSeptum(worldLog);
+//    CreateTargetChamber(worldLog);
+    CreateHRS(worldLog);
 
     return fWorldVolume;
 }

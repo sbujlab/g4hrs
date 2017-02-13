@@ -375,6 +375,7 @@ void g4hrsEMFieldSetup::UpdateField()
   //G4cout<<"g4hrsEMFieldSetup:: The minimal step is equal to "<<fMinStep/mm<<" mm"<<G4endl ;
   
   fFieldManager->SetDetectorField(fEMfield);
+  fFieldManager->CreateChordFinder( fEMfield );
   
   /*
   if(fChordFinder) delete fChordFinder;
@@ -392,6 +393,7 @@ void g4hrsEMFieldSetup::UpdateFieldFZBL1()
   //G4cout<<"g4hrsEMFieldSetup:: The minimal step for FZBL1 is equal to "<<fMinStep/mm<<" mm"<<G4endl ;
 
 	fLocalFieldManagerFZBL1->SetDetectorField(fMagFieldFZBL1);
+	fLocalFieldManagerFZBL1->CreateChordFinder(fMagFieldFZBL1);
 
         /*
 	if(fChordFinderFZBL1) delete fChordFinderFZBL1;
@@ -406,6 +408,7 @@ void g4hrsEMFieldSetup::UpdateFieldFZBR1()
   //G4cout<<"g4hrsEMFieldSetup:: The minimal step for FZBR1 is equal to "<<fMinStep/mm<<" mm"<<G4endl ;
 
 	fLocalFieldManagerFZBR1->SetDetectorField(fMagFieldFZBR1);
+	fLocalFieldManagerFZBR1->CreateChordFinder(fMagFieldFZBR1);
 
         /*
 	if(fChordFinderFZBR1) delete fChordFinderFZBR1;
@@ -422,6 +425,7 @@ void g4hrsEMFieldSetup::UpdateFieldFZBL2()
   //G4cout<<"g4hrsEMFieldSetup:: The minimal step for FZBL2 is equal to "<<fMinStep/mm<<" mm"<<G4endl ;
 
 	fLocalFieldManagerFZBL2->SetDetectorField(fMagFieldFZBL2);
+	fLocalFieldManagerFZBL2->CreateChordFinder(fMagFieldFZBL2);
 
         /*
 	if(fChordFinderFZBL2) delete fChordFinderFZBL2;
@@ -435,6 +439,7 @@ void g4hrsEMFieldSetup::UpdateFieldFZBR2()
   //G4cout<<"g4hrsEMFieldSetup:: The minimal step for FZBR2 is equal to "<<fMinStep/mm<<" mm"<<G4endl ;
 
 	fLocalFieldManagerFZBR2->SetDetectorField(fMagFieldFZBR2);
+	fLocalFieldManagerFZBR2->CreateChordFinder(fMagFieldFZBR2);
 
         /*
 	if(fChordFinderFZBR2) delete fChordFinderFZBR2;
@@ -454,6 +459,7 @@ void g4hrsEMFieldSetup::UpdateFieldFZBL3()
   //G4cout<<"g4hrsEMFieldSetup:: The minimal step for FZBL3 is equal to "<<fMinStep/mm<<" mm"<<G4endl ;
   
   fLocalFieldManagerFZBL3->SetDetectorField(fMagFieldFZBL3);
+  fLocalFieldManagerFZBL3->CreateChordFinder(fMagFieldFZBL3);
   
   /*
   if(fChordFinderFZBL3) delete fChordFinderFZBL3;
@@ -473,6 +479,7 @@ void g4hrsEMFieldSetup::UpdateFieldFZBR3()
   //G4cout<<"g4hrsEMFieldSetup:: The minimal step for FZBR3 is equal to "<<fMinStep/mm<<" mm"<<G4endl ;
   
   fLocalFieldManagerFZBR3->SetDetectorField(fMagFieldFZBR3);
+  fLocalFieldManagerFZBR3->CreateChordFinder(fMagFieldFZBR3);
   
   /*
   if(fChordFinderFZBR3) delete fChordFinderFZBR3;
@@ -492,6 +499,7 @@ void g4hrsEMFieldSetup::UpdateFieldFZBL4()
   //G4cout<<"g4hrsEMFieldSetup:: The minimal step for FZBL4 is equal to "<<fMinStep/mm<<" mm"<<G4endl ;
 
 	fLocalFieldManagerFZBL4->SetDetectorField(fMagFieldFZBL4);
+	fLocalFieldManagerFZBL4->CreateChordFinder(fMagFieldFZBL4);
 
         /*
 	if(fChordFinderFZBL4) delete fChordFinderFZBL4;
@@ -505,6 +513,7 @@ void g4hrsEMFieldSetup::UpdateFieldFZBR4()
   //G4cout<<"g4hrsEMFieldSetup:: The minimal step for FZBR4 is equal to "<<fMinStep/mm<<" mm"<<G4endl ;
 
 	fLocalFieldManagerFZBR4->SetDetectorField(fMagFieldFZBR4);
+	fLocalFieldManagerFZBR4->CreateChordFinder(fMagFieldFZBR4);
 
         /*
 	if(fChordFinderFZBR4) delete fChordFinderFZBR4;
