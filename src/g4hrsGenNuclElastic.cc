@@ -154,16 +154,16 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
     //  Multiply by Z because we have Z protons 
     //  value for uneven weighting
 
+    double thisZ = vert->GetMaterial()->GetZ();
+
+    if( fabs( thisZ - 82.0 ) < 1e-6 ){
 	// Tyler: use th, ef to interpolate cross section
-	// divide by 1000 to convert from millibarns/str
-	sigma = fDatabase->Interpolate(ef,th,0,0)/1000.;  	
+	sigma = fDatabase->Interpolate(ef,th,0,0)/(thisZ*thisZ);  	
+    }
 
-    double thisZ;
-
-    thisZ = vert->GetMaterial()->GetZ();
 
     //evt->SetEffCrossSection(sigma*V*thisZ*thisZ*value);
-	evt->SetEffCrossSection(sigma);
+	evt->SetEffCrossSection(sigma*V*thisZ*thisZ);
 
     if( vert->GetMaterial()->GetNumberOfElements() != 1 ){
 	G4cerr << __FILE__ << " line " << __LINE__ << 

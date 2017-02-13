@@ -24,6 +24,8 @@ g4hrsBeamTarget *g4hrsBeamTarget::gSingleton = NULL;
 
 g4hrsBeamTarget::g4hrsBeamTarget(){
     gSingleton = this;
+    fTargVol = NULL;
+
     UpdateInfo();
 
     fOldRaster = true;
@@ -44,6 +46,7 @@ g4hrsBeamTarget::g4hrsBeamTarget(){
     fDefaultMat = new G4Material("Default_proton"   , 1., 1.0, 1e-19*g/mole);
 
     fAlreadyWarned = false;
+
 }
 
 g4hrsBeamTarget::~g4hrsBeamTarget(){
@@ -71,8 +74,8 @@ void g4hrsBeamTarget::UpdateInfo(){
     double thiszlen = -1e9;
 
     if( fTargVol ){
-        if( !dynamic_cast<G4Tubs *>( fTargVol->GetLogicalVolume()->GetSolid() )  ||
-                !dynamic_cast<G4Box *>( fTargVol->GetLogicalVolume()->GetSolid() ) 
+        if( !dynamic_cast<G4Tubs *>( fTargVol->GetLogicalVolume()->GetSolid() )  &&
+            !dynamic_cast<G4Box *>( fTargVol->GetLogicalVolume()->GetSolid() ) 
           ){
             G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
                 ":  Target volume not made of G4Tubs or G4Box" << G4endl; 
@@ -86,7 +89,7 @@ void g4hrsBeamTarget::UpdateInfo(){
             thiszlen = ((G4Box *) fTargVol->GetLogicalVolume()->GetSolid())->GetZHalfLength()*2.0;
         }
 
-        printf("[g4hrsBeamTarget::UpdateInfo] Target volume material %s\n", (*it)->GetLogicalVolume()->GetMaterial()->GetName().c_str() );
+        printf("[g4hrsBeamTarget::UpdateInfo] Target volume material %s\n", fTargVol->GetLogicalVolume()->GetMaterial()->GetName().c_str() );
 
         fTargLength  = thiszlen*fTargVol->GetLogicalVolume()->GetMaterial()->GetDensity();
         fTotalLength += thiszlen*fTargVol->GetLogicalVolume()->GetMaterial()->GetDensity();
@@ -95,7 +98,7 @@ void g4hrsBeamTarget::UpdateInfo(){
     // First upstream
     for(it = fUpstreamVols.begin(); it != fUpstreamVols.end(); it++ ){
 	// Assume everything is non-nested tubes
-	if( !dynamic_cast<G4Tubs *>( (*it)->GetLogicalVolume()->GetSolid() )  ||
+	if( !dynamic_cast<G4Tubs *>( (*it)->GetLogicalVolume()->GetSolid() )  &&
             !dynamic_cast<G4Box *>( (*it)->GetLogicalVolume()->GetSolid() ) 
             ){
 	    G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
@@ -125,7 +128,7 @@ void g4hrsBeamTarget::UpdateInfo(){
     for(it = fDownstreamVols.begin(); it != fDownstreamVols.end(); it++ ){
 
 	// Assume everything is non-nested tubes
-	if( !dynamic_cast<G4Tubs *>( (*it)->GetLogicalVolume()->GetSolid() )  ||
+	if( !dynamic_cast<G4Tubs *>( (*it)->GetLogicalVolume()->GetSolid() )  &&
             !dynamic_cast<G4Box *>( (*it)->GetLogicalVolume()->GetSolid() ) 
             ){
 	    G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
@@ -155,7 +158,7 @@ void g4hrsBeamTarget::SetTargetLen(G4double z){
     std::vector<G4VPhysicalVolume *>::iterator it;
 
     if( fTargVol ){
-        if( !dynamic_cast<G4Tubs *>( fTargVol->GetLogicalVolume()->GetSolid() )  ||
+        if( !dynamic_cast<G4Tubs *>( fTargVol->GetLogicalVolume()->GetSolid() )  &&
                 !dynamic_cast<G4Box *>( fTargVol->GetLogicalVolume()->GetSolid() ) 
           ){
             G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
@@ -202,7 +205,7 @@ void g4hrsBeamTarget::SetTargetPos(G4double z){
     double targz = -1e9;
     if( fTargVol ){
         targz = fTargVol->GetFrameTranslation().z();
-        (*it)->SetTranslation( G4ThreeVector(0.0, 0.0, z ) );
+        fTargVol->SetTranslation( G4ThreeVector(0.0, 0.0, z ) );
     }
 
     for(it = fUpstreamVols.begin(); it != fUpstreamVols.end(); it++ ){

@@ -1,4 +1,6 @@
 #include "g4hrsDatabase.hh"
+#include "G4SystemOfUnits.hh"
+
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -13,16 +15,16 @@ g4hrsDatabase::g4hrsDatabase(int whichExperiment) : experiment(whichExperiment) 
 	//experiment = {0, 1} = {PREX, CREX}
 
 	if(experiment == 0) {
-		E_min = 0.55;
-		E_step = 0.05;
+		E_min = 0.55*GeV;
+		E_step = 0.05*GeV;
 		n_E = 14;
 		n_Th = 66;
 		LoadTable("horpb.dat",0);
 		LoadTable("horpb1.dat",1);
 	}
 	if(experiment == 1) {
-		E_min = 0.5;
-		E_step = 0.05;
+		E_min = 0.5*GeV;
+		E_step = 0.05*GeV;
 		n_E = 62;
 		n_Th = 141;
 		LoadTable("ca48_fsu.dat",0);
@@ -39,6 +41,11 @@ void g4hrsDatabase::LoadTable(string filename, int stretch) {
 	// stretch = {0, 1} = {R_n not stretched, R_n stretched 1%)
 	
 	ifstream datafile(filename, std::ifstream::in);
+
+        if( !datafile ){
+            fprintf(stderr, "ERROR %s line %d:  %s opening %s failed\n", __FILE__, __LINE__, __FUNCTION__, filename.c_str());
+            exit(1);
+        }
 	
 	double thisEnergy, thisAngle, thisXs, thisAsym, ignore;
 	string dummy;
@@ -56,9 +63,9 @@ void g4hrsDatabase::LoadTable(string filename, int stretch) {
 
 			datafile >> thisAngle >> thisXs >> ignore >> thisAsym >> ignore >> ignore;
 
-			angle.push_back(thisAngle);			
+			angle.push_back(thisAngle*deg);			
 
-			row_xs.push_back(thisXs);
+			row_xs.push_back(thisXs*millibarn);
 			row_asym.push_back(thisAsym);
 
 		} // end j (angle) for loop
@@ -75,7 +82,7 @@ void g4hrsDatabase::LoadTable(string filename, int stretch) {
 
 	} // end i (energy) for loop 
 
-	cout << "Tables loaded" << endl;
+	cout << "Table " << filename << " loaded" << endl;
 
 // end LoadTable
 }
@@ -84,7 +91,15 @@ double g4hrsDatabase::Interpolate(double thisE, double thisTh, int stretch, int 
 	// stretch = {0, 1} = {R_n not stretched, R_n stretched 1%)
 	// value = {0, 1} = {cross section, asymmetry}	
 	double th0, th1, e0, e1;
-	double i0, i1, j0, j1;
+	int i0, i1, j0, j1;
+
+        // Check ranges
+        if( thisTh < angle[0] ) return 0;
+        if( thisTh > angle[angle.size()-1] ) return 0;
+        if( thisE < energy[0] ) return 0;
+        if( thisE > energy[energy.size()-1] ) return 0;
+
+
 	for(int i=1; i<n_E; i++) {
 		if(energy[i-1] < thisE && energy[i] > thisE) {
 			e0 = energy[i-1];
