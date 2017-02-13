@@ -29,6 +29,13 @@ g4hrsGenNuclElastic::g4hrsGenNuclElastic(){
 
     fApplyMultScatt = true;
     fBeamTarg = g4hrsBeamTarget::GetBeamTarget();
+
+    // Tyler: creating g4hrsDatabase to look up cross section, asymmetry
+    // FIXME:  This should not have magic numbers and should
+    // either pull target type from BeamTarget or load all targets
+    fDatabase = new g4hrsDatabase(0);
+
+
 }
 
 g4hrsGenNuclElastic::~g4hrsGenNuclElastic(){
@@ -96,8 +103,6 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
 
     ////////////////////////////////////////////////////////////////////////////////////////////
 
-	// Tyler: creating g4hrsDatabase to look up cross section, asymmetry
-	g4hrsDatabase *fDatabase = new g4hrsDatabase(0);
 		
 
 
