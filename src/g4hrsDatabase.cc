@@ -10,11 +10,10 @@
 using std::cout;
 using std::endl;
 
-g4hrsDatabase::g4hrsDatabase(int whichExperiment) : experiment(whichExperiment) {
+g4hrsDatabase::g4hrsDatabase(G4String targmat) {
 
-	//experiment = {0, 1} = {PREX, CREX}
 
-	if(experiment == 0) {
+	if(targmat == "Pb208") {
 		E_min = 0.55*GeV;
 		E_step = 0.05*GeV;
 		n_E = 14;
@@ -22,7 +21,7 @@ g4hrsDatabase::g4hrsDatabase(int whichExperiment) : experiment(whichExperiment) 
 		LoadTable("horpb.dat",0);
 		LoadTable("horpb1.dat",1);
 	}
-	if(experiment == 1) {
+	if(targmat == "Ca48") {
 		E_min = 0.5*GeV;
 		E_step = 0.05*GeV;
 		n_E = 62;
@@ -31,6 +30,14 @@ g4hrsDatabase::g4hrsDatabase(int whichExperiment) : experiment(whichExperiment) 
 		LoadTable("ca48_fsu_stretched.dat",1);
 	}
 
+	if(targmat == "Ca40") {
+		E_min = 0.5*GeV;
+		E_step = 0.05*GeV;
+		n_E = 62;
+		n_Th = 141;
+		LoadTable("ca40_fsu.dat",0);
+		LoadTable("ca40_fsu_stretched.dat",1);
+	}
 // end constructer 
 } 
 

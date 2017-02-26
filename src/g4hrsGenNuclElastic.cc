@@ -33,7 +33,7 @@ g4hrsGenNuclElastic::g4hrsGenNuclElastic(){
     // Tyler: creating g4hrsDatabase to look up cross section, asymmetry
     // FIXME:  This should not have magic numbers and should
     // either pull target type from BeamTarget or load all targets
-    fDatabase = new g4hrsDatabase(0);
+    fDatabase = new g4hrsDatabase(fBeamTarg->GetTargetMaterial());
 
 
 }

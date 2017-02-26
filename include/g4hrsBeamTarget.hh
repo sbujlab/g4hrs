@@ -54,6 +54,8 @@ class g4hrsBeamTarget {
 	void SetTargetPos(G4double z);
 	void SetTargetLen(G4double l);
 
+	G4String GetTargetMaterial();
+
 	void SetBeamCurrent(G4double I){ fBeamCurr = I; }
 
 	g4hrsVertex SampleVertex(SampType_t);
@@ -61,6 +63,7 @@ class g4hrsBeamTarget {
 	G4double fBeamE;
 	G4double fBeamCurr;
 	G4double fBeamPol;
+	G4String fTargetMaterial;	
 
 	G4VPhysicalVolume * GetTargVol(){ return fTargVol; }
 

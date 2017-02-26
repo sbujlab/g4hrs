@@ -77,12 +77,17 @@ g4hrsMessenger::g4hrsMessenger(){
     tgtLenCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/targlen",this);
     tgtLenCmd->SetGuidance("Target length");
     tgtLenCmd->SetParameterName("targlen", false);
-    tgtLenCmd->AvailableForStates(G4State_Idle); // Only have this AFTER we've initalized geometry
+    tgtLenCmd->AvailableForStates(G4State_Idle); // Only have this AFTER we've initialized geometry
 
     tgtPosCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/targpos",this);
     tgtPosCmd->SetGuidance("Target position");
     tgtPosCmd->SetParameterName("targpos", false);
-    tgtPosCmd->AvailableForStates(G4State_Idle); // Only have this AFTER we've initalized geometry
+    tgtPosCmd->AvailableForStates(G4State_Idle); // Only have this AFTER we've initialized geometry
+
+    tgtMatCmd = new G4UIcmdWithAString("/g4hrs/targmat", this);
+    tgtMatCmd->SetGuidance("Target material");
+    tgtMatCmd->SetParameterName("targmat", false);
+    tgtMatCmd->AvailableForStates(G4State_Idle); // Only have this AFTER we've initialized geometry
 
     beamCurrCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/beamcurr",this);
     beamCurrCmd->SetGuidance("Beam current");
@@ -359,6 +364,10 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
     if( cmd == tgtPosCmd ){
 	G4double pos = tgtPosCmd->GetNewDoubleValue(newValue);
 	fBeamTarg->SetTargetPos(pos);
+    }
+
+    if ( cmd == tgtMatCmd ){
+	fBeamTarg->fTargetMaterial = newValue;
     }
 
     if( cmd == genSelectCmd ){

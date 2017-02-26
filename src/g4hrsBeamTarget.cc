@@ -230,6 +230,10 @@ void g4hrsBeamTarget::SetTargetPos(G4double z){
     UpdateInfo();
 }
 
+G4String g4hrsBeamTarget::GetTargetMaterial() {
+	return fTargetMaterial;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 //  Sampling functions

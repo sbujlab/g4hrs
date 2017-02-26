@@ -289,13 +289,16 @@ void g4hrsMaterial::ConstructMaterials()
 	density = 2.70*g/cm3;
 	aluminum = new G4Material(name="Aluminum", z=13., a, density);
 
-	//Calcium
-	//a = 40.078*g/mole;//natural
+	//Calcium40
+	a = 40.078*g/mole;//natural
+	density = 1.55*g/cm3;//natural
+	calcium40 = new G4Material(name="Calcium", z=20., a, density);
+	
+	//Calcium48
 	a = 47.952534*g/mole;//48Ca
-	//density = 1.55*g/cm3;//natural
 	density = 1.855*g/cm3;//48Ca
-	calcium = new G4Material(name="Calcium", z=20., a, density);
-
+	calcium48 = new G4Material(name="Calcium", z=20., a, density);
+	
 	//Iron
 	a = 55.845*g/mole;
 	density = 7.874*g/cm3;

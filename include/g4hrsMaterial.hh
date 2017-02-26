@@ -46,7 +46,8 @@ public:
 	G4Material* heliumGas;
 	G4Material* heliumGas4k;
 	G4Material* aluminum;
-	G4Material* calcium;
+	G4Material* calcium40;
+	G4Material* calcium48;
 	G4Material* iron;
 	G4Material* carbon;
 	G4Material* diamond;

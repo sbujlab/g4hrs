@@ -60,6 +60,7 @@ class g4hrsMessenger : public G4UImessenger {
 
 	G4UIcmdWithADoubleAndUnit *tgtLenCmd;
 	G4UIcmdWithADoubleAndUnit *tgtPosCmd;
+	G4UIcmdWithAString 	  *tgtMatCmd;
 
 	G4UIcmdWithADoubleAndUnit *beamCurrCmd;
 	G4UIcmdWithADoubleAndUnit *beamECmd;

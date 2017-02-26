@@ -98,6 +98,10 @@ g4hrsDetectorConstruction::g4hrsDetectorConstruction() {
     fFieldX = 45000*mm;
     fFieldY = 45000*mm;
     fFieldZ = 45000*mm;
+
+	
+    mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
+
 }
 
 g4hrsDetectorConstruction::~g4hrsDetectorConstruction() {
@@ -150,10 +154,27 @@ void g4hrsDetectorConstruction::CreateTarget(G4LogicalVolume *pMotherLogVol){
     g4hrsBeamTarget *beamtarg = g4hrsBeamTarget::GetBeamTarget();
     beamtarg->Reset();
 
+    G4Material* targ_material;
+    
+    if(beamtarg->GetTargetMaterial() == "Pb208") {
+	targ_material = mMaterialManager->lead208;	
+    }
+    else if(beamtarg->GetTargetMaterial() == "Ca40") {
+	targ_material = mMaterialManager->calcium40;	
+    }
+    else if(beamtarg->GetTargetMaterial() == "Ca48") {
+	targ_material = mMaterialManager->calcium48;	
+    } else {
+	G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
+	":  Invalid target material selected" << G4endl; 
+    	exit(1);
+    }
+
 
 //    G4VSolid* targetSolid  = new G4Box("targetBox", fTargetW / 2.0, fTargetH / 2.0, fTargetL / 2.0 );
     G4VSolid* targetSolid  = new G4Tubs("targetBox", 0.0, fTargetW, fTargetL / 2.0, 0, 360*deg );
-    G4LogicalVolume* targetLogical = new G4LogicalVolume(targetSolid,Pb_Mat,"targetLogical",0,0,0);
+//    G4LogicalVolume* targetLogical = new G4LogicalVolume(targetSolid,Pb_Mat,"targetLogical",0,0,0);
+    G4LogicalVolume* targetLogical = new G4LogicalVolume(targetSolid,targ_material,"targetLogical",0,0,0); // Tyler test
 
     G4VPhysicalVolume *phystarg = new G4PVPlacement(0,G4ThreeVector(fTargetX, fTargetY, fTargetZ),
         targetLogical,"targetPhys",pMotherLogVol,0,0);
@@ -175,7 +196,7 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 
 	G4SDManager* SDman = G4SDManager::GetSDMpointer();
 
-        g4hrsMaterial* mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
+        //g4hrsMaterial* mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
 
 
 	/////////////////////////////////////////////////

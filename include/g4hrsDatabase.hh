@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include "G4String.hh"
 using std::string;
 using std::vector;
 using std::ifstream;
@@ -12,7 +13,7 @@ class g4hrsDatabase{
 
 public:
 
-	g4hrsDatabase(int);
+	g4hrsDatabase(G4String);
 	~g4hrsDatabase();
 	double Interpolate(double,double,int,int);
 	

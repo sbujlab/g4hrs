@@ -12,6 +12,7 @@ class G4VSensitiveDetector;
 
 class g4hrsIO;
 class g4hrsEMFieldSetup;
+class g4hrsMaterial;
 
 class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
 {
@@ -89,6 +90,8 @@ class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
       double fFieldX;
       double fFieldY;
       double fFieldZ;
+ 
+      g4hrsMaterial *mMaterialManager;
 
 };
 
