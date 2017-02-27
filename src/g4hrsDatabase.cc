@@ -66,17 +66,22 @@ void g4hrsDatabase::LoadTable(string filename, int stretch) {
 		vector<double> row_xs;
 		vector<double> row_asym;
 
-		for(int j=0; j<n_Th; j++) {
-
-			datafile >> thisAngle >> thisXs >> ignore >> thisAsym >> ignore >> ignore;
-
-			angle.push_back(thisAngle*deg);			
-
-			row_xs.push_back(thisXs*millibarn);
-			row_asym.push_back(thisAsym);
-
-		} // end j (angle) for loop
-
+		if(filename.find("pb") != string::npos) {	
+			for(int j=0; j<n_Th; j++) {
+				datafile >> thisAngle >> thisXs >> ignore >> thisAsym >> ignore >> ignore;
+				angle.push_back(thisAngle*deg);			
+				row_xs.push_back(thisXs*millibarn);
+				row_asym.push_back(thisAsym);
+			} // end j (angle) for loop
+		} else if(filename.find("ca") != string::npos) {
+			for(int j=0; j<n_Th; j++) {
+				datafile >> thisAngle >> thisXs >> thisAsym;
+				angle.push_back(thisAngle*deg);			
+				row_xs.push_back(thisXs*millibarn);
+				row_asym.push_back(thisAsym);
+			} // end j (angle) for loop
+		}
+	
 		if(stretch == 0) {
 			xs.push_back(row_xs);
 			asym.push_back(row_asym);
