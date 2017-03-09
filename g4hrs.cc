@@ -79,8 +79,8 @@ int main(int argc, char** argv){
 	fclose(fdrand);
     }
 
-    CLHEP::HepRandom::createInstance();
-    CLHEP::HepRandom::setTheSeed(seed);
+    G4Random::createInstance();
+    G4Random::setTheSeed(seed);
 
     g4hrsRun::GetRun()->GetData()->SetSeed(seed);
 
