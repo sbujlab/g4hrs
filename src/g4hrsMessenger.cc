@@ -4,6 +4,7 @@
 #include "G4UIcmdWithAString.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWithABool.hh"
+#include "G4UIcmdWithADouble.hh"
 
 #include "g4hrsDetectorConstruction.hh"
 #include "g4hrsIO.hh"
@@ -15,6 +16,8 @@
 #include "g4hrsRunData.hh"
 #include "g4hrsSteppingAction.hh"
 #include "g4hrsGenFlat.hh"
+#include "g4hrsEMFieldSetup.hh"
+#include "g4hrsEMField.hh"
 
 #include "G4UImanager.hh"
 #include "G4RunManager.hh"
@@ -34,6 +37,9 @@ g4hrsMessenger::g4hrsMessenger(){
     fBeamTarg     = NULL;
     fStepAct      = NULL;
     fPhysicsList  = NULL;
+    fEMFieldSetup = NULL;		
+    fEMField	  = NULL;		
+    
 
     // Grab singleton beam/target
     fBeamTarg = g4hrsBeamTarget::GetBeamTarget();
@@ -73,6 +79,26 @@ g4hrsMessenger::g4hrsMessenger(){
     fieldCurrCmd = new G4UIcmdWithAString("/g4hrs/magcurrent",this);
     fieldCurrCmd->SetGuidance("Scale magnetic field by current");
     fieldCurrCmd->SetParameterName("filename", false);
+
+	sepAngCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/sepangle",this);
+	sepAngCmd->SetGuidance("Set septum angle");
+	sepAngCmd->SetParameterName("sepang",false);
+
+	hrsAngCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/hrsangle",this);
+	hrsAngCmd->SetGuidance("Set HRS angle");
+	hrsAngCmd->SetParameterName("hrsang",false);
+
+	hrsMomCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/hrsmom",this);
+	hrsMomCmd->SetGuidance("Set HRS momentum");
+	hrsMomCmd->SetParameterName("hrsmom",false);
+	
+	sepMomCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/sepmom",this);
+	sepMomCmd->SetGuidance("Set septum momentum");
+	sepMomCmd->SetParameterName("sepmom",false);
+
+	sepMapCmd = new G4UIcmdWithAString("/g4hrs/septummap",this);
+	sepMapCmd->SetGuidance("Set septum map file");
+	sepMapCmd->SetParameterName("sepmap",false);
 
     tgtLenCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/targlen",this);
     tgtLenCmd->SetGuidance("Target length");
@@ -356,6 +382,32 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 //	fField->SetMagnetCurrent( scalefile, scaleval );
     }
 
+	if( cmd == sepAngCmd ) {
+		G4double angle = sepAngCmd->GetNewDoubleValue(newValue);
+		fEMFieldSetup->fSeptumAngle = angle;
+		fdetcon->fSeptumAngle = angle;
+	}
+
+	if( cmd == hrsAngCmd ) {
+		G4double angle = hrsAngCmd->GetNewDoubleValue(newValue);
+		fEMFieldSetup->fHRSAngle = angle;
+		fdetcon->fHRSAngle = angle;
+	}
+
+	if( cmd == hrsMomCmd ) {
+		G4double p = hrsMomCmd->GetNewDoubleValue(newValue);
+		fEMFieldSetup->fHRSMomentum = p;
+	}
+
+	if( cmd == sepMomCmd ) {
+		G4double p = sepMomCmd->GetNewDoubleValue(newValue);
+		fEMField->fSeptumMomentum = p; 
+	}
+
+	if( cmd == sepMapCmd ) {
+		fEMField->fSeptumMapFile = newValue;
+	}
+
     if( cmd == tgtLenCmd ){
 	G4double len = tgtLenCmd->GetNewDoubleValue(newValue);
 	fBeamTarg->SetTargetLen(len);
@@ -414,7 +466,7 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
     }
 
     if( cmd == thmaxCmd ){
-	G4double th = thminCmd->GetNewDoubleValue(newValue);
+	G4double th = thmaxCmd->GetNewDoubleValue(newValue);
 	g4hrsVEventGen *agen = fprigen->GetGenerator();
 	if( agen ){
 	    agen->fTh_max = th;

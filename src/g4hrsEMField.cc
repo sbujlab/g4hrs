@@ -14,18 +14,13 @@
 
 g4hrsEMField::g4hrsEMField(): mBField_Septum(0)
 {
-    // FIXME set by macro
-    double pHRSMomentum = 1.068;
-
-
 
 	bool pSetupHRS= true;
 	if(pSetupHRS)
 	{
 
-            // FIXME set by macro
-		mBField_Septum = new BField_Septum(pHRSMomentum,
-						   "BField_Septum.ini","PREX_juliette.dat");
+//		mBField_Septum = new BField_Septum(pHRSMomentum,"PREX_septumFieldMap.dat");
+		mBField_Septum = new BField_Septum(fSeptumMomentum,fSeptumMapFile);
 	}
 
 	bUseUniformBField=false;

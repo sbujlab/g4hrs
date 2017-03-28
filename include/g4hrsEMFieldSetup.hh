@@ -84,6 +84,11 @@ public:
 	void SetBField3VFZBR4(G4double fieldGradient);
 	G4FieldManager* GetFieldManagerFZBR4(){return fLocalFieldManagerFZBR4;}
 
+	G4int                       fSnakeModel;
+	G4double                    fHRSMomentum;
+	G4double                    fHRSAngle;
+	G4double                    fSeptumAngle;
+
 private:
   g4hrsEMField*                 fEMfield; 
   G4FieldManager*             fFieldManager;
@@ -103,10 +108,10 @@ private:
   G4int                       fStepperType ;
   G4double                    fMinStep ;
   
-  G4int                       fSnakeModel;
-  G4double                    fHRSMomentum;
-  G4double                    fHRSAngle;
-  G4double                    fSeptumAngle;
+//  G4int                       fSnakeModel;
+//  G4double                    fHRSMomentum;
+//  G4double                    fHRSAngle;
+//  G4double                    fSeptumAngle;
 
   //for local field at FZB1 and FZB2
   BField_Quad*                fMagFieldFZBL1 ;

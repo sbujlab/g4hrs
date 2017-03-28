@@ -27,6 +27,8 @@ public:
 
 	inline void SetBField3V(G4ThreeVector v) { BField3V = v; bUseUniformBField=true;}
 	inline G4ThreeVector GetBField3V() const { return BField3V; }
+	G4double fSeptumMomentum;
+	G4String fSeptumMapFile;
 
 private:
 

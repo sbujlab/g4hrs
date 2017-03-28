@@ -54,7 +54,7 @@ g4hrsEMFieldSetup* g4hrsEMFieldSetup::Getg4hrsEMFieldSetup()
 g4hrsEMFieldSetup::g4hrsEMFieldSetup()
 : fChordFinder(0), fStepper(0), fIntgrDriver(0)
 {
-  fHRSMomentum = 1*GeV;
+//  fHRSMomentum = 1*GeV;
   fSnakeModel = 49;
   fHRSAngle = 12.5*deg;
   fSeptumAngle = 5.0*deg;
@@ -277,7 +277,7 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
   LROTATEQ3->rotateY( fHRSAngle);
   RROTATEQ3->rotateX(-45.0 * deg);
   RROTATEQ3->rotateY( -fHRSAngle);
-  
+ 
   fMagFieldFZBL1 = new BField_Quad(KAPPA1, LORIGINQ1, LROTATEQ1, pQ1Length, pQ1Radius, 1);
   /*
   fEquationFZBL1 = new G4Mag_UsualEqRhs(fMagFieldFZBL1);	

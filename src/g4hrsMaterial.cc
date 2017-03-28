@@ -23,8 +23,8 @@ g4hrsMaterial* g4hrsMaterial::GetHRSMaterialManager()
 	if(!fHRSMaterialManager) 
 	{
             fHRSMaterialManager = new g4hrsMaterial();
-	  G4cout<<"Errro! No instance of g4hrsMaterial found! \n"
-			<<"Use g4hrsMaterial::g4hrsMaterial() to build one in HRSDetectorConstruction::Construt()!"
+	  G4cout<<"Error! No instance of g4hrsMaterial found! \n"
+			<<"Use g4hrsMaterial::g4hrsMaterial() to build one in HRSDetectorConstruction::Construct()!"
 			<<G4endl;
 	}
 	return fHRSMaterialManager; 
@@ -292,12 +292,12 @@ void g4hrsMaterial::ConstructMaterials()
 	//Calcium40
 	a = 40.078*g/mole;//natural
 	density = 1.55*g/cm3;//natural
-	calcium40 = new G4Material(name="Calcium", z=20., a, density);
+	calcium40 = new G4Material(name="Calcium40", z=20., a, density);
 	
 	//Calcium48
 	a = 47.952534*g/mole;//48Ca
 	density = 1.855*g/cm3;//48Ca
-	calcium48 = new G4Material(name="Calcium", z=20., a, density);
+	calcium48 = new G4Material(name="Calcium48", z=20., a, density);
 	
 	//Iron
 	a = 55.845*g/mole;

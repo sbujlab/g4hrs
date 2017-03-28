@@ -19,7 +19,6 @@ private:
 
 public:
 	BField_Septum(double pMomentum,
-		const char *inifile,
 		const char *mapfile);
 	virtual ~BField_Septum();
 	bool GetBField(double Pos[3],double B[3]);

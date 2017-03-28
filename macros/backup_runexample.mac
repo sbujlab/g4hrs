@@ -1,0 +1,106 @@
+#  Example file
+
+# store tracks
+#/tracking/storeTrajectory 1
+
+# This must be explicitly called
+/run/initialize
+
+# Should usually be commented out
+#/g4hrs/setseed 50
+
+/g4hrs/kryptonite TRUE
+
+#/g4hrs/scalefield 70.0 A
+
+/g4hrs/sepangle 5.0 deg
+/g4hrs/hrsangle 12.0 deg
+/g4hrs/sepmom 1.063 GeV
+/g4hrs/hrsmom 1.063 GeV
+/g4hrs/septummap PREX_septumFieldMap.dat
+
+/g4hrs/targlen 0.5 mm
+/g4hrs/targpos 0.0 mm
+/g4hrs/targmat Pb208
+
+/g4hrs/beamcurr 70e-6 A
+/g4hrs/beamene 1.063 GeV
+
+/g4hrs/gen elastic
+
+/g4hrs/filename g4hrs_out.root
+
+/g4hrs/thmin 0.0 deg
+/g4hrs/thmax 10.0 deg
+#/g4hrs/thcommin 0.0 deg
+#/g4hrs/thcommax 10.0 deg
+
+#/g4hrs/emin 80 MeV
+#/g4hrs/emax 1.063 GeV
+
+/g4hrs/oldras FALSE
+/g4hrs/rasx 2.0 mm
+/g4hrs/rasy 2.0 mm
+
+#/g4hrs/beam_x0 0.0 mm
+#/g4hrs/beam_y0 0.0 mm
+#/g4hrs/beam_th0 5.0 deg
+#/g4hrs/beam_ph0 180.0 deg
+#/g4hrs/beam_corrth 0.0 deg
+#/g4hrs/beam_corrph 0.0 deg
+#/g4hrs/beam_dth 0.0 deg
+#/g4hrs/beam_dph 0.0 deg
+
+
+#/remoll/scalefield map_directory/blockyHybrid_rm_3.0.txt 1.0
+#/remoll/magcurrent map_directory/blockyHybrid_rm_3.0.txt 1000.0 A
+
+# Raster and initial angle stuff
+/remoll/rasx 5 mm
+/remoll/rasy 5 mm
+#/remoll/beam_x0 0 mm
+#/remoll/beam_y0 0 mm
+# initial angle
+#/remoll/beam_th0 0 mrad
+#/remoll/beam_ph0 0 mrad
+# gaussian spread widths
+#/remoll/beam_dth 0 mrad
+#/remoll/beam_dph 0 mrad
+
+/remoll/beamene 1.068 GeV
+
+#/remoll/gen beam
+#/remoll/gen moller
+#/remoll/thcommin 30.0 deg
+#/remoll/thcommax 150.0 deg
+/remoll/gen elastic 
+#/remoll/thmin 0.1 deg
+#/remoll/thmax 2.0 deg
+#/remoll/emin 80.0 MeV
+#/remoll/gen inelastic 
+#/remoll/gen pion
+#/remoll/piontype pi+
+#/remoll/gen pion_LUND
+#/remoll/gen inelasticAl
+#/remoll/gen quasielasticAl
+#/remoll/gen elasticAl
+
+/remoll/targpos   0 cm
+
+/remoll/beamcurr 85 microampere
+
+#Enable optical photons and processes
+#/remoll/optical true
+
+# Make interactions with W, Cu, and Pb
+# realistic rather than pure absorbers
+/remoll/kryptonite true
+
+# Specify random number seed
+
+/remoll/filename g4hrsout.root
+#/remoll/LUND_filename hallD_pion_p_MOLLER_1M_1.lund
+
+#/tracking/verbose 2
+
+/run/beamOn 10000

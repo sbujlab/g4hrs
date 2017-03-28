@@ -39,6 +39,9 @@ class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
 
   public:
     void SetIO(g4hrsIO *io){ fIO = io; }
+	
+	double fHRSAngle;
+	double fSeptumAngle;
 
 
   private:
@@ -47,8 +50,8 @@ class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
       void CreateSeptum(G4LogicalVolume *);
       void CreateHRS(G4LogicalVolume *);
 
-      double fHRSAngle;
-      double fSeptumAngle;
+//      double fHRSAngle;
+//      double fSeptumAngle;
 
       double fTargetW;
       double fTargetH;

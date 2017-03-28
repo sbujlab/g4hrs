@@ -51,9 +51,8 @@ g4hrsDetectorConstruction::g4hrsDetectorConstruction() {
 
     fWorldVolume = NULL;
 
-    // FIXME parameter
-    fHRSAngle=12.5*deg;
-    fSeptumAngle=5.0*deg;
+//    fHRSAngle=12.5*deg;
+//    fSeptumAngle=5.0*deg;
 
     fTargetW = 2.0*2.54*cm;
     fTargetH = 2.0*2.54*cm;
@@ -99,8 +98,6 @@ g4hrsDetectorConstruction::g4hrsDetectorConstruction() {
     fFieldY = 45000*mm;
     fFieldZ = 45000*mm;
 
-	
-    mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
 
 }
 
@@ -133,6 +130,7 @@ G4VPhysicalVolume* g4hrsDetectorConstruction::Construct() {
 
     fWorldVolume = new G4PVPlacement(0, G4ThreeVector(), worldLog, "world", 0, false, 0);
 
+    mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
 
     CreateTarget(worldLog);
     CreateSeptum(worldLog);
@@ -394,6 +392,8 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
                 mMaterialManager->siliconsteel,"septumLogical",0,0,0);
         septumLogical->SetVisAttributes(IronVisAtt);
 
+	G4FieldManager* septumFieldManager = fEMFieldSetup->GetFieldManager();
+	septumLogical->SetFieldManager(septumFieldManager,true);
 
         G4int placeseptum = 1;
         //put it in the hall, no rotation
@@ -688,7 +688,7 @@ void g4hrsDetectorConstruction::CreateTargetChamber(G4LogicalVolume *pMotherLogV
 	G4RotationMatrix *pRotScatInHall=new G4RotationMatrix();
 	pRotScatInHall->rotateX(90.*deg);
 
-        g4hrsMaterial* mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
+//        g4hrsMaterial* mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
 	double startphi=0.*deg, deltaphi=360.*deg;
 	/////////////////////////////////////////////////////////
 	//scattering chamber container
@@ -853,7 +853,7 @@ void g4hrsDetectorConstruction::CreateTargetChamber(G4LogicalVolume *pMotherLogV
 
 void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 {
-        g4hrsMaterial* mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
+//        g4hrsMaterial* mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
 
 	int IS_NIM = 0;//if it's 0, then we go by SNAKE, if it is 1, we go by NIM.
 	//As it turns out, I think we want to go by SNAKE, so that is why it is zero right now.

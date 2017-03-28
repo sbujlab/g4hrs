@@ -47,7 +47,7 @@ BField_Septum* BField_Septum::GetInstance()
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-BField_Septum::BField_Septum(double pMomentum, const char *inifile,const char *mapfile)
+BField_Septum::BField_Septum(double pMomentum, const char *mapfile)
 {
 #ifdef BFIELD_SEPTUM_DEBUG
 	if(BFIELD_SEPTUM_DEBUG > Global_Debug_Level)
@@ -56,7 +56,120 @@ BField_Septum::BField_Septum(double pMomentum, const char *inifile,const char *m
 
 	fInstance=this;
 
-	this->ReadIni(inifile);
+	this->ReadMap(mapfile);
+
+	//update the Current Ratio if necessary
+	if(fabs(pMomentum)>1.0E-5) 
+	  SetMomentum(pMomentum);
+	//SetMomentum(mDefaultMomentumL,mDefaultMomentumR);
+
+}
+
+BField_Septum::~BField_Septum()
+{
+	int i,j,k;
+	for(i=0;i<mXNum;i++)
+	{
+		for (j=0;j<mYNum;j++)
+		{
+			for (k=0;k<mZNum;k++)
+			{
+				delete [] mBField[i][j][k];
+			}
+			delete [] mBField[i][j];
+		}
+		delete [] mBField[i];
+	}
+	delete mRotL2F;
+	delete mRotF2L;
+}
+
+/////////////////////////////////////////////////////////////////////
+bool BField_Septum::ReadMap(const char *filename)
+{
+
+	////////////////////
+	//START INI BLOCK //
+	////////////////////
+	// This block was added to replace the BField_Septum.ini file		       
+	// Initialization parameters are now read in from a header in the map itself   
+	mNPara = 6;
+	mInterpolateOutOfRange = 0;
+
+	//FIXME: Set in macro!
+	mDefaultMomentum = 1.063;
+
+	//FIXME: Are these necessary?  Hard-coding for now to test, fix/delete later.
+	mUseUniformB = 0;
+	mUniformB[0] = 0.; mUniformB[1] = 0.; mUniformB[2] = 0.; 
+	mFieldUnit = 1.0;	
+	mRotAxis[0] = 0.; mRotAxis[1] = 0.; mRotAxis[2] = 0.;
+	mRotAngle[0] = 0.; mRotAngle[1] = 0.; mRotAngle[2] = 0.;
+
+	char strLog[1024];
+	sprintf(strLog,"BField_Septum::ReadMap() is loading field map %s......\n",filename);
+
+	ifstream ins;
+	int indexX=0,indexY=0,indexZ=0,col=0;
+	double tempLine[10];
+	ins.open(filename);
+	if (ins.fail())
+	{
+		sprintf(strLog,"***ERROR! Can not open field map %s...exit!***\n",filename);
+		exit(-1);
+		return false;
+	}
+
+	if(ins >> mXmin >> mXmax >> mStepX) {
+		G4cout << "xmin, xmax, xstep = " << mXmin << ", " << mXmax << ", " << mStepX << endl;
+	} else {
+		G4cerr << "Error " << __FILE__ << " line " << __LINE__ 
+		<< ": File " << filename << " contains unreadable header.  Aborting" << G4endl;
+	    	exit(1);
+	}
+	
+	if(ins >> mYmin >> mYmax >> mStepY) {
+		G4cout << "ymin, ymax, ystep = " << mYmin << ", " << mYmax << ", " << mStepY << endl;
+	} else {
+		G4cerr << "Error " << __FILE__ << " line " << __LINE__ 
+		<< ": File " << filename << " contains unreadable header.  Aborting" << G4endl;
+	    	exit(1);
+	}
+
+	if(ins >> mZmin >> mZmax >> mStepZ) {
+		G4cout << "zmin, zmax, zstep = " << mZmin << ", " << mZmax << ", " << mStepZ << endl;
+	} else {
+		G4cerr << "Error " << __FILE__ << " line " << __LINE__ 
+		<< ": File " << filename << " contains unreadable header.  Aborting" << G4endl;
+	    	exit(1);
+	}
+
+	if(ins >> mOrigin[0] >> mOrigin[1] >> mOrigin[3]) {
+		G4cout << "septumX, septumY, septumZ = " << mOrigin[0] << ", " << mOrigin[1] << ", " << mOrigin[2] << endl;
+	} else {
+		G4cerr << "Error " << __FILE__ << " line " << __LINE__ 
+		<< ": File " << filename << " contains unreadable header.  Aborting" << G4endl;
+	    	exit(1);
+	}
+
+	int LineNum = 6;
+	char tempname[256];
+
+	//Burn empty line, column headers
+	ins.getline(tempname,256);
+	ins.getline(tempname,256);
+	
+	//////////////////
+	//END INI BLOCK //
+	//////////////////
+
+	////////////////////////////
+	//START CONSTRUCTOR BLOCK //
+	////////////////////////////
+	// This block is a cut/paste of commands that were previously executed in the constructor
+	// These commands were run AFTER the BField_Septum.ini was read, but BEFORE the map was read
+	// Therefore they are placed after the initialization header is read, but before the field map is read
+
 	if(fabs(mDefaultMomentum)<1.0E-5 ) 
 	{
 		cerr<<"\n##DefaultMomentumL is invaid ("<<mDefaultMomentum
@@ -132,177 +245,10 @@ BField_Septum::BField_Septum(double pMomentum, const char *inifile,const char *m
 	}
 	/////////////allocate end////////////
 
-	if(mUseUniformB!=1) this->ReadMap(mapfile);
 
-	//update the Current Ratio if necessary
-	if(fabs(pMomentum)>1.0E-5) 
-	  SetMomentum(pMomentum);
-	//SetMomentum(mDefaultMomentumL,mDefaultMomentumR);
-	//
-}
-
-BField_Septum::~BField_Septum()
-{
-	int i,j,k;
-	for(i=0;i<mXNum;i++)
-	{
-		for (j=0;j<mYNum;j++)
-		{
-			for (k=0;k<mZNum;k++)
-			{
-				delete [] mBField[i][j][k];
-			}
-			delete [] mBField[i][j];
-		}
-		delete [] mBField[i];
-	}
-	delete mRotL2F;
-	delete mRotF2L;
-}
-
-
-
-
-
-/////////////////////////////////////////////////////////////////////
-bool BField_Septum::ReadIni(const char *filename)
-{
-    g4hrsUsageManager *pConfig= new g4hrsUsageManager(filename);
-
-	double deg2rad=acos(-1.0)/180.;
-	//By Jixie: I am not use this routine to read ini file any longer
-	//I prefer to use UsageManager::ReadFile
-	//
-	bool ret=pConfig->ReadFile(filename);
-
-	pConfig->GetParameter("Septum_UseUniformB",mUseUniformB);
-	pConfig->GetParameter("Septum_UniformB_x", mUniformB[0]);
-	pConfig->GetParameter("Septum_UniformB_y", mUniformB[1]);
-	pConfig->GetParameter("Septum_UniformB_z", mUniformB[2]);
-	
-	pConfig->GetParameter("Septum_FieldUnit",	mFieldUnit);
-	pConfig->GetParameter("Septum_FirstDataLine",mFirstDataLine);
-	pConfig->GetParameter("Septum_NPara",		mNPara);
-
-	pConfig->GetParameter("Septum_Xmin",		mXmin);
-	pConfig->GetParameter("Septum_Xmax",		mXmax);
-	pConfig->GetParameter("Septum_Ymin",		mYmin);
-	pConfig->GetParameter("Septum_Ymax",		mYmax);
-	pConfig->GetParameter("Septum_Zmin",		mZmin);
-	pConfig->GetParameter("Septum_Zmax",		mZmax);
-	pConfig->GetParameter("Septum_StepX",		mStepX);
-	pConfig->GetParameter("Septum_StepY",		mStepY);
-	pConfig->GetParameter("Septum_StepZ",		mStepZ);
-	pConfig->GetParameter("Septum_InterpolateOutOfRange", mInterpolateOutOfRange);
-
-	pConfig->GetParameter("Septum_OriginX",		mOrigin[0]);
-	pConfig->GetParameter("Septum_OriginY",		mOrigin[1]);
-	pConfig->GetParameter("Septum_OriginZ",		mOrigin[2]);
-	pConfig->GetParameter("Septum_RotAxis1",	mRotAxis[0]);
-	pConfig->GetParameter("Septum_RotAxis2",	mRotAxis[1]);
-	pConfig->GetParameter("Septum_RotAxis3",	mRotAxis[2]);
-	pConfig->GetParameter("Septum_RotAngle1",	mRotAngle[0]); mRotAngle[0]*=deg2rad;
-	pConfig->GetParameter("Septum_RotAngle2",	mRotAngle[1]); mRotAngle[1]*=deg2rad;
-	pConfig->GetParameter("Septum_RotAngle3",	mRotAngle[2]); mRotAngle[2]*=deg2rad;
-
-	pConfig->GetParameter("Septum_DefaultMomentum",mDefaultMomentum);
-
-#ifdef BFIELD_SEPTUM_DEBUG
-	pConfig->PrintParamMap(); 
-#endif
-	return ret;
-
-	//The following is the original code
-	//please keep it this way
-	FILE *ini;
-	char ch[]="=;\n";
-	char *name,*value,line[100];
-	char *pDest;
-	int iPos=-1;
-
-	if((ini=fopen(filename,"r"))==NULL)
-	{
-		printf("***Error! Can not open configure file \"%s\"!",filename);
-		return false;
-	}
-
-	printf("\nThe magnetic field configuration is:\n");
-	while(!feof(ini))
-	{
-		fgets(line,100,ini);
-		/* Search forward. for the '#' to skip the comment*/
-		pDest = strchr( line, '#' );
-		iPos = pDest - line + 1;
-		//in Linux, if not found '#', iPos==1073747457//
-		if(iPos>0 && iPos<100) continue;
-		name=strtok(line,ch);
-		value=strtok(0,ch);
-		//show the confif info
-
-		if(name&&value) printf("%15s = %s\n",name,value);
-		else printf("read %s error\n",filename);
-
-		if (strcmp(name,"UseUniformB")==0)				mUseUniformB=atoi(value);
-		else if (strcmp(name,"Septum_UniformB_x")==0)	mUniformB[0]=atof(value);
-		else if (strcmp(name,"Septum_UniformB_y")==0)	mUniformB[1]=atof(value);
-		else if (strcmp(name,"Septum_UniformB_z")==0)	mUniformB[2]=atof(value);
-		
-		else if (strcmp(name,"Septum_FieldUnit")==0)	mFieldUnit=atof(value);
-		else if (strcmp(name,"Septum_FirstDataLine")==0)mFirstDataLine=atoi(value);
-		else if (strcmp(name,"Septum_NPara")==0)		mNPara=atoi(value);
-
-		else if (strcmp(name,"Septum_Xmin")==0)			mXmin=atof(value);
-		else if (strcmp(name,"Septum_Xmax")==0)			mXmax=atof(value);
-		else if (strcmp(name,"Septum_Ymin")==0)			mYmin=atof(value);
-		else if (strcmp(name,"Septum_Ymax")==0)			mYmax=atof(value);
-		else if (strcmp(name,"Septum_Zmin")==0)			mZmin=atof(value);
-		else if (strcmp(name,"Septum_Zmax")==0)			mZmax=atof(value);
-		else if (strcmp(name,"Septum_StepX")==0)		mStepX=atof(value);
-		else if (strcmp(name,"Septum_StepY")==0)		mStepY=atof(value);
-		else if (strcmp(name,"Septum_StepZ")==0)		mStepZ=atof(value);
-		else if (strcmp(name,"Septum_InterpolateOutOfRange")==0) mInterpolateOutOfRange=atoi(value);
-
-		else if (strcmp(name,"Septum_OriginX")==0)		mOrigin[0]=atof(value);
-		else if (strcmp(name,"Septum_OriginY")==0)		mOrigin[1]=atof(value);
-		else if (strcmp(name,"Septum_OriginZ")==0)		mOrigin[2]=atof(value);
-		else if (strcmp(name,"Septum_RotAxis1")==0)		mRotAxis[0]=atoi(value);
-		else if (strcmp(name,"Septum_RotAxis2")==0)		mRotAxis[1]=atoi(value);
-		else if (strcmp(name,"Septum_RotAxis3")==0)		mRotAxis[2]=atoi(value);
-		else if (strcmp(name,"Septum_RotAngle1")==0)	mRotAngle[0]=atof(value)*deg2rad;
-		else if (strcmp(name,"Septum_RotAngle2")==0)	mRotAngle[1]=atof(value)*deg2rad;
-		else if (strcmp(name,"Septum_RotAngle3")==0)	mRotAngle[2]=atof(value)*deg2rad;
-
-		else if (strcmp(name,"Septum_DefaultMomentum")==0)	mDefaultMomentum=atof(value);
-	}
-	fclose(ini);
-
-	if(mNPara<6) mNPara=6; //mNPara should not less than 6 columns
-	return true;
-
-}
-
-/////////////////////////////////////////////////////////////////////
-bool BField_Septum::ReadMap(const char *filename)
-{
-	char strLog[1024];
-	sprintf(strLog,"BField_Septum::ReadMap() is loading field map %s......\n",filename);
-
-	ifstream ins;
-	int indexX=0,indexY=0,indexZ=0,col=0;
-	double tempLine[10];
-	ins.open(filename);
-	if (ins.fail())
-	{
-		sprintf(strLog,"***ERROR! Can not open field map %s...exit!***\n",filename);
-		exit(-1);
-		return false;
-	}
-
-	//eat the first 15 lines
-	int nLine2Eat=mFirstDataLine-1;
-	int LineNum=nLine2Eat;
-	char tempname[256];
-	for(int i=0;i<nLine2Eat;i++) ins.getline (tempname,256);
+	//////////////////////////
+	//END CONSTRUCTOR BLOCK //
+	//////////////////////////
 
 	while (!ins.eof())
 	{
