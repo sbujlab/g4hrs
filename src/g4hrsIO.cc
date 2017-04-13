@@ -24,6 +24,7 @@
 
 
 g4hrsIO::g4hrsIO(){
+    
     fTree = NULL;
     InitializeTree();
     // Default filename

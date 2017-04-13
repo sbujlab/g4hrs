@@ -10,6 +10,7 @@
 g4hrsSteppingAction::g4hrsSteppingAction()
 :drawFlag(false)
 {
+
 ///  new g4hrsSteppingActionMessenger(this);
 
     fEnableKryptonite = true;

@@ -89,7 +89,7 @@ int main(int argc, char** argv){
     //-------------------------------
     // Initialization of Run manager
     //-------------------------------
-    G4cout << "RunManager construction starting...." << G4endl;
+    //G4cout << "RunManager construction starting...." << G4endl;
     G4RunManager * runManager = new G4RunManager;
 
     g4hrsMessenger *rmmess = new g4hrsMessenger();
@@ -101,6 +101,8 @@ int main(int argc, char** argv){
     rmmess->SetDetCon( ((g4hrsDetectorConstruction *) detector) );
 
     ((g4hrsDetectorConstruction *) detector)->SetIO(io);
+
+	rmmess->SetEmFieldSetup(((g4hrsDetectorConstruction *) detector)->GetEMFieldSetup());
 
     // Physics we want to use
     G4int verbose = 0;
@@ -163,8 +165,10 @@ int main(int argc, char** argv){
     }
 
     g4hrsRunData *rundata = g4hrsRun::GetRun()->GetData();
-
+	//TYLERTEST
+	//G4cout << "About to initialize runManager...\n";
     runManager->Initialize();
+	//G4cout << "Just initialized runManager...\n";
 
 #ifdef G4VIS_USE
     // Visualization, if you choose to have it!

@@ -65,6 +65,7 @@ class g4hrsMessenger : public G4UImessenger {
 	G4UIcmdWithAString   *fieldCurrCmd;
 	G4UIcmdWithAString   *genSelectCmd;
 
+	G4UIcmdWithAnInteger		*snakeModCmd;
 	G4UIcmdWithADoubleAndUnit	*sepAngCmd;
 	G4UIcmdWithADoubleAndUnit	*hrsAngCmd;
 	G4UIcmdWithADoubleAndUnit	*hrsMomCmd;

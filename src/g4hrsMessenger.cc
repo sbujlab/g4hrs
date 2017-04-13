@@ -28,8 +28,8 @@
 #include <iostream>
 
 g4hrsMessenger::g4hrsMessenger(){
+	
     /*  Initialize all the things it talks to to NULL */
-
     fIO           = NULL;
     fdetcon       = NULL;
     fevact        = NULL;
@@ -79,6 +79,10 @@ g4hrsMessenger::g4hrsMessenger(){
     fieldCurrCmd = new G4UIcmdWithAString("/g4hrs/magcurrent",this);
     fieldCurrCmd->SetGuidance("Scale magnetic field by current");
     fieldCurrCmd->SetParameterName("filename", false);
+
+	snakeModCmd = new G4UIcmdWithAnInteger("/g4hrs/snake",this);
+	snakeModCmd->SetGuidance("Set snake model");
+	snakeModCmd->SetParameterName("snakemod",false);
 
 	sepAngCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/sepangle",this);
 	sepAngCmd->SetGuidance("Set septum angle");
@@ -381,6 +385,11 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 	scaleval = atof(scalestr.data());
 //	fField->SetMagnetCurrent( scalefile, scaleval );
     }
+
+	if( cmd == snakeModCmd ) {
+		G4int snake = snakeModCmd->GetNewIntValue(newValue);
+		fEMFieldSetup->fSnakeModel = snake;
+	}
 
 	if( cmd == sepAngCmd ) {
 		G4double angle = sepAngCmd->GetNewDoubleValue(newValue);

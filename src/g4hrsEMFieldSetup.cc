@@ -54,10 +54,12 @@ g4hrsEMFieldSetup* g4hrsEMFieldSetup::Getg4hrsEMFieldSetup()
 g4hrsEMFieldSetup::g4hrsEMFieldSetup()
 : fChordFinder(0), fStepper(0), fIntgrDriver(0)
 {
+	
 //  fHRSMomentum = 1*GeV;
-  fSnakeModel = 49;
-  fHRSAngle = 12.5*deg;
-  fSeptumAngle = 5.0*deg;
+//  fSnakeModel = 49;
+//  fHRSAngle = 12.5*deg;
+//  fSeptumAngle = 5.0*deg;
+	fSnakeModel = 49;
 
   G4cout << "HRS angles: " << fHRSAngle <<  G4endl;
 
@@ -65,7 +67,6 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
   //QuadFringe* fringe = new QuadFringe();
   //G4cout << "Quad fringe!" << G4endl;
   fg4hrsEMFieldSetup=this;
-  
   //global EM field
   fEMfield = new g4hrsEMField();
   fEquation = new G4EqMagElectricField(fEMfield);
@@ -73,7 +74,6 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
   fStepperType = 4 ;     // ClassicalRK4 -- the default stepper
   
   fFieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
-  
   /*
   fChordFinder = 0;   //will be set in UpdateField()
   UpdateField();
@@ -348,7 +348,7 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
   */
   fLocalFieldManagerFZBR4 = new G4FieldManager();
   UpdateFieldFZBR4();
-    
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////

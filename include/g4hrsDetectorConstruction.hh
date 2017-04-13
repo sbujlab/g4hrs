@@ -12,6 +12,7 @@ class G4VSensitiveDetector;
 
 class g4hrsIO;
 class g4hrsEMFieldSetup;
+class g4hrsEMField;
 class g4hrsMaterial;
 
 class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
@@ -42,7 +43,7 @@ class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
 	
 	double fHRSAngle;
 	double fSeptumAngle;
-
+	g4hrsEMFieldSetup* GetEMFieldSetup() {return fEMFieldSetup;}
 
   private:
       void CreateTarget(G4LogicalVolume *);

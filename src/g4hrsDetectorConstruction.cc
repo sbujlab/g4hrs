@@ -47,6 +47,7 @@
 #define __MAX_DETS 5000
 
 g4hrsDetectorConstruction::g4hrsDetectorConstruction() {
+
     // Default geometry file
 
     fWorldVolume = NULL;
@@ -98,7 +99,6 @@ g4hrsDetectorConstruction::g4hrsDetectorConstruction() {
     fFieldY = 45000*mm;
     fFieldZ = 45000*mm;
 
-
 }
 
 g4hrsDetectorConstruction::~g4hrsDetectorConstruction() {
@@ -110,10 +110,11 @@ g4hrsDetectorConstruction::~g4hrsDetectorConstruction() {
 }
 
 G4VPhysicalVolume* g4hrsDetectorConstruction::Construct() {
+    
     G4VPhysicalVolume *worldVolume;
 
     fEMFieldSetup = new g4hrsEMFieldSetup();
-
+    
     int z, nelements;
     double a, density;
 

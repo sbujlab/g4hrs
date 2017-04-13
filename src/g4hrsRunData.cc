@@ -1,6 +1,6 @@
 #include "g4hrsRunData.hh"
 #include "gitinfo.hh"
-
+#include "G4ios.hh"
 #include <string.h>
 #include <errno.h>
 
@@ -9,6 +9,7 @@
 #endif
 
 g4hrsRunData::g4hrsRunData(){
+
     fNthrown = -1;
     fBeamE   = -1e9;
     fGenName[0]  = '\0';
