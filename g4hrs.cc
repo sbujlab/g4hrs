@@ -103,6 +103,7 @@ int main(int argc, char** argv){
     ((g4hrsDetectorConstruction *) detector)->SetIO(io);
 
 	rmmess->SetEmFieldSetup(((g4hrsDetectorConstruction *) detector)->GetEMFieldSetup());
+	rmmess->SetEMField(((g4hrsDetectorConstruction *) detector)->GetEMFieldFromSetup());
 
     // Physics we want to use
     G4int verbose = 0;
@@ -111,7 +112,8 @@ int main(int argc, char** argv){
     G4VModularPhysicsList* physlist = factory.GetReferencePhysList("LHEP");
     #else
     //G4VModularPhysicsList* physlist = factory.GetReferencePhysList("FTFP_BERT_LIV");
-    G4VModularPhysicsList* physlist = factory.GetReferencePhysList("QGSP_BERT_HP");
+    //G4VModularPhysicsList* physlist = factory.GetReferencePhysList("QGSP_BERT_HP");
+    G4VModularPhysicsList* physlist = factory.GetReferencePhysList("FTFP_BERT");
     #endif
     physlist->RegisterPhysics(new G4OpticalPhysics());
     physlist->SetVerboseLevel(verbose);
@@ -165,10 +167,7 @@ int main(int argc, char** argv){
     }
 
     g4hrsRunData *rundata = g4hrsRun::GetRun()->GetData();
-	//TYLERTEST
-	//G4cout << "About to initialize runManager...\n";
     runManager->Initialize();
-	//G4cout << "Just initialized runManager...\n";
 
 #ifdef G4VIS_USE
     // Visualization, if you choose to have it!
