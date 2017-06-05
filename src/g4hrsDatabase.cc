@@ -18,16 +18,16 @@ g4hrsDatabase::g4hrsDatabase(G4String targmat) {
 		E_step = 0.05*GeV;
 		n_E = 14;
 		n_Th = 66;
-		LoadTable("horpb.dat",0);
-		LoadTable("horpb1.dat",1);
+		LoadTable("../g4hrs/horpb.dat",0);
+		LoadTable("../g4hrs/horpb1.dat",1);
 	}
 	if(targmat == "Ca48") {
 		E_min = 0.5*GeV;
 		E_step = 0.05*GeV;
 		n_E = 62;
 		n_Th = 141;
-		LoadTable("ca48_fsu.dat",0);
-		LoadTable("ca48_fsu_stretched.dat",1);
+		LoadTable("../g4hrs/ca48_fsu.dat",0);
+		LoadTable("../g4hrs/ca48_fsu_stretched.dat",1);
 	}
 
 	if(targmat == "Ca40") {
@@ -35,8 +35,8 @@ g4hrsDatabase::g4hrsDatabase(G4String targmat) {
 		E_step = 0.05*GeV;
 		n_E = 62;
 		n_Th = 141;
-		LoadTable("ca40_fsu.dat",0);
-		LoadTable("ca40_fsu_stretched.dat",1);
+		LoadTable("../g4hrs/ca40_fsu.dat",0);
+		LoadTable("../g4hrs/ca40_fsu_stretched.dat",1);
 	}
 // end constructer 
 } 
