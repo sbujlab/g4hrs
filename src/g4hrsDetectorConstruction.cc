@@ -1,5 +1,3 @@
-
-
 #include "g4hrsDetectorConstruction.hh"
 #include "g4hrsGenericDetector.hh"
 #include "g4hrsBeamTarget.hh"
@@ -52,8 +50,8 @@ g4hrsDetectorConstruction::g4hrsDetectorConstruction() {
 
     fWorldVolume = NULL;
 
-//    fHRSAngle=12.5*deg;
-//    fSeptumAngle=5.0*deg;
+    fHRSAngle=12.5*deg;
+    fSeptumAngle=5.0*deg;
 
     fTargetW = 2.0*2.54*cm;
     fTargetH = 2.0*2.54*cm;
@@ -68,7 +66,7 @@ g4hrsDetectorConstruction::g4hrsDetectorConstruction() {
     fPivot2SieveFace = 800*mm;
     fPivotXOffset =  0.0*deg;
     fPivotYOffset =  0.0*deg;
-    fPivotZOffset =  1053.79*deg;
+    fPivotZOffset =  1053.79*mm;
 
     fSetupSieveSlit = false;
 
@@ -77,11 +75,13 @@ g4hrsDetectorConstruction::g4hrsDetectorConstruction() {
 
     fSetupStdScatChamber = 0;
 
-
+	// create septum and HRS fields
+    	fEMFieldSetup = new g4hrsEMFieldSetup();
+    
     //#SetupHRS have the following candidates: 
     //# 0: do nothing; 1: will build septum, sieve and VB; 
     //# 2: add Q1; 3: add Q2 ; 4: add Dipole and Q3  
-    int    fSetupHRS = 4;
+    fSetupHRS = 4;
 
 
     fScatChamberRin   =  484.025*mm;
@@ -93,7 +93,7 @@ g4hrsDetectorConstruction::g4hrsDetectorConstruction() {
     fScatChamberZOffset = -1053.79*mm;
     fSetupCREXGeometry = true;
 
-    fEMFieldSetup = NULL;
+    //fEMFieldSetup = NULL;
 
     fFieldX = 45000*mm;
     fFieldY = 45000*mm;
@@ -113,7 +113,7 @@ G4VPhysicalVolume* g4hrsDetectorConstruction::Construct() {
     
     G4VPhysicalVolume *worldVolume;
 
-    fEMFieldSetup = new g4hrsEMFieldSetup();
+//    fEMFieldSetup = new g4hrsEMFieldSetup();
     
     int z, nelements;
     double a, density;
@@ -130,7 +130,8 @@ G4VPhysicalVolume* g4hrsDetectorConstruction::Construct() {
     G4LogicalVolume *worldLog = new G4LogicalVolume(worldSolid, Air, "worldLog", 0, 0, 0);
 
     fWorldVolume = new G4PVPlacement(0, G4ThreeVector(), worldLog, "world", 0, false, 0);
-
+    
+//    g4hrsMaterial::g4hrsMaterial();
     mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
 
     CreateTarget(worldLog);
@@ -147,28 +148,31 @@ void g4hrsDetectorConstruction::CreateTarget(G4LogicalVolume *pMotherLogVol){
 
 
     G4Element* Pb = new G4Element("Lead", "Pb", z=82 , a=208.0*g/mole);
-    G4Material* Pb_Mat = new G4Material("Pb_Mat", 11.34*g/cm3, nelements=1);
-    Pb_Mat->AddElement(Pb, 1);
+//    G4Material* Pb_Mat = new G4Material("lead208", 11.34*g/cm3, nelements=1);
+	G4Material* Pb_Mat = new G4Material("lead208",z=82.,a=207.9766521*g/mole, 11.38*g/cm3);
+//    Pb_Mat->AddElement(Pb, 1);
 
     g4hrsBeamTarget *beamtarg = g4hrsBeamTarget::GetBeamTarget();
     beamtarg->Reset();
 
     G4Material* targ_material;
-    
-    if(beamtarg->GetTargetMaterial() == "Pb208") {
+
+	fTargetMaterial=beamtarg->GetTargetMaterial();
+ 
+    if(fTargetMaterial == "Pb208") {
 	targ_material = mMaterialManager->lead208;	
     }
-    else if(beamtarg->GetTargetMaterial() == "Ca40") {
+    else if(fTargetMaterial == "Ca40") {
 	targ_material = mMaterialManager->calcium40;	
     }
-    else if(beamtarg->GetTargetMaterial() == "Ca48") {
+    else if(fTargetMaterial == "Ca48") {
 	targ_material = mMaterialManager->calcium48;	
     } else {
 	G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
 	":  Invalid target material selected" << G4endl; 
-    	exit(1);
-    }
-
+  	exit(1);
+//	targ_material = mMaterialManager->lead208;  
+  }
 
 //    G4VSolid* targetSolid  = new G4Box("targetBox", fTargetW / 2.0, fTargetH / 2.0, fTargetL / 2.0 );
     G4VSolid* targetSolid  = new G4Tubs("targetBox", 0.0, fTargetW, fTargetL / 2.0, 0, 360*deg );
@@ -177,10 +181,44 @@ void g4hrsDetectorConstruction::CreateTarget(G4LogicalVolume *pMotherLogVol){
 
     G4VPhysicalVolume *phystarg = new G4PVPlacement(0,G4ThreeVector(fTargetX, fTargetY, fTargetZ),
         targetLogical,"targetPhys",pMotherLogVol,0,0);
-
+    
     beamtarg->SetTargetVolume(phystarg);
 
+	//Attempt at tracking detector just past target
+	
+	G4SDManager* SDMan = G4SDManager::GetSDMpointer();
+
+	G4VSensitiveDetector* airDetSD1 = new g4hrsGenericDetector("airDet1",37);
+	SDMan->AddNewDetector(airDetSD1);
+	
+	G4VSolid* airDetSolid1 = new G4Box("airDetBox1", 500., 500., 0.05);
+	G4LogicalVolume* airDetLogical1 = new G4LogicalVolume(airDetSolid1,mMaterialManager->vacuum,"airDetLogical1",0,0,0);
+	airDetLogical1->SetSensitiveDetector(airDetSD1);
+	G4VPhysicalVolume* airDetPhys1 = new G4PVPlacement(0,G4ThreeVector(fTargetX,fTargetY,fTargetZ + 4.0*cm),
+		airDetLogical1,"physAirDet1",pMotherLogVol,0,0);
+
+
+	G4VSensitiveDetector* airDetSD2 = new g4hrsGenericDetector("airDet2",38);
+	SDMan->AddNewDetector(airDetSD2);
+	
+	G4VSolid* airDetSolid2 = new G4Box("airDetBox2", 5000., 5000., 0.05);
+	G4LogicalVolume* airDetLogical2 = new G4LogicalVolume(airDetSolid2,mMaterialManager->vacuum,"airDetLogical2",0,0,0);
+	airDetLogical2->SetSensitiveDetector(airDetSD2);
+	G4VPhysicalVolume* airDetPhys2 = new G4PVPlacement(0,G4ThreeVector(fTargetX,fTargetY,fTargetZ + 175.38*cm),
+		airDetLogical2,"physAirDet2",pMotherLogVol,0,0);
+
+	G4VSensitiveDetector* airDetSD3 = new g4hrsGenericDetector("airDet3",39);
+	SDMan->AddNewDetector(airDetSD3);
+	
+	G4VSolid* airDetSolid3 = new G4Box("airDetBox1", 5000., 5000., 0.05);
+	G4LogicalVolume* airDetLogical3 = new G4LogicalVolume(airDetSolid3,mMaterialManager->vacuum,"airDetLogical3",0,0,0);
+	airDetLogical3->SetSensitiveDetector(airDetSD3);
+	G4VPhysicalVolume* airDetPhys3 = new G4PVPlacement(0,G4ThreeVector(fTargetX,fTargetY,fTargetZ + 1.46*m + fPivotZOffset ),
+		airDetLogical3,"physAirDet3",pMotherLogVol,0,0);
+
+
     return;
+
 }
 
 void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
@@ -393,13 +431,13 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
                 mMaterialManager->siliconsteel,"septumLogical",0,0,0);
         septumLogical->SetVisAttributes(IronVisAtt);
 
-	G4FieldManager* septumFieldManager = fEMFieldSetup->GetFieldManager();
-	septumLogical->SetFieldManager(septumFieldManager,true);
+//	G4FieldManager* septumFieldManager = fEMFieldSetup->GetFieldManager();
+//	septumLogical->SetFieldManager(septumFieldManager,true);
 
         G4int placeseptum = 1;
         //put it in the hall, no rotation
         if( placeseptum ){
-          new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPos_Z),
+          new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPos_Z+fPivotZOffset),
                             septumLogical,"septumPhys",pMotherLogVol,0,0,0);
         }
 
@@ -447,29 +485,29 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 
         if( placeseptum ){
         new G4PVPlacement(pSeptumCoilRotFrontDown,
-                G4ThreeVector(pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
+                G4ThreeVector(pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up+fPivotZOffset),
                 septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,0,0);
         new G4PVPlacement(pSeptumCoilRotFrontUp,
-                G4ThreeVector(pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
+                G4ThreeVector(pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up+fPivotZOffset),
                 septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,1,0);
         new G4PVPlacement(pSeptumCoilRotFrontUp,
-                G4ThreeVector(pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
+                G4ThreeVector(pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up+fPivotZOffset),
                 septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,2,0);
         new G4PVPlacement(pSeptumCoilRotFrontDown,
-                G4ThreeVector(pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
+                G4ThreeVector(pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up+fPivotZOffset),
                 septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,3,0);
 
         new G4PVPlacement(pSeptumCoilRotFrontDown,
-                G4ThreeVector(-pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
+                G4ThreeVector(-pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up+fPivotZOffset),
                 septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,4,0);
         new G4PVPlacement(pSeptumCoilRotFrontUp,
-                G4ThreeVector(-pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
+                G4ThreeVector(-pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up+fPivotZOffset),
                 septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,5,0);
         new G4PVPlacement(pSeptumCoilRotFrontUp,
-                G4ThreeVector(-pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
+                G4ThreeVector(-pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_up+fPivotZOffset),
                 septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,6,0);
         new G4PVPlacement(pSeptumCoilRotFrontDown,
-                G4ThreeVector(-pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up),
+                G4ThreeVector(-pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_up+fPivotZOffset),
                 septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,7,0);
         }
 
@@ -486,29 +524,29 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 
         if( placeseptum ){
         new G4PVPlacement(pSeptumCoilRotBackDown,
-                G4ThreeVector(pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
+                G4ThreeVector(pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down+fPivotZOffset),
                 septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,8,0);
         new G4PVPlacement(pSeptumCoilRotBackUp,
-                G4ThreeVector(pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
+                G4ThreeVector(pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down+fPivotZOffset),
                 septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,9,0);
         new G4PVPlacement(pSeptumCoilRotBackUp,
-                G4ThreeVector(pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
+                G4ThreeVector(pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down+fPivotZOffset),
                 septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,10,0);
         new G4PVPlacement(pSeptumCoilRotBackDown,
-                G4ThreeVector(pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
+                G4ThreeVector(pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down+fPivotZOffset),
                 septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,11,0);
 
         new G4PVPlacement(pSeptumCoilRotBackDown,
-                G4ThreeVector(-pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
+                G4ThreeVector(-pSeptumCoilPos_X_out,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down+fPivotZOffset),
                 septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,12,0);
         new G4PVPlacement(pSeptumCoilRotBackUp,
-                G4ThreeVector(-pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
+                G4ThreeVector(-pSeptumCoilPos_X_out,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down+fPivotZOffset),
                 septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,13,0);
         new G4PVPlacement(pSeptumCoilRotBackUp,
-                G4ThreeVector(-pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
+                G4ThreeVector(-pSeptumCoilPos_X_in,-pSeptumCoilPos_Y,pSeptumCoilPos_Z_down+fPivotZOffset),
                 septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,14,0);
         new G4PVPlacement(pSeptumCoilRotBackDown,
-                G4ThreeVector(-pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down),
+                G4ThreeVector(-pSeptumCoilPos_X_in,pSeptumCoilPos_Y,pSeptumCoilPos_Z_down+fPivotZOffset),
                 septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,15,0);
         }
     
@@ -899,7 +937,7 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 	//                      /                             |
 	//                     /                        Q3    |
 	//                    /                               |
-	//                   /                       E        |
+	//                   /                       E        /
 	//                  /                     L           |
 	//          --------                   O              |
 	//         /                        P                 |
@@ -966,12 +1004,12 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 
 	if(fSetupHRS>=2)
 	{
-		new G4PVPlacement(pRotLHRSContainer,G4ThreeVector(0,0,0),
+		new G4PVPlacement(pRotLHRSContainer,G4ThreeVector(0,0,0.+fPivotZOffset),
 			LHRSContainerLogical,"LHRSContainerPhys",motherLogical,0,0,0);
 	}
 	if(fSetupHRS>=2)
 	{
-		new G4PVPlacement(pRotRHRSContainer,G4ThreeVector(0,0,0),
+		new G4PVPlacement(pRotRHRSContainer,G4ThreeVector(0,0,0.+fPivotZOffset),
 			RHRSContainerLogical,"RHRSContainerPhys",motherLogical,0,0,0);
 	}
 
@@ -1844,7 +1882,6 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 	pRotVDCInContainer->rotateX(0.*deg); 
 	G4RotationMatrix *pRotFPInContainer=new G4RotationMatrix();
 	pRotFPInContainer->rotateX(-45*deg); 
-	//if(fSetupHRS>=4){
 	if(fSnakeModel == 49 || fSnakeModel == 48 || fSnakeModel > 51 ){
 	  double pSeptumX      = 140.0  * cm;
 	  double pSeptumY      = 84.4   * cm;
@@ -1932,7 +1969,6 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 			    LFPLogical,"virtualBoundaryPhys_qz2_LHRS",LHRSContainerLogical,0,0,0);
 
 	}
-	//if(fSetupHRS>=4){
 	if(fSnakeModel == 49 || fSnakeModel == 48 || fSnakeModel > 50 ){
 	  new G4PVPlacement(pRotXRHRSdeg,G4ThreeVector(-pPaulY, 0, -pPaulX),
 			    LPlaneLogical1,"virtualBoundaryPhys_col_RHRS",motherLogical,0,0,0);//q1en
@@ -1991,5 +2027,13 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 	return;
 
 }
+
+
+g4hrsEMField* g4hrsDetectorConstruction::GetEMFieldFromSetup(){
+	
+	return fEMFieldSetup->GetEMField();
+	
+}
+
 
 

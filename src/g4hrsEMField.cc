@@ -15,14 +15,14 @@
 g4hrsEMField::g4hrsEMField(): mBField_Septum(0)
 {
 
-	G4cout << "This is g4hrsEMField (not setup!)...\n\n\n";
 	bool pSetupHRS= true;
 	if(pSetupHRS)
 
 	fSeptumMomentum = 1.063;
-	fSeptumMapFile = "PREX_septumFieldMap.dat";
+//	fSeptumMapFile = "/home/tyler/g4hrs/g4hrs/src/fields/PREX_septumFieldMap.dat";
+	fSeptumMapFile = "../g4hrs/src/fields/PREX_septumFieldMap.dat";
 
-	{
+	if(fSeptumMomentum != 0 && fSeptumMapFile != "") {
 
 //		mBField_Septum = new BField_Septum(pHRSMomentum,"PREX_septumFieldMap.dat");
 		mBField_Septum = new BField_Septum(fSeptumMomentum,fSeptumMapFile);

@@ -21,8 +21,10 @@
 #define NINTERVAL 3
 
 g4hrsGenNuclElastic::g4hrsGenNuclElastic(){
-    fTh_min =     1.0*deg;
-    fTh_max =     10.0*deg;
+    fTh_min =	1.*deg;
+    fTh_max =	10.*deg;
+    fPh_min = 	0.*deg;
+    fPh_max = 	360.*deg;	  
 
     fE_min = 80.0*MeV; // Absolute minimum of electron energy
                             // to generate
@@ -126,7 +128,7 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
     // sampling
     double samp_fact = sampv*sampv*(icth_a-icth_b)/(cthmin-cthmax);
 
-    double ph = CLHEP::RandFlat::shoot(0.0, 2.0*pi);
+    double ph = CLHEP::RandFlat::shoot(fPh_min, fPh_max);
 
     double ef    = proton_mass_c2*beamE/(proton_mass_c2 + beamE*(1.0-cos(th)));;
 
@@ -163,11 +165,8 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
 
     double thisZ = vert->GetMaterial()->GetZ();
 
-    if( fabs( thisZ - 82.0 ) < 1e-6 ){
 	// Tyler: use th, ef to interpolate cross section
 	sigma = fDatabase->Interpolate(ef,th,0,0)/(thisZ*thisZ);  	
-    }
-
 
     //evt->SetEffCrossSection(sigma*V*thisZ*thisZ*value);
 	evt->SetEffCrossSection(sigma*V*thisZ*thisZ);

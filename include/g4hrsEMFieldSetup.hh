@@ -52,6 +52,8 @@ public:
 	
 	G4FieldManager* GetFieldManager(){return fFieldManager;}
 
+	g4hrsEMField* GetEMField() {return fEMfield;}
+
 	//Local field  FZB1
 	void UpdateFieldFZBL1();
 	void SetBField3VFZBL1(G4double fieldGradient);

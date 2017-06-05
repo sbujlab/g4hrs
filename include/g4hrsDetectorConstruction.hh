@@ -43,7 +43,10 @@ class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
 	
 	double fHRSAngle;
 	double fSeptumAngle;
+	G4String fTargetMaterial;
 	g4hrsEMFieldSetup* GetEMFieldSetup() {return fEMFieldSetup;}
+	g4hrsEMField* GetEMFieldFromSetup();
+	int    fSetupHRS;
 
   private:
       void CreateTarget(G4LogicalVolume *);
@@ -79,7 +82,6 @@ class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
 
       int fSetupStdScatChamber;
 
-      int    fSetupHRS;
 
       double fScatChamberRin;
       double fScatChamberRout;
