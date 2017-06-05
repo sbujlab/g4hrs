@@ -54,14 +54,9 @@ BField_Septum::BField_Septum(double pMomentum, const char *mapfile)
 		SetGlobalDebugLevel("BField_Septum::BField_Septum()", (int)BFIELD_SEPTUM_DEBUG);
 #endif
 
-	//TYLERTEST
-	G4cout << "BField_Septum constructor...\n";
-
 	fInstance=this;
 
 	this->ReadMap(mapfile);
-
-	G4cout << "Just read the map...\n";
 
 	//update the Current Ratio if necessary
 	if(fabs(pMomentum)>1.0E-5) 
@@ -149,7 +144,7 @@ bool BField_Septum::ReadMap(const char *filename)
 	    	exit(1);
 	}
 
-	if(ins >> mOrigin[0] >> mOrigin[1] >> mOrigin[3]) {
+	if(ins >> mOrigin[0] >> mOrigin[1] >> mOrigin[2]) {
 		G4cout << "septumX, septumY, septumZ = " << mOrigin[0] << ", " << mOrigin[1] << ", " << mOrigin[2] << endl;
 	} else {
 		G4cerr << "Error " << __FILE__ << " line " << __LINE__ 
