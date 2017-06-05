@@ -3,9 +3,6 @@
 # store tracks
 #/tracking/storeTrajectory 1
 
-# This must be explicitly called
-/run/initialize
-
 # Should usually be commented out
 #/g4hrs/setseed 50
 
@@ -13,15 +10,21 @@
 
 #/g4hrs/scalefield 70.0 A
 
+/g4hrs/snake 49
+
+/g4hrs/hrssetup 4
 /g4hrs/sepangle 5.0 deg
-/g4hrs/hrsangle 12.0 deg
+/g4hrs/hrsangle 12.5 deg
 /g4hrs/sepmom 1.063 GeV
 /g4hrs/hrsmom 1.063 GeV
-/g4hrs/septummap PREX_septumFieldMap.dat
+/g4hrs/septummap ../g4hrs/src/fields/PREX_septumFieldMap.dat
 
 /g4hrs/targlen 0.5 mm
 /g4hrs/targpos 0.0 mm
 /g4hrs/targmat Pb208
+
+# This must be explicitly called
+/run/initialize
 
 /g4hrs/beamcurr 70e-6 A
 /g4hrs/beamene 1.063 GeV
@@ -30,8 +33,10 @@
 
 /g4hrs/filename g4hrs_out.root
 
-/g4hrs/thmin 0.0 deg
+/g4hrs/thmin 2.0 deg
 /g4hrs/thmax 10.0 deg
+/g4hrs/phmin 90.0 deg
+/g4hrs/phmax 270.0 deg
 #/g4hrs/thcommin 0.0 deg
 #/g4hrs/thcommax 10.0 deg
 
@@ -51,4 +56,4 @@
 #/g4hrs/beam_dth 0.0 deg
 #/g4hrs/beam_dph 0.0 deg
 
-/run/beamOn 100
+/run/beamOn 10000
