@@ -143,7 +143,7 @@ void g4hrsMaterial::ConstructMaterials()
 	air = new G4Material(name="Air", density, nElem=2);
 	air->AddElement(elN, weightRatio=0.7);
 	air->AddElement(elO, weightRatio=0.3);
-
+/*
 	// Argon gas
 	a = 39.95*g/mole;
 	density = 1.782*mg/cm3;
@@ -277,7 +277,7 @@ void g4hrsMaterial::ConstructMaterials()
 	a = 12.01 * g/mole;
 	density = 3.515*g/cm3;
 	diamond = new G4Material("Diamond", z=6, a, density);
-
+*/
 	//mylar
 	density = 1.39*g/cm3;
 	mylar = new G4Material(name="Mylar", density, nElem=2);
@@ -298,7 +298,7 @@ void g4hrsMaterial::ConstructMaterials()
 	a = 47.952534*g/mole;//48Ca
 	density = 1.855*g/cm3;//48Ca
 	calcium48 = new G4Material(name="Calcium48", z=20., a, density);
-	
+/*	
 	//Iron
 	a = 55.845*g/mole;
 	density = 7.874*g/cm3;
@@ -328,7 +328,7 @@ void g4hrsMaterial::ConstructMaterials()
 	stainlesssteel304->AddElement(elC,  weightRatio=0.0008);
 	stainlesssteel304->AddElement(elP,  weightRatio=0.0005);
 	stainlesssteel304->AddElement(elS,  weightRatio=0.0003);
-
+*/
 	//Silicon Steel(electrical steel),
 	//Electrical steel is an iron alloy which may have from zero to 6.5% silicon (Si:5Fe). 
 	//Silicon significantly increases the electrical resistivity of the steel, which 
@@ -357,12 +357,12 @@ void g4hrsMaterial::ConstructMaterials()
 	siliconsteel = new G4Material(name="SiliconSteel", density, nElem=2);
 	siliconsteel->AddElement(elFe, nAtoms=11);
 	siliconsteel->AddElement(elSi, nAtoms=1);
-
+/*
 	//Tantalum
 	a = 180.95*g/mole;
 	density = 16.69*g/cm3;
 	tantalum = new G4Material(name="Tantalum", z=73., a, density);
-
+*/
 	//Tungsten
 	a = 183.84*g/mole;
 	density = 19.25*g/cm3;
@@ -378,7 +378,7 @@ void g4hrsMaterial::ConstructMaterials()
 	a = 207.9766521*g/mole;
 	density = 11.38*g/cm3;
 	lead208 = new G4Material(name="Lead208", z=82., a, density);
-
+/*
 	//solid NH3 	
 	//double mSolidNH3D = 0.817*g/cm3;
 	density=mSolidNH3D;
@@ -396,12 +396,12 @@ void g4hrsMaterial::ConstructMaterials()
 	NH3He = new G4Material(name="SolidNH3+LiquidHe", density, nComponent=2);
 	NH3He->AddMaterial(solidNH3, weightRatio=mNH3WeightRatio);
 	NH3He->AddMaterial(liquidHe, weightRatio=1.0-mNH3WeightRatio);
-
+*/
 	//Copper
 	a = 63.546*g/mole;
 	density = 8.96*g/cm3;
 	copper = new G4Material(name="Copper", z=29., a, density);
-
+/*
 	//check here for tha name of the material
 	//http://geant4.cern.ch/UserDocumentation/UsersGuides/ForApplicationDeveloper/html/apas09.html
 	beryllium = pMatMan->FindOrBuildMaterial("G4_Be");       // pure beryllium
@@ -466,7 +466,7 @@ void g4hrsMaterial::ConstructMaterials()
 	a = 55.845*g/mole;
 	density = 7.874*g/cm3*1.0E10;
 	absorber = new G4Material(name="Absorber", z=26., a, density);
-
+*/
 
 	BuildMaterialMap();
 
