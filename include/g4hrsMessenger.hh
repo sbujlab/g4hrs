@@ -37,8 +37,8 @@ class g4hrsMessenger : public G4UImessenger {
 	void SetEvAct( g4hrsEventAction *ev ){ fevact = ev; }
 	void SetStepAct( g4hrsSteppingAction *st ){ fStepAct = st; }
 	void SetPhysList( G4VModularPhysicsList *l ){ fPhysicsList = l; }
-	void SetEmFieldSetup( g4hrsEMFieldSetup *emset ) { fEMFieldSetup = emset; }
-	void SetEMField( g4hrsEMField *em ) { fEMField = em; } 
+	void SetEmFieldSetup( g4hrsEMFieldSetup *emset ) { femfieldsetup = emset; }
+	void SetEMField( g4hrsEMField *em ) { femfield = em; } 
 
 	void SetNewValue(G4UIcommand* cmd, G4String newValue);
 
@@ -49,8 +49,8 @@ class g4hrsMessenger : public G4UImessenger {
 	g4hrsPrimaryGeneratorAction *fprigen;
 	g4hrsBeamTarget *fBeamTarg;
 	g4hrsSteppingAction *fStepAct;
-	g4hrsEMFieldSetup * fEMFieldSetup;
-	g4hrsEMField *fEMField;
+	g4hrsEMFieldSetup *femfieldsetup;
+	g4hrsEMField *femfield;
 	G4VModularPhysicsList *fPhysicsList;
 
 	G4UIcmdWithAnInteger *seedCmd;
@@ -69,6 +69,7 @@ class g4hrsMessenger : public G4UImessenger {
 	G4UIcmdWithADoubleAndUnit	*sepAngCmd;
 	G4UIcmdWithADoubleAndUnit	*hrsAngCmd;
 	G4UIcmdWithADoubleAndUnit	*hrsMomCmd;
+	G4UIcmdWithAnInteger		*hrsSetupCmd;
 	G4UIcmdWithADoubleAndUnit	*sepMomCmd;
 	G4UIcmdWithAString		*sepMapCmd;
 
@@ -104,6 +105,8 @@ class g4hrsMessenger : public G4UImessenger {
 	// To general event generators
 	G4UIcmdWithADoubleAndUnit *thminCmd;
 	G4UIcmdWithADoubleAndUnit *thmaxCmd;
+	G4UIcmdWithADoubleAndUnit *phminCmd;
+	G4UIcmdWithADoubleAndUnit *phmaxCmd;
 	G4UIcmdWithADoubleAndUnit *thCoMminCmd;
 	G4UIcmdWithADoubleAndUnit *thCoMmaxCmd;
 	G4UIcmdWithADoubleAndUnit *EminCmd;

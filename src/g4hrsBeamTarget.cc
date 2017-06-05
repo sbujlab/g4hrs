@@ -47,6 +47,8 @@ g4hrsBeamTarget::g4hrsBeamTarget(){
 
     fAlreadyWarned = false;
 
+	fTargetMaterial = "Pb208";
+
 }
 
 g4hrsBeamTarget::~g4hrsBeamTarget(){
@@ -59,6 +61,9 @@ g4hrsBeamTarget *g4hrsBeamTarget::GetBeamTarget() {
     return gSingleton;
 }
 
+G4String g4hrsBeamTarget::GetTargetMaterial() {
+	return fTargetMaterial;
+}
 
 G4double g4hrsBeamTarget::GetEffLumin(){
     G4double lumin = fEffMatLen*fBeamCurr/(e_SI*coulomb);
@@ -180,7 +185,6 @@ void g4hrsBeamTarget::SetTargetLen(G4double z){
     // Move positions of upstream and downstream volumes
     for(it = fUpstreamVols.begin(); it != fUpstreamVols.end(); it++ ){
 	G4GeometryManager::GetInstance()->OpenGeometry((*it));
-
         double zpos = (*it)->GetFrameTranslation().z();
         (*it)->SetTranslation( G4ThreeVector(0.0, 0.0, zpos-z/2.0) );
 	G4GeometryManager::GetInstance()->CloseGeometry(true, false, (*it));
@@ -207,10 +211,10 @@ void g4hrsBeamTarget::SetTargetPos(G4double z){
         targz = fTargVol->GetFrameTranslation().z();
         fTargVol->SetTranslation( G4ThreeVector(0.0, 0.0, z ) );
     }
-
+	
     for(it = fUpstreamVols.begin(); it != fUpstreamVols.end(); it++ ){
 	G4GeometryManager::GetInstance()->OpenGeometry((*it));
-
+	G4String volname = (*it)->GetName();
         double zpos = (*it)->GetFrameTranslation().z();
         (*it)->SetTranslation( G4ThreeVector(0.0, 0.0, z+(zpos-targz) ) );
 	G4GeometryManager::GetInstance()->CloseGeometry(true, false, (*it));
@@ -218,6 +222,7 @@ void g4hrsBeamTarget::SetTargetPos(G4double z){
     for(it = fDownstreamVols.begin(); it != fDownstreamVols.end(); it++ ){
 	G4GeometryManager::GetInstance()->OpenGeometry((*it));
 
+	G4String volname = (*it)->GetName();
         double zpos = (*it)->GetFrameTranslation().z();
         (*it)->SetTranslation( G4ThreeVector(0.0, 0.0, z+(zpos-targz)) );
 	G4GeometryManager::GetInstance()->CloseGeometry(true, false, (*it));
@@ -230,8 +235,11 @@ void g4hrsBeamTarget::SetTargetPos(G4double z){
     UpdateInfo();
 }
 
-G4String g4hrsBeamTarget::GetTargetMaterial() {
-	return fTargetMaterial;
+void g4hrsBeamTarget::SetTargetMaterial(G4String targMat) {
+	fTargetMaterial = targMat;
+	G4RunManager* runManager = G4RunManager::GetRunManager();
+	runManager->GeometryHasBeenModified();
+	UpdateInfo();
 }
 
 
@@ -477,3 +485,5 @@ g4hrsVertex g4hrsBeamTarget::SampleVertex(SampType_t samp){
 
     return thisvert;
 }
+
+

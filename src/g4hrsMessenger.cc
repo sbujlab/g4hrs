@@ -37,8 +37,8 @@ g4hrsMessenger::g4hrsMessenger(){
     fBeamTarg     = NULL;
     fStepAct      = NULL;
     fPhysicsList  = NULL;
-    fEMFieldSetup = NULL;		
-    fEMField	  = NULL;		
+    femfieldsetup = NULL;		
+    femfield	  = NULL;		
     
 
     // Grab singleton beam/target
@@ -96,6 +96,10 @@ g4hrsMessenger::g4hrsMessenger(){
 	hrsMomCmd->SetGuidance("Set HRS momentum");
 	hrsMomCmd->SetParameterName("hrsmom",false);
 	
+	hrsSetupCmd = new G4UIcmdWithAnInteger("/g4hrs/hrssetup",this);
+	hrsSetupCmd->SetGuidance("Set HRS setup level");
+	hrsSetupCmd->SetParameterName("hrssetup",false);
+	
 	sepMomCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/sepmom",this);
 	sepMomCmd->SetGuidance("Set septum momentum");
 	sepMomCmd->SetParameterName("sepmom",false);
@@ -137,12 +141,20 @@ g4hrsMessenger::g4hrsMessenger(){
 
 
     thminCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/thmin",this);
-    thminCmd->SetGuidance("Minimum generation angle");
+    thminCmd->SetGuidance("Minimum generated polar angle");
     thminCmd->SetParameterName("thmin", false);
 
     thmaxCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/thmax",this);
-    thmaxCmd->SetGuidance("Minimum generation angle");
+    thmaxCmd->SetGuidance("Maximum generated polar angle");
     thmaxCmd->SetParameterName("thmax", false);
+    
+    phminCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/phmin",this);
+    phminCmd->SetGuidance("Minimum generated azimuthal angle");
+    phminCmd->SetParameterName("phmin", false);
+
+    phmaxCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/phmax",this);
+    phmaxCmd->SetGuidance("Maximum generated azimuthal angle");
+    phmaxCmd->SetParameterName("phmax", false);
 
     thCoMminCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/thcommin",this);
     thCoMminCmd->SetGuidance("Minimum CoM generation angle");
@@ -388,33 +400,38 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 
 	if( cmd == snakeModCmd ) {
 		G4int snake = snakeModCmd->GetNewIntValue(newValue);
-		fEMFieldSetup->fSnakeModel = snake;
+		femfieldsetup->fSnakeModel = snake;
 	}
 
 	if( cmd == sepAngCmd ) {
 		G4double angle = sepAngCmd->GetNewDoubleValue(newValue);
-		fEMFieldSetup->fSeptumAngle = angle;
+		femfieldsetup->fSeptumAngle = angle;
 		fdetcon->fSeptumAngle = angle;
 	}
 
 	if( cmd == hrsAngCmd ) {
 		G4double angle = hrsAngCmd->GetNewDoubleValue(newValue);
-		fEMFieldSetup->fHRSAngle = angle;
+		femfieldsetup->fHRSAngle = angle;
 		fdetcon->fHRSAngle = angle;
 	}
 
 	if( cmd == hrsMomCmd ) {
 		G4double p = hrsMomCmd->GetNewDoubleValue(newValue);
-		fEMFieldSetup->fHRSMomentum = p;
+		femfieldsetup->fHRSMomentum = p;
+	}
+	
+	if( cmd == hrsSetupCmd ) {
+		G4int hrs = hrsSetupCmd->GetNewIntValue(newValue);
+		fdetcon->fSetupHRS = hrs;
 	}
 
 	if( cmd == sepMomCmd ) {
 		G4double p = sepMomCmd->GetNewDoubleValue(newValue);
-		fEMField->fSeptumMomentum = p; 
+		femfield->fSeptumMomentum = p; 
 	}
 
 	if( cmd == sepMapCmd ) {
-		fEMField->fSeptumMapFile = newValue;
+		femfield->fSeptumMapFile = newValue;
 	}
 
     if( cmd == tgtLenCmd ){
@@ -428,8 +445,10 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
     }
 
     if ( cmd == tgtMatCmd ){
-	fBeamTarg->fTargetMaterial = newValue;
-    }
+//	fBeamTarg->fTargetMaterial = newValue;
+//	fdetcon->fTargetMaterial = newValue;
+  	fBeamTarg->SetTargetMaterial(newValue);
+  }
 
     if( cmd == genSelectCmd ){
 	fprigen->SetGenerator( newValue );
@@ -479,6 +498,22 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 	g4hrsVEventGen *agen = fprigen->GetGenerator();
 	if( agen ){
 	    agen->fTh_max = th;
+	}
+    }
+    
+    if( cmd == phminCmd ){
+	G4double ph = phminCmd->GetNewDoubleValue(newValue);
+	g4hrsVEventGen *agen = fprigen->GetGenerator();
+	if( agen ){
+	    agen->fPh_min = ph;
+	}
+    }
+
+    if( cmd == phmaxCmd ){
+	G4double ph = phmaxCmd->GetNewDoubleValue(newValue);
+	g4hrsVEventGen *agen = fprigen->GetGenerator();
+	if( agen ){
+	    agen->fPh_max = ph;
 	}
     }
 

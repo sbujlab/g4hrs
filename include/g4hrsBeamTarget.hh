@@ -53,9 +53,8 @@ class g4hrsBeamTarget {
 	void SetTargetVolume( G4VPhysicalVolume *v ){ fTargVol = v;  UpdateInfo(); }
 	void SetTargetPos(G4double z);
 	void SetTargetLen(G4double l);
-
-	G4String GetTargetMaterial();
-
+	void SetTargetMaterial(G4String);
+	G4String GetTargetMaterial(); 
 	void SetBeamCurrent(G4double I){ fBeamCurr = I; }
 
 	g4hrsVertex SampleVertex(SampType_t);
@@ -63,8 +62,8 @@ class g4hrsBeamTarget {
 	G4double fBeamE;
 	G4double fBeamCurr;
 	G4double fBeamPol;
-	G4String fTargetMaterial;	
-
+	G4String fTargetMaterial;
+	
 	G4VPhysicalVolume * GetTargVol(){ return fTargVol; }
 
 	g4hrsMultScatt *fMS;
@@ -75,7 +74,6 @@ class g4hrsBeamTarget {
 	G4double fTotalLength;
 
 	G4double fTargRad;
-
 	G4Material *fDefaultMat;
 
 	bool fAlreadyWarned;
