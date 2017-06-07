@@ -55,11 +55,10 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
 : fChordFinder(0), fStepper(0), fIntgrDriver(0)
 {
 	
-  fHRSMomentum = 1*GeV;
+  fHRSMomentum = 1.063*GeV;
   fSnakeModel = 49;
   fHRSAngle = 12.5*deg;
   fSeptumAngle = 5.0*deg;
-	fSnakeModel = 49;
 
   G4cout << "HRS angles: " << fHRSAngle <<  G4endl;
 
@@ -69,15 +68,15 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
   fg4hrsEMFieldSetup=this;
   //global EM field
   fEMfield = new g4hrsEMField();
-  fEquation = new G4EqMagElectricField(fEMfield);
-  fMinStep  = 0.00001*mm ; // minimal step of 1 miron, default is 0.01 mm, Nickie finely
-  fStepperType = 4 ;     // ClassicalRK4 -- the default stepper
+//  fEquation = new G4EqMagElectricField(fEMfield);
+//  fMinStep  = 0.00001*mm ; // minimal step of 1 miron, default is 0.01 mm, Nickie finely
+//  fStepperType = 4 ;     // ClassicalRK4 -- the default stepper
   
 // 	fFieldManager = new G4FieldManager();
 //	UpdateField();
 
   fFieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
-  fChordFinder = 0;   //will be set in UpdateField()
+//  fChordFinder = 0;   //will be set in UpdateField()
   UpdateField();
   
 //G4double snakemagnumber = 1. / -4.77577734;//unitless, STD - correct, I believe
@@ -280,57 +279,57 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
   RROTATEQ3->rotateY( -fHRSAngle);
  
   fMagFieldFZBL1 = new BField_Quad(KAPPA1, LORIGINQ1, LROTATEQ1, pQ1Length, pQ1Radius, 1);
-  fEquationFZBL1 = new G4Mag_UsualEqRhs(fMagFieldFZBL1);	
-  fStepperFZBL1  = new G4ClassicalRK4(fEquationFZBL1);
-  fChordFinderFZBL1 = 0;
+//  fEquationFZBL1 = new G4Mag_UsualEqRhs(fMagFieldFZBL1);	
+//  fStepperFZBL1  = new G4ClassicalRK4(fEquationFZBL1);
+//  fChordFinderFZBL1 = 0;
   fLocalFieldManagerFZBL1 = new G4FieldManager();
   UpdateFieldFZBL1();
   fMagFieldFZBR1 = new BField_Quad(KAPPA1, RORIGINQ1, RROTATEQ1, pQ1Length, pQ1Radius, 1);
-  fEquationFZBR1 = new G4Mag_UsualEqRhs(fMagFieldFZBR1);	
-  fStepperFZBR1  = new G4ClassicalRK4(fEquationFZBR1);
-  fChordFinderFZBR1 = 0;
+//  fEquationFZBR1 = new G4Mag_UsualEqRhs(fMagFieldFZBR1);	
+//  fStepperFZBR1  = new G4ClassicalRK4(fEquationFZBR1);
+//  fChordFinderFZBR1 = 0;
   fLocalFieldManagerFZBR1 = new G4FieldManager();
   UpdateFieldFZBR1();
   
   //Local field  FZB2, Q2
   fMagFieldFZBL2 = new BField_Quad(KAPPA2, LORIGINQ2, LROTATEQ2, pQ2Length, pQ2Radius, 2);
-  fEquationFZBL2 = new G4Mag_UsualEqRhs(fMagFieldFZBL2);	
-  fStepperFZBL2  = new G4ClassicalRK4(fEquationFZBL2);
-  fChordFinderFZBL2 = 0;
+//  fEquationFZBL2 = new G4Mag_UsualEqRhs(fMagFieldFZBL2);	
+//  fStepperFZBL2  = new G4ClassicalRK4(fEquationFZBL2);
+//  fChordFinderFZBL2 = 0;
   fLocalFieldManagerFZBL2 = new G4FieldManager();
   UpdateFieldFZBL2();
   fMagFieldFZBR2 = new BField_Quad(KAPPA2, RORIGINQ2, RROTATEQ2, pQ2Length, pQ2Radius, 2);
-  fEquationFZBR2 = new G4Mag_UsualEqRhs(fMagFieldFZBR2);	
-  fStepperFZBR2  = new G4ClassicalRK4(fEquationFZBR2);
-  fChordFinderFZBR2 = 0;
+//  fEquationFZBR2 = new G4Mag_UsualEqRhs(fMagFieldFZBR2);	
+//  fStepperFZBR2  = new G4ClassicalRK4(fEquationFZBR2);
+//  fChordFinderFZBR2 = 0;
   fLocalFieldManagerFZBR2 = new G4FieldManager();
   UpdateFieldFZBR2();
   
   fMagFieldFZBL3 = new BField_Dipole( dipoleField, LORIGIND, LROTATED );
-  fEquationFZBL3 = new G4Mag_UsualEqRhs(fMagFieldFZBL3);	
-  fChordFinderFZBL3 = 0;
-  fLocalFieldManagerFZBL3 = new G4FieldManager();
+//  fEquationFZBL3 = new G4Mag_UsualEqRhs(fMagFieldFZBL3);	
+//  fChordFinderFZBL3 = 0;
+//  fLocalFieldManagerFZBL3 = new G4FieldManager();
   UpdateFieldFZBL3();
   fMagFieldFZBR3 = new BField_Dipole( dipoleField, RORIGIND, RROTATED );
-  fEquationFZBR3 = new G4Mag_UsualEqRhs(fMagFieldFZBR3);	
-  fChordFinderFZBR3 = 0;
-  fLocalFieldManagerFZBR3 = new G4FieldManager();
+//  fEquationFZBR3 = new G4Mag_UsualEqRhs(fMagFieldFZBR3);	
+//  fChordFinderFZBR3 = 0;
+//  fLocalFieldManagerFZBR3 = new G4FieldManager();
   UpdateFieldFZBR3();
   
   //Local field  FZB4, Q3
   fMagFieldFZBL4 = new BField_Quad(KAPPA3, LORIGINQ3, LROTATEQ3, pQ3Length, pQ3Radius, 3);
   //fMagFieldFZBL4 = new BField_Quad(KAPPA3, ORIGINACTUAL, ROTATETEST);
-  fEquationFZBL4 = new G4Mag_UsualEqRhs(fMagFieldFZBL4);	
-  fStepperFZBL4  = new G4ClassicalRK4(fEquationFZBL4);
-  fChordFinderFZBL4 = 0;
+//  fEquationFZBL4 = new G4Mag_UsualEqRhs(fMagFieldFZBL4);	
+//  fStepperFZBL4  = new G4ClassicalRK4(fEquationFZBL4);
+//  fChordFinderFZBL4 = 0;
   fLocalFieldManagerFZBL4 = new G4FieldManager();
   UpdateFieldFZBL4();
   //Local field  FZB4, Q3
   fMagFieldFZBR4 = new BField_Quad(KAPPA3, RORIGINQ3, RROTATEQ3, pQ3Length, pQ3Radius, 3);
   //fMagFieldFZBR4 = new BField_Quad(KAPPA3, ORIGINACTUAL, ROTATETEST);
-  fEquationFZBR4 = new G4Mag_UsualEqRhs(fMagFieldFZBR4);	
-  fStepperFZBR4  = new G4ClassicalRK4(fEquationFZBR4);
-  fChordFinderFZBR4 = 0;
+//  fEquationFZBR4 = new G4Mag_UsualEqRhs(fMagFieldFZBR4);	
+//  fStepperFZBR4  = new G4ClassicalRK4(fEquationFZBR4);
+//  fChordFinderFZBR4 = 0;
   fLocalFieldManagerFZBR4 = new G4FieldManager();
   UpdateFieldFZBR4();
 
@@ -356,17 +355,17 @@ g4hrsEMFieldSetup::~g4hrsEMFieldSetup()
 void g4hrsEMFieldSetup::UpdateField()
 {
   //SetStepper();
-  fStepper = new G4ClassicalRK4( fEquation, 8 );
+//  fStepper = new G4ClassicalRK4( fEquation, 8 );
   //G4cout<<"g4hrsEMFieldSetup:: The minimal step is equal to "<<fMinStep/mm<<" mm"<<G4endl ;
   
   fFieldManager->SetDetectorField(fEMfield);
-//  fFieldManager->CreateChordFinder( fEMfield );
-  
+  fFieldManager->CreateChordFinder( fEMfield );
+  /*
   if(fChordFinder) delete fChordFinder;
   fIntgrDriver = new G4MagInt_Driver(fMinStep,fStepper,fStepper->GetNumberOfVariables());
   fChordFinder = new G4ChordFinder(fIntgrDriver);
   fFieldManager->SetChordFinder( fChordFinder );
-  
+  */
 }
 
 
@@ -377,12 +376,12 @@ void g4hrsEMFieldSetup::UpdateFieldFZBL1()
 
 	fLocalFieldManagerFZBL1->SetDetectorField(fMagFieldFZBL1);
 	fLocalFieldManagerFZBL1->CreateChordFinder(fMagFieldFZBL1);
-
+/*
 	if(fChordFinderFZBL1) delete fChordFinderFZBL1;
 	fIntgrDriverFZBL1 = new G4MagInt_Driver(fMinStep,fStepperFZBL1,fStepperFZBL1->GetNumberOfVariables());
 	fChordFinderFZBL1 = new G4ChordFinder((G4MagneticField*) fMagFieldFZBL1, fMinStep, fStepperFZBL1);
 	fLocalFieldManagerFZBL1->SetChordFinder( fChordFinderFZBL1 );
-	
+*/	
 }
 void g4hrsEMFieldSetup::UpdateFieldFZBR1()
 {
@@ -390,12 +389,12 @@ void g4hrsEMFieldSetup::UpdateFieldFZBR1()
 
 	fLocalFieldManagerFZBR1->SetDetectorField(fMagFieldFZBR1);
 	fLocalFieldManagerFZBR1->CreateChordFinder(fMagFieldFZBR1);
-
+/*
 	if(fChordFinderFZBR1) delete fChordFinderFZBR1;
 	fIntgrDriverFZBR1 = new G4MagInt_Driver(fMinStep,fStepperFZBR1,fStepperFZBR1->GetNumberOfVariables());
 	fChordFinderFZBR1 = new G4ChordFinder((G4MagneticField*) fMagFieldFZBR1, fMinStep, fStepperFZBR1);
 	fLocalFieldManagerFZBR1->SetChordFinder( fChordFinderFZBR1 );
-	
+*/	
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -405,11 +404,12 @@ void g4hrsEMFieldSetup::UpdateFieldFZBL2()
 
 	fLocalFieldManagerFZBL2->SetDetectorField(fMagFieldFZBL2);
 	fLocalFieldManagerFZBL2->CreateChordFinder(fMagFieldFZBL2);
-
+/*
 	if(fChordFinderFZBL2) delete fChordFinderFZBL2;
 	fIntgrDriverFZBL2 = new G4MagInt_Driver(fMinStep,fStepperFZBL2,fStepperFZBL2->GetNumberOfVariables());
 	fChordFinderFZBL2 = new G4ChordFinder((G4MagneticField*) fMagFieldFZBL2, fMinStep, fStepperFZBL2);
 	fLocalFieldManagerFZBL2->SetChordFinder( fChordFinderFZBL2 );
+*/
 }
 void g4hrsEMFieldSetup::UpdateFieldFZBR2()
 {
@@ -417,14 +417,13 @@ void g4hrsEMFieldSetup::UpdateFieldFZBR2()
 
 	fLocalFieldManagerFZBR2->SetDetectorField(fMagFieldFZBR2);
 	fLocalFieldManagerFZBR2->CreateChordFinder(fMagFieldFZBR2);
-
+/*
 	if(fChordFinderFZBR2) delete fChordFinderFZBR2;
 	fIntgrDriverFZBR2 = new G4MagInt_Driver(fMinStep,fStepperFZBR2,fStepperFZBR2->GetNumberOfVariables());
 	fChordFinderFZBR2 = new G4ChordFinder((G4MagneticField*) fMagFieldFZBR2, fMinStep, fStepperFZBR2);
 	fLocalFieldManagerFZBR2->SetChordFinder( fChordFinderFZBR2 );
+*/
 }
-
-
 
 void g4hrsEMFieldSetup::UpdateFieldFZBL3()
 {
@@ -435,7 +434,7 @@ void g4hrsEMFieldSetup::UpdateFieldFZBL3()
   
   fLocalFieldManagerFZBL3->SetDetectorField(fMagFieldFZBL3);
   fLocalFieldManagerFZBL3->CreateChordFinder(fMagFieldFZBL3);
-  
+/*  
   if(fChordFinderFZBL3) delete fChordFinderFZBL3;
   fChordFinderFZBL3 = new G4ChordFinder((G4MagneticField*) fMagFieldFZBL3, fMinStep, fStepperFZBL3);
   fLocalFieldManagerFZBL3->SetChordFinder( fChordFinderFZBL3 );
@@ -443,6 +442,7 @@ void g4hrsEMFieldSetup::UpdateFieldFZBL3()
   fLocalFieldManagerFZBL3->SetMinimumEpsilonStep( 1.0e-5 );
   fLocalFieldManagerFZBL3->SetMaximumEpsilonStep( 1.0e-4 );
   fLocalFieldManagerFZBL3->SetDeltaOneStep( 0.5e-3 * mm );  // 0.5 micrometer
+*/
 }
 void g4hrsEMFieldSetup::UpdateFieldFZBR3()
 {
@@ -453,7 +453,7 @@ void g4hrsEMFieldSetup::UpdateFieldFZBR3()
   
   fLocalFieldManagerFZBR3->SetDetectorField(fMagFieldFZBR3);
   fLocalFieldManagerFZBR3->CreateChordFinder(fMagFieldFZBR3);
-  
+ /* 
   if(fChordFinderFZBR3) delete fChordFinderFZBR3;
   fChordFinderFZBR3 = new G4ChordFinder((G4MagneticField*) fMagFieldFZBR3, fMinStep, fStepperFZBR3);
   fLocalFieldManagerFZBR3->SetChordFinder( fChordFinderFZBR3 );
@@ -461,6 +461,7 @@ void g4hrsEMFieldSetup::UpdateFieldFZBR3()
   fLocalFieldManagerFZBR3->SetMinimumEpsilonStep( 1.0e-5 );
   fLocalFieldManagerFZBR3->SetMaximumEpsilonStep( 1.0e-4 );
   fLocalFieldManagerFZBR3->SetDeltaOneStep( 0.5e-3 * mm );  // 0.5 micrometer
+*/
 }
 
 
@@ -471,11 +472,12 @@ void g4hrsEMFieldSetup::UpdateFieldFZBL4()
 
 	fLocalFieldManagerFZBL4->SetDetectorField(fMagFieldFZBL4);
 	fLocalFieldManagerFZBL4->CreateChordFinder(fMagFieldFZBL4);
-
+/*
 	if(fChordFinderFZBL4) delete fChordFinderFZBL4;
 	fIntgrDriverFZBL4 = new G4MagInt_Driver(fMinStep,fStepperFZBL4,fStepperFZBL4->GetNumberOfVariables());
 	fChordFinderFZBL4 = new G4ChordFinder((G4MagneticField*) fMagFieldFZBL4, fMinStep, fStepperFZBL4);
 	fLocalFieldManagerFZBL4->SetChordFinder( fChordFinderFZBL4 );
+*/
 }
 void g4hrsEMFieldSetup::UpdateFieldFZBR4()
 {
@@ -483,11 +485,12 @@ void g4hrsEMFieldSetup::UpdateFieldFZBR4()
 
 	fLocalFieldManagerFZBR4->SetDetectorField(fMagFieldFZBR4);
 	fLocalFieldManagerFZBR4->CreateChordFinder(fMagFieldFZBR4);
-
+/*
 	if(fChordFinderFZBR4) delete fChordFinderFZBR4;
 	fIntgrDriverFZBR4 = new G4MagInt_Driver(fMinStep,fStepperFZBR4,fStepperFZBR4->GetNumberOfVariables());
 	fChordFinderFZBR4 = new G4ChordFinder((G4MagneticField*) fMagFieldFZBR4, fMinStep, fStepperFZBR4);
 	fLocalFieldManagerFZBR4->SetChordFinder( fChordFinderFZBR4 );
+*/
 }
 
 /////////////////////////////////////////////////////////////////////////////
