@@ -138,6 +138,7 @@ int main(int argc, char** argv){
     G4UserSteppingAction* stepping_action = new g4hrsSteppingAction;
     runManager->SetUserAction(stepping_action);
     rmmess->SetStepAct((g4hrsSteppingAction *) stepping_action);
+	io->SetSteppingAction((g4hrsSteppingAction *) stepping_action);
 
     // New units
 

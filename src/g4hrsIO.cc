@@ -12,6 +12,7 @@
 #include "g4hrsRun.hh"
 #include "g4hrsRunData.hh"
 #include "g4hrsBeamTarget.hh"
+#include "g4hrsSteppingAction.hh"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -128,6 +129,133 @@ void g4hrsIO::InitializeTree(){
     fTree->Branch("sum.det",  &fGenDetSum_det,  "sum.det[sum.n]/I");
     fTree->Branch("sum.vid",  &fGenDetSum_id,   "sum.vid[sum.n]/I");
     fTree->Branch("sum.edep", &fGenDetSum_edep, "sum.edep[sum.n]/D");
+
+	//Virtual boundary data
+	fTree->Branch("x_sen", 	&fX_sen,	"x_sen/D");
+	fTree->Branch("y_sen", 	&fY_sen,	"y_sen/D");
+	fTree->Branch("z_sen", 	&fZ_sen,	"z_sen/D");
+	fTree->Branch("p_sen", 	&fP_sen,	"p_sen/D");
+	fTree->Branch("th_sen", &fTheta_sen,	"th_sen/D");
+	fTree->Branch("ph_sen", &fPhi_sen,	"ph_sen/D");
+
+	fTree->Branch("x_sm", 	&fX_sm,	"x_sm/D");
+	fTree->Branch("y_sm", 	&fY_sm,	"y_sm/D");
+	fTree->Branch("z_sm", 	&fZ_sm,	"z_sm/D");
+	fTree->Branch("p_sm", 	&fP_sm,	"p_sm/D");
+	fTree->Branch("th_sm", &fTheta_sm,	"th_sm/D");
+	fTree->Branch("ph_sm", &fPhi_sm,	"ph_sm/D");
+
+	fTree->Branch("x_sex", 	&fX_sex,	"x_sex/D");
+	fTree->Branch("y_sex", 	&fY_sex,	"y_sex/D");
+	fTree->Branch("z_sex", 	&fZ_sex,	"z_sex/D");
+	fTree->Branch("p_sex", 	&fP_sex,	"p_sex/D");
+	fTree->Branch("th_sex", &fTheta_sex,	"th_sex/D");
+	fTree->Branch("ph_sex", &fPhi_sex,	"ph_sex/D");
+
+	fTree->Branch("x_coil", 	&fX_coil,	"x_coil/D");
+	fTree->Branch("y_coil", 	&fY_coil,	"y_coil/D");
+	fTree->Branch("z_coil", 	&fZ_coil,	"z_coil/D");
+	fTree->Branch("p_coil", 	&fP_coil,	"p_coil/D");
+	fTree->Branch("th_coil", &fTheta_coil,	"th_coil/D");
+	fTree->Branch("ph_coil", &fPhi_coil,	"ph_coil/D");
+
+	fTree->Branch("x_mid", 	&fX_mid,	"x_mid/D");
+	fTree->Branch("y_mid", 	&fY_mid,	"y_mid/D");
+	fTree->Branch("z_mid", 	&fZ_mid,	"z_mid/D");
+	fTree->Branch("p_mid", 	&fP_mid,	"p_mid/D");
+	fTree->Branch("th_mid", &fTheta_mid,	"th_mid/D");
+	fTree->Branch("ph_mid", &fPhi_mid,	"ph_mid/D");
+
+	fTree->Branch("x_col", 	&fX_col,	"x_col/D");
+	fTree->Branch("y_col", 	&fY_col,	"y_col/D");
+	fTree->Branch("z_col", 	&fZ_col,	"z_col/D");
+	fTree->Branch("p_col", 	&fP_col,	"p_col/D");
+	fTree->Branch("th_col", &fTheta_col,	"th_col/D");
+	fTree->Branch("ph_col", &fPhi_col,	"ph_col/D");
+
+	fTree->Branch("x_q1en", 	&fX_q1en,	"x_q1en/D");
+	fTree->Branch("y_q1en", 	&fY_q1en,	"y_q1en/D");
+	fTree->Branch("z_q1en", 	&fZ_q1en,	"z_q1en/D");
+	fTree->Branch("p_q1en", 	&fP_q1en,	"p_q1en/D");
+	fTree->Branch("th_q1en", &fTheta_q1en,	"th_q1en/D");
+	fTree->Branch("ph_q1en", &fPhi_q1en,	"ph_q1en/D");
+
+	fTree->Branch("x_q1ex", 	&fX_q1ex,	"x_q1ex/D");
+	fTree->Branch("y_q1ex", 	&fY_q1ex,	"y_q1ex/D");
+	fTree->Branch("z_q1ex", 	&fZ_q1ex,	"z_q1ex/D");
+	fTree->Branch("p_q1ex", 	&fP_q1ex,	"p_q1ex/D");
+	fTree->Branch("th_q1ex", &fTheta_q1ex,	"th_q1ex/D");
+	fTree->Branch("ph_q1ex", &fPhi_q1ex,	"ph_q1ex/D");
+
+	fTree->Branch("x_q2en", 	&fX_q2en,	"x_q2en/D");
+	fTree->Branch("y_q2en", 	&fY_q2en,	"y_q2en/D");
+	fTree->Branch("z_q2en", 	&fZ_q2en,	"z_q2en/D");
+	fTree->Branch("p_q2en", 	&fP_q2en,	"p_q2en/D");
+	fTree->Branch("th_q2en", &fTheta_q2en,	"th_q2en/D");
+	fTree->Branch("ph_q2en", &fPhi_q2en,	"ph_q2en/D");
+
+	fTree->Branch("x_q2ex", 	&fX_q2ex,	"x_q2ex/D");
+	fTree->Branch("y_q2ex", 	&fY_q2ex,	"y_q2ex/D");
+	fTree->Branch("z_q2ex", 	&fZ_q2ex,	"z_q2ex/D");
+	fTree->Branch("p_q2ex", 	&fP_q2ex,	"p_q2ex/D");
+	fTree->Branch("th_q2ex", &fTheta_q2ex,	"th_q2ex/D");
+	fTree->Branch("ph_q2ex", &fPhi_q2ex,	"ph_q2ex/D");
+
+	fTree->Branch("x_den", 	&fX_den,	"x_den/D");
+	fTree->Branch("y_den", 	&fY_den,	"y_den/D");
+	fTree->Branch("z_den", 	&fZ_den,	"z_den/D");
+	fTree->Branch("p_den", 	&fP_den,	"p_den/D");
+	fTree->Branch("th_den", &fTheta_den,	"th_den/D");
+	fTree->Branch("ph_den", &fPhi_den,	"ph_den/D");
+
+	fTree->Branch("x_dex", 	&fX_dex,	"x_dex/D");
+	fTree->Branch("y_dex", 	&fY_dex,	"y_dex/D");
+	fTree->Branch("z_dex", 	&fZ_dex,	"z_dex/D");
+	fTree->Branch("p_dex", 	&fP_dex,	"p_dex/D");
+	fTree->Branch("th_dex", &fTheta_dex,	"th_dex/D");
+	fTree->Branch("ph_dex", &fPhi_dex,	"ph_dex/D");
+
+	fTree->Branch("x_q3en", 	&fX_q3en,	"x_q3en/D");
+	fTree->Branch("y_q3en", 	&fY_q3en,	"y_q3en/D");
+	fTree->Branch("z_q3en", 	&fZ_q3en,	"z_q3en/D");
+	fTree->Branch("p_q3en", 	&fP_q3en,	"p_q3en/D");
+	fTree->Branch("th_q3en", &fTheta_q3en,	"th_q3en/D");
+	fTree->Branch("ph_q3en", &fPhi_q3en,	"ph_q3en/D");
+
+	fTree->Branch("x_q3ex", 	&fX_q3ex,	"x_q3ex/D");
+	fTree->Branch("y_q3ex", 	&fY_q3ex,	"y_q3ex/D");
+	fTree->Branch("z_q3ex", 	&fZ_q3ex,	"z_q3ex/D");
+	fTree->Branch("p_q3ex", 	&fP_q3ex,	"p_q3ex/D");
+	fTree->Branch("th_q3ex", &fTheta_q3ex,	"th_q3ex/D");
+	fTree->Branch("ph_q3ex", &fPhi_q3ex,	"ph_q3ex/D");
+
+	fTree->Branch("x_vdc", 	&fX_vdc,	"x_vdc/D");
+	fTree->Branch("y_vdc", 	&fY_vdc,	"y_vdc/D");
+	fTree->Branch("z_vdc", 	&fZ_vdc,	"z_vdc/D");
+	fTree->Branch("p_vdc", 	&fP_vdc,	"p_vdc/D");
+	fTree->Branch("th_vdc", &fTheta_vdc,	"th_vdc/D");
+	fTree->Branch("ph_vdc", &fPhi_vdc,	"ph_vdc/D");
+
+	fTree->Branch("x_qz1", 	&fX_qz1,	"x_qz1/D");
+	fTree->Branch("y_qz1", 	&fY_qz1,	"y_qz1/D");
+	fTree->Branch("z_qz1", 	&fZ_qz1,	"z_qz1/D");
+	fTree->Branch("p_qz1", 	&fP_qz1,	"p_qz1/D");
+	fTree->Branch("th_qz1", &fTheta_qz1,	"th_qz1/D");
+	fTree->Branch("ph_qz1", &fPhi_qz1,	"ph_qz1/D");
+
+	fTree->Branch("x_qz2", 	&fX_qz2,	"x_qz2/D");
+	fTree->Branch("y_qz2", 	&fY_qz2,	"y_qz2/D");
+	fTree->Branch("z_qz2", 	&fZ_qz2,	"z_qz2/D");
+	fTree->Branch("p_qz2", 	&fP_qz2,	"p_qz2/D");
+	fTree->Branch("th_qz2", &fTheta_qz2,	"th_qz2/D");
+	fTree->Branch("ph_qz2", &fPhi_qz2,	"ph_qz2/D");
+
+	fTree->Branch("x_fp", 	&fX_fp,	"x_fp/D");
+	fTree->Branch("y_fp", 	&fY_fp,	"y_fp/D");
+	fTree->Branch("z_fp", 	&fZ_fp,	"z_fp/D");
+	fTree->Branch("p_fp", 	&fP_fp,	"p_fp/D");
+	fTree->Branch("th_fp", &fTheta_fp,	"th_fp/D");
+	fTree->Branch("ph_fp", &fPhi_fp,	"ph_fp/D");
 
     return;
 }
@@ -302,6 +430,30 @@ void g4hrsIO::AddGenericDetectorSum(g4hrsGenericDetectorSum *hit){
     fGenDetSum_id[n]   = hit->fCopyID;
 
     fNGenDetSum++;
+}
+
+// Virtual boundary data
+
+void g4hrsIO::ClearVirtualBoundaryData() {
+
+	fSteppingAction->fX_sen = -150.;
+	fSteppingAction->fY_sen = -150.;
+	fSteppingAction->fZ_sen = -150.;
+	fSteppingAction->fP_sen = -150.;
+	fSteppingAction->fTheta_sen = -150.;
+	fSteppingAction->fPhi_sen = -150.;
+
+}
+
+void g4hrsIO::SetVirtualBoundaryData() {
+
+	fX_sen = fSteppingAction->fX_sen;
+	fY_sen = fSteppingAction->fY_sen;
+	fZ_sen = fSteppingAction->fZ_sen;
+	fP_sen = fSteppingAction->fP_sen;
+	fTheta_sen = fSteppingAction->fTheta_sen;
+	fPhi_sen = fSteppingAction->fPhi_sen;
+
 }
 
 /*---------------------------------------------------------------------------------*/

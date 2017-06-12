@@ -66,7 +66,8 @@ g4hrsDetectorConstruction::g4hrsDetectorConstruction() {
     fPivot2SieveFace = 800*mm;
     fPivotXOffset =  0.0*deg;
     fPivotYOffset =  0.0*deg;
-    fPivotZOffset =  1053.79*mm;
+//    fPivotZOffset =  1053.79*mm;
+    fPivotZOffset =  0.;
 
     fSetupSieveSlit = false;
 
@@ -349,6 +350,7 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 	SDman->AddNewDetector(sieveSlitSD);
 	sieveSlitLogical->SetSensitiveDetector(sieveSlitSD);
 
+	double fPivotZOffsetNonzero = 1053.79; 
 
 	//calculate the center position in the Lab frame
 	double pSieveSlitCenterHOffset=pSieveSlitLargeHoleH-pSieveSlitHolePosH[3];
@@ -358,11 +360,11 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 	double pLSieveSlitPos_X=(fPivot2SieveFace+pSieveSlitZ/2.0)*sin(fSeptumAngle)+
 		pSieveSlitCenterHOffset+fPivotXOffset;
 	double pLSieveSlitPos_Y=pSieveSlitCenterVOffset+fPivotYOffset;
-	double pLSieveSlitPos_Z=(fPivot2SieveFace+pSieveSlitZ/2.0)*cos(fSeptumAngle)+fPivotZOffset;
+	double pLSieveSlitPos_Z=(fPivot2SieveFace+pSieveSlitZ/2.0)*cos(fSeptumAngle)+fPivotZOffsetNonzero;
 	double pRSieveSlitPos_X=(fPivot2SieveFace+pSieveSlitZ/2.0)*sin(-fSeptumAngle)-
 		pSieveSlitCenterHOffset+fPivotXOffset;
 	double pRSieveSlitPos_Y=pSieveSlitCenterVOffset+fPivotYOffset;
-	double pRSieveSlitPos_Z=(fPivot2SieveFace+pSieveSlitZ/2.0)*cos(-fSeptumAngle)+fPivotZOffset;
+	double pRSieveSlitPos_Z=(fPivot2SieveFace+pSieveSlitZ/2.0)*cos(-fSeptumAngle)+fPivotZOffsetNonzero;
 
 	if(fSetupSieveSlit)
 	{ 

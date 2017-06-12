@@ -308,12 +308,12 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
   fMagFieldFZBL3 = new BField_Dipole( dipoleField, LORIGIND, LROTATED );
 //  fEquationFZBL3 = new G4Mag_UsualEqRhs(fMagFieldFZBL3);	
 //  fChordFinderFZBL3 = 0;
-//  fLocalFieldManagerFZBL3 = new G4FieldManager();
+  fLocalFieldManagerFZBL3 = new G4FieldManager();
   UpdateFieldFZBL3();
   fMagFieldFZBR3 = new BField_Dipole( dipoleField, RORIGIND, RROTATED );
 //  fEquationFZBR3 = new G4Mag_UsualEqRhs(fMagFieldFZBR3);	
 //  fChordFinderFZBR3 = 0;
-//  fLocalFieldManagerFZBR3 = new G4FieldManager();
+  fLocalFieldManagerFZBR3 = new G4FieldManager();
   UpdateFieldFZBR3();
   
   //Local field  FZB4, Q3
@@ -427,7 +427,7 @@ void g4hrsEMFieldSetup::UpdateFieldFZBR2()
 
 void g4hrsEMFieldSetup::UpdateFieldFZBL3()
 {
-  fStepperFZBL3 = new G4ClassicalRK4( fEquationFZBL3, 8 );
+//  fStepperFZBL3 = new G4ClassicalRK4( fEquationFZBL3, 8 );
   //G4cout<<"g4hrsEMFieldSetup:: G4ClassicalRK4 (default) is called"<<G4endl;
 
   //G4cout<<"g4hrsEMFieldSetup:: The minimal step for FZBL3 is equal to "<<fMinStep/mm<<" mm"<<G4endl ;
@@ -446,7 +446,7 @@ void g4hrsEMFieldSetup::UpdateFieldFZBL3()
 }
 void g4hrsEMFieldSetup::UpdateFieldFZBR3()
 {
-  fStepperFZBR3 = new G4ClassicalRK4( fEquationFZBR3, 8 );
+//  fStepperFZBR3 = new G4ClassicalRK4( fEquationFZBR3, 8 );
   //G4cout<<"g4hrsEMFieldSetup:: G4ClassicalRK4 (default) is called"<<G4endl;
 
   //G4cout<<"g4hrsEMFieldSetup:: The minimal step for FZBR3 is equal to "<<fMinStep/mm<<" mm"<<G4endl ;

@@ -24,6 +24,9 @@ g4hrsEventAction::~g4hrsEventAction(){
 
 
 void g4hrsEventAction::BeginOfEventAction(const G4Event* ev){
+
+	fIO->ClearVirtualBoundaryData();
+  
   // Start timer at event 0
   if (ev->GetEventID() == 0) fTimer.Start();
   // Pretty ongoing status
@@ -79,12 +82,13 @@ void g4hrsEventAction::EndOfEventAction(const G4Event* evt ) {
       }
 
   }
+
+	fIO->SetVirtualBoundaryData();
+
   // Fill tree and reset buffers
   fIO->FillTree();
   fIO->Flush();
 
   return;
 }
-
-
 
