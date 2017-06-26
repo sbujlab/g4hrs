@@ -25,6 +25,7 @@ g4hrsEventAction::~g4hrsEventAction(){
 
 void g4hrsEventAction::BeginOfEventAction(const G4Event* ev){
 
+    G4cout << "Event " << ev->GetEventID();
 	fIO->ClearVirtualBoundaryData();
   
   // Start timer at event 0
@@ -34,7 +35,7 @@ void g4hrsEventAction::BeginOfEventAction(const G4Event* ev){
     // Stop timer (running timer cannot be read)
     fTimer.Stop();
     // Print event number
-    G4cout << "Event " << ev->GetEventID();
+//    G4cout << "Event " << ev->GetEventID();
     // Only print duration per event when meaningful (avoid division by zero)
     if (ev->GetEventID() > 0)
       G4cout << " (" << std::setprecision(3) << std::fixed

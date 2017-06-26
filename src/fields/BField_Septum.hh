@@ -71,7 +71,8 @@ private:
 	double mYmin,mYmax;
 	double mZmin,mZmax;
 	int	   mInterpolateOutOfRange;
-	double mOrigin[3];
+	double mOrigin[3];	// shift from hall center to septum center
+	double mTarget[3];	// shift from target center to hall center
 
 	double mFieldUnit;
 	int    mFirstDataLine;

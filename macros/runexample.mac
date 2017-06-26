@@ -56,4 +56,4 @@
 #/g4hrs/beam_dth 0.0 deg
 #/g4hrs/beam_dph 0.0 deg
 
-/run/beamOn 10000
+/run/beamOn 1000

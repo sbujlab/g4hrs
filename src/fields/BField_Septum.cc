@@ -152,6 +152,13 @@ bool BField_Septum::ReadMap(const char *filename)
 	    	exit(1);
 	}
 
+	if(ins >> mTarget[0] >> mTarget[1] >> mTarget[2]) {
+		G4cout << "septumX, septumY, septumZ = " << mTarget[0] << ", " << mTarget[1] << ", " << mTarget[2] << endl;
+	} else {
+		G4cerr << "Error " << __FILE__ << " line " << __LINE__ 
+		<< ": File " << filename << " contains unreadable header.  Aborting" << G4endl;
+	    	exit(1);
+	}
 	int LineNum = 6;
 	char tempname[256];
 
@@ -551,7 +558,7 @@ void BField_Septum::Rotate_Lab2Field(const double LabP[3],double FieldP[3])
 
 void BField_Septum::Transform_Lab2Field(const double LabP[3],double FieldP[3])
 {
-	for(int i=0;i<3;i++) FieldP[i]=LabP[i]-mOrigin[i];
+	for(int i=0;i<3;i++) FieldP[i]=LabP[i]-mOrigin[i]-mTarget[i];
 	if(mDoRotation) Rotate_Lab2Field(FieldP,FieldP);
 }
 

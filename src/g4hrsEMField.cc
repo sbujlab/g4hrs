@@ -56,7 +56,7 @@ inline void g4hrsEMField::GetFieldValue(const G4double Point[4],G4double *Bfield
 	}
 	else
 	{
-		double pB[3],pPos[3]={Point[0]/cm,Point[1]/cm,Point[2]/cm};  //turn into cm
+		double pB[3],pPos[3]={Point[0]*cm,Point[1]*cm,Point[2]*cm};  //turn into cm
 		for(int i=0;i<3;i++) Bfield[i]=0.0;  //reset
 
 

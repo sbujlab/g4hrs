@@ -11,7 +11,7 @@
 /g4hrs/septummap ../g4hrs/src/fields/PREX_septumFieldMap.dat
 
 /g4hrs/targlen 0.5 mm
-/g4hrs/targpos 1054.0 mm
+/g4hrs/targpos 0.0 mm
 /g4hrs/targmat Pb208
 
 /g4hrs/beamcurr 70e-6 A
@@ -21,10 +21,10 @@
 
 /g4hrs/filename g4hrs_out.root
 
-/g4hrs/thmin 2.0 deg
-/g4hrs/thmax 10.0 deg
-/g4hrs/phmin 0.0 deg
-/g4hrs/phmax 360.0 deg
+/g4hrs/thmin 4.95 deg
+/g4hrs/thmax 5.05 deg
+/g4hrs/phmin 179.5 deg
+/g4hrs/phmax 380.5 deg
 #/g4hrs/thcommin 0.0 deg
 #/g4hrs/thcommax 10.0 deg
 

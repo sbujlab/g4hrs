@@ -10,14 +10,14 @@ c     Input is in mm and T, output is in T.
       integer in
       real dipx,dipy,dipz,fact1(5),fact2(5)
       real sx,sy,sz,x,y,z,bx,by,bz,b_0,sbx,sby,sbz
-c      print*,'beginning snake dipole'
-c      print*,'B_0',b_0
+      print*,'beginning snake dipole'
+      print*,'B_0',b_0
       sbx=0.
       sby=0.
       sbz=0.
       call g4mctosnake(x,y,z,sx,sy,sz)
-c      print*,x,y,z
-c      print*,sx,sy,sz
+      print*,x,y,z
+      print*,sx,sy,sz
 c     dipolert2 takes cm instead of mm because the function was stolen from raytrace
       dipx=sx/10.
       dipy=sy/10.
@@ -34,16 +34,16 @@ c     3: after dipole exit
       else
          in=1
       endif
-c      print*,in
+      print*,in
       if(in==1.or.in==2)then
 c     the coordinates y and z are flipped for dipolert2
-c         print*,in
+         print*,in
          call dipolert2(dipx, dipz, dipy, sbx, sbz, sby, b_0)
          sbx=-sbx
          sby=-sby
          sbz=-sbz
       else if(in==3)then
-c         print*,in
+         print*,in
 c     You can take what SNAKE has, or set your own b_0
 c         fact1(1)= 0.3302653
 c         print*,b_0,"versus",0.3302653
@@ -59,14 +59,14 @@ c         print*,b_0,"versus",0.3302653
          dl=1591.0
          call dqfringe2(sx,sy,sz,dl,sbx,sby,sbz,fact1,fact2,qrad1,qrad2)
       else if(in==0)then
-c         print*,in
+         print*,in
          sbx=0.
          sby=0.
          sbz=0.
       else
          print*,'Something has gone very wrong'
       endif
-c      print*,'BSSSSS',bx,by,bz
+      print*,'BSSSSS',bx,by,bz
 c      if(abs(bx)>100..or.abs(by)>100..or.abs(bz)>100.)then
 c         bx = 0.;
 c         by = 0.;
@@ -76,8 +76,8 @@ c      if ( in == 3 ) then
 c         print*,sbx,sby,sbz
 c      endif
       call snaketog4mc(bx,by,bz,sbx,sby,sbz)
-c      print*,bx,by,bz
-c      print*,'exiting snake dipole, returning to G4MC'
+      print*,bx,by,bz
+      print*,'exiting snake dipole, returning to G4MC'
 c      by = 0.
 c      bz = 0.
       end

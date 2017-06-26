@@ -66,8 +66,7 @@ g4hrsDetectorConstruction::g4hrsDetectorConstruction() {
     fPivot2SieveFace = 800*mm;
     fPivotXOffset =  0.0*deg;
     fPivotYOffset =  0.0*deg;
-//    fPivotZOffset =  1053.79*mm;
-    fPivotZOffset =  0.;
+    fPivotZOffset =  1053.79*mm;
 
     fSetupSieveSlit = false;
 
@@ -186,7 +185,7 @@ void g4hrsDetectorConstruction::CreateTarget(G4LogicalVolume *pMotherLogVol){
     beamtarg->SetTargetVolume(phystarg);
 
 	//Attempt at tracking detector just past target
-	
+/*	
 	G4SDManager* SDMan = G4SDManager::GetSDMpointer();
 
 	G4VSensitiveDetector* airDetSD1 = new g4hrsGenericDetector("airDet1",37);
@@ -217,7 +216,7 @@ void g4hrsDetectorConstruction::CreateTarget(G4LogicalVolume *pMotherLogVol){
 	G4VPhysicalVolume* airDetPhys3 = new G4PVPlacement(0,G4ThreeVector(fTargetX,fTargetY,fTargetZ + 1.46*m + fPivotZOffset ),
 		airDetLogical3,"physAirDet3",pMotherLogVol,0,0);
 
-
+*/
     return;
 
 }
@@ -350,8 +349,6 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 	SDman->AddNewDetector(sieveSlitSD);
 	sieveSlitLogical->SetSensitiveDetector(sieveSlitSD);
 
-	double fPivotZOffsetNonzero = 1053.79; 
-
 	//calculate the center position in the Lab frame
 	double pSieveSlitCenterHOffset=pSieveSlitLargeHoleH-pSieveSlitHolePosH[3];
 	double pSieveSlitCenterVOffset=pSieveSlitLargeHoleV-pSieveSlitHolePosV[3];
@@ -360,11 +357,11 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 	double pLSieveSlitPos_X=(fPivot2SieveFace+pSieveSlitZ/2.0)*sin(fSeptumAngle)+
 		pSieveSlitCenterHOffset+fPivotXOffset;
 	double pLSieveSlitPos_Y=pSieveSlitCenterVOffset+fPivotYOffset;
-	double pLSieveSlitPos_Z=(fPivot2SieveFace+pSieveSlitZ/2.0)*cos(fSeptumAngle)+fPivotZOffsetNonzero;
+	double pLSieveSlitPos_Z=(fPivot2SieveFace+pSieveSlitZ/2.0)*cos(fSeptumAngle)+fPivotZOffset;
 	double pRSieveSlitPos_X=(fPivot2SieveFace+pSieveSlitZ/2.0)*sin(-fSeptumAngle)-
 		pSieveSlitCenterHOffset+fPivotXOffset;
 	double pRSieveSlitPos_Y=pSieveSlitCenterVOffset+fPivotYOffset;
-	double pRSieveSlitPos_Z=(fPivot2SieveFace+pSieveSlitZ/2.0)*cos(-fSeptumAngle)+fPivotZOffsetNonzero;
+	double pRSieveSlitPos_Z=(fPivot2SieveFace+pSieveSlitZ/2.0)*cos(-fSeptumAngle)+fPivotZOffset;
 
 	if(fSetupSieveSlit)
 	{ 
