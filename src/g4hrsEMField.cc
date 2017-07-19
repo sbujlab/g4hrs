@@ -20,8 +20,9 @@ g4hrsEMField::g4hrsEMField(): mBField_Septum(0)
 
 	fSeptumMomentum = 1.063;
 //	fSeptumMapFile = "/home/tyler/g4hrs/g4hrs/src/fields/PREX_septumFieldMap.dat";
-	fSeptumMapFile = "../g4hrs/src/fields/PREX_septumFieldMap.dat";
+	fSeptumMapFile = "PREX_septumFieldMap.dat";
 
+        // FIXME - this should not be hardcoded
 	if(fSeptumMomentum != 0 && fSeptumMapFile != "") {
 
 //		mBField_Septum = new BField_Septum(pHRSMomentum,"PREX_septumFieldMap.dat");
@@ -56,7 +57,7 @@ inline void g4hrsEMField::GetFieldValue(const G4double Point[4],G4double *Bfield
 	}
 	else
 	{
-		double pB[3],pPos[3]={Point[0]*cm,Point[1]*cm,Point[2]*cm};  //turn into cm
+		double pB[3],pPos[3]={Point[0]/cm,Point[1]/cm,Point[2]/cm};  //turn into cm
 		for(int i=0;i<3;i++) Bfield[i]=0.0;  //reset
 
 
@@ -66,7 +67,7 @@ inline void g4hrsEMField::GetFieldValue(const G4double Point[4],G4double *Bfield
 			for(int i=0;i<3;i++) pB[i]=0.0;  //reset
 			if (! mBField_Septum->IsUniformField() )  mBField_Septum->GetBField(pPos,pB); 
 			else  mBField_Septum->GetUniformField(pB); 
-			for(int i=0;i<3;i++) Bfield[i]+=pB[i]*tesla;
+			for(int i=0;i<3;i++) Bfield[i] =pB[i]*tesla;
 		}
 
 	}

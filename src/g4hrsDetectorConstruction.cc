@@ -430,8 +430,8 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
                 mMaterialManager->siliconsteel,"septumLogical",0,0,0);
         septumLogical->SetVisAttributes(IronVisAtt);
 
-//	G4FieldManager* septumFieldManager = fEMFieldSetup->GetFieldManager();
-//	septumLogical->SetFieldManager(septumFieldManager,true);
+	G4FieldManager* septumFieldManager = fEMFieldSetup->GetFieldManager();
+	pMotherLogVol->SetFieldManager(septumFieldManager,true);
 
         G4int placeseptum = 1;
         //put it in the hall, no rotation
@@ -1043,16 +1043,6 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 		//y'=z  z'=-y ==> I have to put this offset as -y
 		double pHallCenter2Q1Win=pHRSContainerRin+4*mm;  //place it at the first 1.464 m
 
-		if(fSetupHRS)
-		{
-			new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pHallCenter2Q1Win,0),
-				HRSQ1WinLogical,"virtualBoundaryPhys_LHRSQ1Win",LHRSContainerLogical,0,0,0);
-		}
-		if(fSetupHRS)
-		{
-			new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pHallCenter2Q1Win,0),
-				HRSQ1WinLogical,"virtualBoundaryPhys_RHRSQ1Win",RHRSContainerLogical,0,0,0);
-		}
 	}
 	//BELOW ARE SNAKE VALUES, NOT NIM VALUES
 	double pTarget =             0.0  * cm;
@@ -1666,9 +1656,15 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 	G4LogicalVolume* RDipoleFringe2Logical = new G4LogicalVolume(DipoleFringeSolid2,
 	        mMaterialManager->vacuum,"RDipoleFringe2Logical",0,0,0);
 
+        /*
 	G4LogicalVolume* LDipoleTunnelLogical = new G4LogicalVolume(DipoleTunnelCone5,
 		mMaterialManager->vacuum,"LDipoleTunnelLogical",0,0,0);
 	G4LogicalVolume* RDipoleTunnelLogical = new G4LogicalVolume(DipoleTunnelCone5,
+		mMaterialManager->vacuum,"RDipoleTunnelLogical",0,0,0);
+        */
+	G4LogicalVolume* LDipoleTunnelLogical = new G4LogicalVolume(DipoleTunnelCone3,
+		mMaterialManager->vacuum,"LDipoleTunnelLogical",0,0,0);
+	G4LogicalVolume* RDipoleTunnelLogical = new G4LogicalVolume(DipoleTunnelCone3,
 		mMaterialManager->vacuum,"RDipoleTunnelLogical",0,0,0);
 
         G4VisAttributes *YellowVisAtt = new G4VisAttributes(G4Colour(1.0,1.0,0.0));      //yellow, color for Ultem
@@ -1887,16 +1883,6 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 	  double pSeptumZ      = 74.0   * cm;
 	  //double pSeptumPlaceZ = 70.414 * cm;
 	  double pSeptumPlaceZ = 69.99937 * cm;
-	  new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPlaceZ - 0.5 * pSeptumZ + 2 * vb_thickness),
-			    LPlaneLogical2,"virtualBoundaryPhys_sen",motherLogical,0,0,0);//sen
-	  new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPlaceZ),
-			    LPlaneLogical2,"virtualBoundaryPhys_sm",motherLogical,0,0,0);//sm
-	  new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPlaceZ + 0.5 * pSeptumZ),
-			    LPlaneLogical2,"virtualBoundaryPhys_sex",motherLogical,0,0,0);//sex
-	  new G4PVPlacement(0,G4ThreeVector(0,0,36. * cm),
-			    LPlaneLogical2,"virtualBoundaryPhys_coil",motherLogical,0,0,0);//coil
-	  new G4PVPlacement(0,G4ThreeVector(0,0,-50. * cm),
-			    LPlaneLogical2,"virtualBoundaryPhys_mid",motherLogical,0,0,0);//mid
 	  
 	}
 	//double pLQ1Pos_Z_en=(pHallCenter2LQ1Face);//NIM
@@ -1920,104 +1906,9 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 	double pPaulY = ( - pHallCenter2Col - pPaulColT * 2. ) * sin(fHRSAngle);
 	if(fSnakeModel == 49 || fSnakeModel == 48 || fSnakeModel > 50 ){
 	  //double pLQ1Pos_Z=(pHallCenter2LQ1FaceMag+pQ1LengthMag/1.0);//SNAKE
-	  new G4PVPlacement(pRotXLHRSdeg,G4ThreeVector(pPaulY,0,-pPaulX),
-			    LPlaneLogical1,"virtualBoundaryPhys_col_LHRS",motherLogical,0,0,0);//q1en
-	  /*
-	  new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pLQ1Pos_Z_en,0),
-			    LPlaneLogical1,"virtualBoundaryPhys_q1en_LHRS",LHRSContainerLogical,0,0,0);//q1en
-	  new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pLQ1Pos_Z_ex,0),
-			    LPlaneLogical1,"virtualBoundaryPhys_q1ex_LHRS",LHRSContainerLogical,0,0,0);//q1ex
-	  new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pLQ2Pos_Z_en,0),
-			    LPlaneLogical2,"virtualBoundaryPhys_q2en_LHRS",LHRSContainerLogical,0,0,0);//q2en
-	  new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pLQ2Pos_Z_ex,0),
-			    LPlaneLogical2,"virtualBoundaryPhys_q2ex_LHRS",LHRSContainerLogical,0,0,0);//q2ex
-	  */
-	  new G4PVPlacement(0,G4ThreeVector(0, 0,-pQ1Length/2.),
-			    LPlaneLogical1,"virtualBoundaryPhys_q1en_LHRS",LQ1MagLogical,0,0,0);//q1en
-	  new G4PVPlacement(0,G4ThreeVector(0, 0, pQ1Length/2.),
-			    LPlaneLogical1,"virtualBoundaryPhys_q1ex_LHRS",LQ1MagLogical,0,0,0);//q1ex
-	  new G4PVPlacement(0,G4ThreeVector(0, 0,-pQ2Length/2.),
-			    LPlaneLogical2,"virtualBoundaryPhys_q2en_LHRS",LQ2MagLogical,0,0,0);//q2en
-	  new G4PVPlacement(0,G4ThreeVector(0, 0, pQ2Length/2.),
-			    LPlaneLogical2,"virtualBoundaryPhys_q2ex_LHRS",LQ2MagLogical,0,0,0);//q2ex
-	  //new G4PVPlacement(pRotX30deg,G4ThreeVector(0,-pLDPos_Z_en,0),
-	  //LPlaneLogical2,"virtualBoundaryPhys_den_LHRS",LHRSContainerLogical,0,0,0);//den
-	  //new G4PVPlacement(pRotX105deg,G4ThreeVector(0, pLDPos_Z_ex,pLDPos_X_ex),
-	  //LPlaneLogical2,"virtualBoundaryPhys_dex_LHRS",LHRSContainerLogical,0,0,0);//dex
-	  
-	  new G4PVPlacement(pRot_den,G4ThreeVector(-8.4*m,0,0),
-			    LPlaneLogical2,"virtualBoundaryPhys_den_LHRS",LDipoleTunnelLogical,0,0,0);//den
-	  new G4PVPlacement(pRot_dex,G4ThreeVector(-8.4 * m * cos( pi / 4. ), -8.4 * m * sin( pi / 4. ),0),
-			    LPlaneLogical2,"virtualBoundaryPhys_dex_LHRS",LDipoleTunnelLogical,0,0,0);//dex
-	  
-	  //new G4PVPlacement(pRotX45deg,G4ThreeVector(0,-pQ3CenterZ + pQ3Length / sqrt(2) / 2,pQ3CenterY - pQ3Length / sqrt(2) / 2),
-	  //LPlaneLogical2,"virtualBoundaryPhys_q3en_LHRS",LHRSContainerLogical,0,0,0);//q3en
-	  //new G4PVPlacement(pRotX45deg,G4ThreeVector(0,-pQ3CenterZ - pQ3Length / sqrt(2) / 2,pQ3CenterY + pQ3Length / sqrt(2) / 2),
-	  //LPlaneLogical2,"virtualBoundaryPhys_q3ex_LHRS",LHRSContainerLogical,0,0,0);//q3ex
-	  new G4PVPlacement(0,G4ThreeVector(0,0,-pQ3Length/2.),
-			    LPlaneLogical2,"virtualBoundaryPhys_q3en_LHRS",LQ3MagLogical,0,0,0);//q3en
-	  new G4PVPlacement(0,G4ThreeVector(0,0, pQ3Length/2.),
-			    LPlaneLogical2,"virtualBoundaryPhys_q3ex_LHRS",LQ3MagLogical,0,0,0);//q3ex
-	  new G4PVPlacement(pRotVDCInContainer,G4ThreeVector(0,-pVDCCenterZ,pVDCCenterY),
-			    LFPLogical,"virtualBoundaryPhys_vdc_LHRS",LHRSContainerLogical,0,0,0);
-	  new G4PVPlacement(pRotFPInContainer,G4ThreeVector(0,-pFPCenterZ,pFPCenterY),
-			    LFPLogical,"virtualBoundaryPhys_fp_LHRS",LHRSContainerLogical,0,0,0);
-	  new G4PVPlacement(pRotFPInContainer,G4ThreeVector(0,-pQZ1CenterZ,pQZ1CenterY),
-			    LFPLogical,"virtualBoundaryPhys_qz1_LHRS",LHRSContainerLogical,0,0,0);
-	  new G4PVPlacement(pRotVDCInContainer,G4ThreeVector(0,-pQZ2CenterZ,pQZ2CenterY),
-			    LFPLogical,"virtualBoundaryPhys_qz2_LHRS",LHRSContainerLogical,0,0,0);
 
 	}
 	if(fSnakeModel == 49 || fSnakeModel == 48 || fSnakeModel > 50 ){
-	  new G4PVPlacement(pRotXRHRSdeg,G4ThreeVector(-pPaulY, 0, -pPaulX),
-			    LPlaneLogical1,"virtualBoundaryPhys_col_RHRS",motherLogical,0,0,0);//q1en
-
-	  //double pRQ1Pos_Z=(pHallCenter2LQ1FaceMag+pQ1LengthMag/1.0);//SNAKE
-	  /*
-	  new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pRQ1Pos_Z_en,0),
-			    RPlaneLogical1,"virtualBoundaryPhys_q1en_RHRS",RHRSContainerLogical,0,0,0);//q1en
-	  new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pRQ1Pos_Z_ex,0),
-			    RPlaneLogical1,"virtualBoundaryPhys_q1ex_RHRS",RHRSContainerLogical,0,0,0);//q1ex
-	  new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pRQ2Pos_Z_en,0),
-			    RPlaneLogical2,"virtualBoundaryPhys_q2en_RHRS",RHRSContainerLogical,0,0,0);//q2en
-	  new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pRQ2Pos_Z_ex,0),
-			    RPlaneLogical2,"virtualBoundaryPhys_q2ex_RHRS",RHRSContainerLogical,0,0,0);//q2ex
-	  */
-	  new G4PVPlacement(0,G4ThreeVector(0,0,-pQ1Length/2.),
-			    RPlaneLogical1,"virtualBoundaryPhys_q1en_RHRS",RQ1MagLogical,0,0,0);//q1en
-	  new G4PVPlacement(0,G4ThreeVector(0,0, pQ1Length/2.),
-			    RPlaneLogical1,"virtualBoundaryPhys_q1ex_RHRS",RQ1MagLogical,0,0,0);//q1ex
-	  new G4PVPlacement(0,G4ThreeVector(0,0,-pQ2Length/2.),
-			    RPlaneLogical2,"virtualBoundaryPhys_q2en_RHRS",RQ2MagLogical,0,0,0);//q2en
-	  new G4PVPlacement(0,G4ThreeVector(0,0, pQ2Length/2.),
-			    RPlaneLogical2,"virtualBoundaryPhys_q2ex_RHRS",RQ2MagLogical,0,0,0);//q2ex
-	  //new G4PVPlacement(pRotX30deg,G4ThreeVector(0,-pRDPos_Z_en,0),
-	  //RPlaneLogical2,"virtualBoundaryPhys_den_RHRS",RHRSContainerLogical,0,0,0);//den
-	  //new G4PVPlacement(pRotX105deg,G4ThreeVector(0, pRDPos_Z_ex,pRDPos_X_ex),
-	  //RPlaneLogical2,"virtualBoundaryPhys_dex_RHRS",RHRSContainerLogical,0,0,0);//dex
-	  
-	  new G4PVPlacement(pRot_den,G4ThreeVector(-8.4*m,0,0),
-			    RPlaneLogical2,"virtualBoundaryPhys_den_RHRS",RDipoleTunnelLogical,0,0,0);//den
-	  new G4PVPlacement(pRot_dex,G4ThreeVector(-8.4 * m * cos( pi / 4. ), -8.4 * m * sin( pi / 4. ),0),
-			    RPlaneLogical2,"virtualBoundaryPhys_dex_RHRS",RDipoleTunnelLogical,0,0,0);//dex
-	  
-	  //new G4PVPlacement(pRotX45deg,G4ThreeVector(0,-pQ3CenterZ + pQ3Length / sqrt(2) / 2,pQ3CenterY - pQ3Length / sqrt(2) / 2),
-	  //RPlaneLogical2,"virtualBoundaryPhys_q3en_RHRS",RHRSContainerLogical,0,0,0);//q3en
-	  //new G4PVPlacement(pRotX45deg,G4ThreeVector(0,-pQ3CenterZ - pQ3Length / sqrt(2) / 2,pQ3CenterY + pQ3Length / sqrt(2) / 2),
-	  //RPlaneLogical2,"virtualBoundaryPhys_q3ex_RHRS",RHRSContainerLogical,0,0,0);//q3ex
-	  new G4PVPlacement(0,G4ThreeVector(0,0,-pQ3Length/2.),
-			    RPlaneLogical2,"virtualBoundaryPhys_q3en_RHRS",RQ3MagLogical,0,0,0);//q3en
-	  new G4PVPlacement(0,G4ThreeVector(0,0, pQ3Length/2.),
-			    RPlaneLogical2,"virtualBoundaryPhys_q3ex_RHRS",RQ3MagLogical,0,0,0);//q3ex
-	  new G4PVPlacement(pRotVDCInContainer,G4ThreeVector(0,-pVDCCenterZ,pVDCCenterY),
-			    RFPLogical,"virtualBoundaryPhys_vdc_RHRS",RHRSContainerLogical,0,0,0);
-	  new G4PVPlacement(pRotFPInContainer,G4ThreeVector(0,-pFPCenterZ,pFPCenterY),
-			    RFPLogical,"virtualBoundaryPhys_fp_RHRS",RHRSContainerLogical,0,0,0);
-	  new G4PVPlacement(pRotFPInContainer,G4ThreeVector(0,-pQZ1CenterZ,pQZ1CenterY),
-			    RFPLogical,"virtualBoundaryPhys_qz1_RHRS",RHRSContainerLogical,0,0,0);
-	  new G4PVPlacement(pRotVDCInContainer,G4ThreeVector(0,-pQZ2CenterZ,pQZ2CenterY),
-			    RFPLogical,"virtualBoundaryPhys_qz2_RHRS",RHRSContainerLogical,0,0,0);
-
 	}
 
 	//#endif

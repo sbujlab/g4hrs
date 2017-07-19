@@ -9,12 +9,14 @@ static G4RotationMatrix IdentityMatrix;
 
 /////////////////////////////////////////////////////////////////////////
 
-BField_Quad::BField_Quad(G4double pGradient, G4ThreeVector
+BField_Quad::BField_Quad(G4double pGradient, G4ThreeVector pPivot, G4ThreeVector
+
 			 pOrigin, G4RotationMatrix* pMatrix, G4double pLength, G4double pRadius, G4int pQuadNumber)
 //pOrigin, G4RotationMatrix* pMatrix, QuadFringe* pQuadFringe, G4double pLength, G4double pRadius, G4int pQuadNumber)
 {
    fGradient    = pGradient ;
    fOrigin      = pOrigin ;
+   fPivot       = pPivot;
    fpMatrix     = pMatrix ;
    //fQuadFringe  = pQuadFringe;
    fLength      = pLength;
@@ -35,16 +37,16 @@ BField_Quad::~BField_Quad()
 
 ////////////////////////////////////////////////////////////////////////
 
-void BField_Quad::GetFieldValue( const G4double y[7],
-				 G4double B[3]  ) const  
+void BField_Quad::GetFieldValue( const G4double y[],
+				 G4double B[]  ) const  
 {
   G4int sos = 1;
   if( fSnakeModel == 52 )
     sos = 1;
   G4ThreeVector r_global= G4ThreeVector
-    (y[0] - fOrigin.x(), 
-     y[1] - fOrigin.y(), 
-     y[2] - fOrigin.z());
+    (y[0] - fOrigin.x() - fPivot.x(), 
+     y[1] - fOrigin.y() - fPivot.y(), 
+     y[2] - fOrigin.z() - fPivot.z());
   
   G4ThreeVector r_local = G4ThreeVector
     (fpMatrix->colX() * r_global,

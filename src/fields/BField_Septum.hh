@@ -21,8 +21,8 @@ public:
 	BField_Septum(double pMomentum,
 		const char *mapfile);
 	virtual ~BField_Septum();
-	bool GetBField(double Pos[3],double B[3]);
-	bool GetBField(float fPos[3],float fB[3]);
+	bool GetBField(double Pos[],double B[]);
+	bool GetBField(float fPos[],float fB[]);
 	
 	void SetMomentum(double pMomentum){fMomentum = pMomentum;}
 

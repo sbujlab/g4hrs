@@ -71,8 +71,8 @@ BField_Dipole_Fringe::~BField_Dipole_Fringe()
 //  Allow displaced origin and rotation 
 //  Extensions by Björn Riese (GSI)
 
-void BField_Dipole_Fringe::GetFieldValue( const G4double y[7],
-				 G4double B[3]  ) const  
+void BField_Dipole_Fringe::GetFieldValue( const G4double y[],
+				 G4double B[]  ) const  
 {
   //This old way doesn't work, I believe.
   //G4ThreeVector r_global= G4ThreeVector

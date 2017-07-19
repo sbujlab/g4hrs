@@ -57,6 +57,7 @@ class BField_Dipole : public G4MagneticField
 
     BField_Dipole(G4double          pBend);
     BField_Dipole(G4double          pBend, 
+		  G4ThreeVector     pPivot,
 		  G4ThreeVector     pOrigin,
 		  G4RotationMatrix* pMatrix);
    ~BField_Dipole();
@@ -66,6 +67,7 @@ class BField_Dipole : public G4MagneticField
   private:
 
     G4double          fBend;
+    G4ThreeVector     fPivot;
     G4ThreeVector     fOrigin;
     G4RotationMatrix* fpMatrix;
 };

@@ -54,7 +54,9 @@ g4hrsEMFieldSetup* g4hrsEMFieldSetup::Getg4hrsEMFieldSetup()
 g4hrsEMFieldSetup::g4hrsEMFieldSetup()
 : fChordFinder(0), fStepper(0), fIntgrDriver(0)
 {
-	
+
+    G4ThreeVector pivotOffset(0.0, 0.0,  1053.79*mm );
+
   fHRSMomentum = 1.063*GeV;
   fSnakeModel = 49;
   fHRSAngle = 12.5*deg;
@@ -278,13 +280,13 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
   RROTATEQ3->rotateX(-45.0 * deg);
   RROTATEQ3->rotateY( -fHRSAngle);
  
-  fMagFieldFZBL1 = new BField_Quad(KAPPA1, LORIGINQ1, LROTATEQ1, pQ1Length, pQ1Radius, 1);
+  fMagFieldFZBL1 = new BField_Quad(KAPPA1, pivotOffset, LORIGINQ1, LROTATEQ1, pQ1Length, pQ1Radius, 1);
 //  fEquationFZBL1 = new G4Mag_UsualEqRhs(fMagFieldFZBL1);	
 //  fStepperFZBL1  = new G4ClassicalRK4(fEquationFZBL1);
 //  fChordFinderFZBL1 = 0;
   fLocalFieldManagerFZBL1 = new G4FieldManager();
   UpdateFieldFZBL1();
-  fMagFieldFZBR1 = new BField_Quad(KAPPA1, RORIGINQ1, RROTATEQ1, pQ1Length, pQ1Radius, 1);
+  fMagFieldFZBR1 = new BField_Quad(KAPPA1, pivotOffset,RORIGINQ1, RROTATEQ1, pQ1Length, pQ1Radius, 1);
 //  fEquationFZBR1 = new G4Mag_UsualEqRhs(fMagFieldFZBR1);	
 //  fStepperFZBR1  = new G4ClassicalRK4(fEquationFZBR1);
 //  fChordFinderFZBR1 = 0;
@@ -292,32 +294,32 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
   UpdateFieldFZBR1();
   
   //Local field  FZB2, Q2
-  fMagFieldFZBL2 = new BField_Quad(KAPPA2, LORIGINQ2, LROTATEQ2, pQ2Length, pQ2Radius, 2);
+  fMagFieldFZBL2 = new BField_Quad(KAPPA2,pivotOffset, LORIGINQ2, LROTATEQ2, pQ2Length, pQ2Radius, 2);
 //  fEquationFZBL2 = new G4Mag_UsualEqRhs(fMagFieldFZBL2);	
 //  fStepperFZBL2  = new G4ClassicalRK4(fEquationFZBL2);
 //  fChordFinderFZBL2 = 0;
   fLocalFieldManagerFZBL2 = new G4FieldManager();
   UpdateFieldFZBL2();
-  fMagFieldFZBR2 = new BField_Quad(KAPPA2, RORIGINQ2, RROTATEQ2, pQ2Length, pQ2Radius, 2);
+  fMagFieldFZBR2 = new BField_Quad(KAPPA2,pivotOffset, RORIGINQ2, RROTATEQ2, pQ2Length, pQ2Radius, 2);
 //  fEquationFZBR2 = new G4Mag_UsualEqRhs(fMagFieldFZBR2);	
 //  fStepperFZBR2  = new G4ClassicalRK4(fEquationFZBR2);
 //  fChordFinderFZBR2 = 0;
   fLocalFieldManagerFZBR2 = new G4FieldManager();
   UpdateFieldFZBR2();
   
-  fMagFieldFZBL3 = new BField_Dipole( dipoleField, LORIGIND, LROTATED );
+  fMagFieldFZBL3 = new BField_Dipole( dipoleField,pivotOffset, LORIGIND, LROTATED );
 //  fEquationFZBL3 = new G4Mag_UsualEqRhs(fMagFieldFZBL3);	
 //  fChordFinderFZBL3 = 0;
   fLocalFieldManagerFZBL3 = new G4FieldManager();
   UpdateFieldFZBL3();
-  fMagFieldFZBR3 = new BField_Dipole( dipoleField, RORIGIND, RROTATED );
+  fMagFieldFZBR3 = new BField_Dipole( dipoleField,pivotOffset, RORIGIND, RROTATED );
 //  fEquationFZBR3 = new G4Mag_UsualEqRhs(fMagFieldFZBR3);	
 //  fChordFinderFZBR3 = 0;
   fLocalFieldManagerFZBR3 = new G4FieldManager();
   UpdateFieldFZBR3();
   
   //Local field  FZB4, Q3
-  fMagFieldFZBL4 = new BField_Quad(KAPPA3, LORIGINQ3, LROTATEQ3, pQ3Length, pQ3Radius, 3);
+  fMagFieldFZBL4 = new BField_Quad(KAPPA3, LORIGINQ3,pivotOffset, LROTATEQ3, pQ3Length, pQ3Radius, 3);
   //fMagFieldFZBL4 = new BField_Quad(KAPPA3, ORIGINACTUAL, ROTATETEST);
 //  fEquationFZBL4 = new G4Mag_UsualEqRhs(fMagFieldFZBL4);	
 //  fStepperFZBL4  = new G4ClassicalRK4(fEquationFZBL4);
@@ -325,7 +327,7 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
   fLocalFieldManagerFZBL4 = new G4FieldManager();
   UpdateFieldFZBL4();
   //Local field  FZB4, Q3
-  fMagFieldFZBR4 = new BField_Quad(KAPPA3, RORIGINQ3, RROTATEQ3, pQ3Length, pQ3Radius, 3);
+  fMagFieldFZBR4 = new BField_Quad(KAPPA3, RORIGINQ3,pivotOffset, RROTATEQ3, pQ3Length, pQ3Radius, 3);
   //fMagFieldFZBR4 = new BField_Quad(KAPPA3, ORIGINACTUAL, ROTATETEST);
 //  fEquationFZBR4 = new G4Mag_UsualEqRhs(fMagFieldFZBR4);	
 //  fStepperFZBR4  = new G4ClassicalRK4(fEquationFZBR4);

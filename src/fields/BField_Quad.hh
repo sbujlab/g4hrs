@@ -11,6 +11,7 @@ class BField_Quad : public G4MagneticField
   public: // with description
 
   BField_Quad(G4double          pGradient, 
+	      G4ThreeVector     pPivot, 
 	      G4ThreeVector     pOrigin, 
 	      G4RotationMatrix* pMatrix,
 	      //QuadFringe*       pFringe,
@@ -27,6 +28,7 @@ private:
   
   G4double          fGradient;
   G4ThreeVector     fOrigin;
+  G4ThreeVector     fPivot;
   G4RotationMatrix* fpMatrix;
   //QuadFringe*       fQuadFringe;
   G4double          fLength;

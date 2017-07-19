@@ -15,6 +15,7 @@
 #include "g4hrsEventAction.hh"
 #include "g4hrsSteppingAction.hh"
 #include "g4hrsDetectorConstruction.hh"
+#include "g4hrsParallelWorld.hh"
 
 #include "g4hrsIO.hh"
 #include "g4hrsMessenger.hh"
@@ -97,13 +98,18 @@ int main(int argc, char** argv){
 
     // Detector geometry
     G4VUserDetectorConstruction* detector = new g4hrsDetectorConstruction();
+    detector->RegisterParallelWorld(new g4hrsParallelWorld());
     runManager->SetUserInitialization(detector);
     rmmess->SetDetCon( ((g4hrsDetectorConstruction *) detector) );
 
     ((g4hrsDetectorConstruction *) detector)->SetIO(io);
 
-	rmmess->SetEmFieldSetup(((g4hrsDetectorConstruction *) detector)->GetEMFieldSetup());
-	rmmess->SetEMField(((g4hrsDetectorConstruction *) detector)->GetEMFieldFromSetup());
+    rmmess->SetEmFieldSetup(((g4hrsDetectorConstruction *) detector)->GetEMFieldSetup());
+    rmmess->SetEMField(((g4hrsDetectorConstruction *) detector)->GetEMFieldFromSetup());
+
+    // Parallel geometry for virtual boundaries
+
+
 
     // Physics we want to use
     G4int verbose = 0;
@@ -153,9 +159,7 @@ int main(int argc, char** argv){
 
 	// G4UIterminal is a (dumb) terminal.
 
-#if defined(G4UI_USE_QT)
-	session = new G4UIQt(argc,argv);
-#elif defined(G4UI_USE_WIN32)
+#if defined(G4UI_USE_WIN32)
 	session = new G4UIWin32();
 #elif defined(G4UI_USE_XM)
 	session = new G4UIXm(argc,argv);
@@ -193,6 +197,8 @@ int main(int argc, char** argv){
 
     if (session)   // Define UI session for interactive mode.
     {
+
+        std::cout << "Executing gui "  << std::endl;
 	// G4UIterminal is a (dumb) terminal.
 	//UI->ApplyCommand("/control/execute myVis.mac");
 
@@ -217,6 +223,9 @@ int main(int argc, char** argv){
 	/* Copy contents of macro into buffer to be written out
 	 * into ROOT file
 	 * */
+
+        std::cout << "Executing " << argv[1] << std::endl;
+
 	rundata->SetMacroFile(argv[1]);
 
 

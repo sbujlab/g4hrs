@@ -35,8 +35,8 @@ BField_Septum* BField_Septum::GetInstance()
 	if(!fInstance)  
 	{
 		//new BField_Septum();
-		cout<<"BField_Septum is not nitialized yet...exit...\n";
-		exit(-99);
+		cout<<"BField_Septum is not initialized yet...exit...\n";
+		exit(1);
 	}
 	return fInstance; 
 }
@@ -116,7 +116,7 @@ bool BField_Septum::ReadMap(const char *filename)
 	if (ins.fail())
 	{
 		sprintf(strLog,"***ERROR! Can not open field map %s...exit!***\n",filename);
-		exit(-1);
+		exit(1);
 		return false;
 	}
 
@@ -181,7 +181,7 @@ bool BField_Septum::ReadMap(const char *filename)
 	{
 		cerr<<"\n##DefaultMomentumL is invaid ("<<mDefaultMomentum
 			<<") in BField_Septum.ini. I quit... \n";
-		exit(-1);
+		exit(1);
 	}
 
 	mDoShift=(mOrigin[0]*mOrigin[0]+mOrigin[1]*mOrigin[1]+mOrigin[2]*mOrigin[2]>0)?true:false;
@@ -393,158 +393,158 @@ bool BField_Septum::ReadMap(const char *filename)
 /////////////////////////////////////////////////////////////////////
 bool BField_Septum::Interpolation(double Pos[3],double B[3],int n)
 {/*////////////////////////////////////////
- //function: calculate the nth order interpolation
- //1)found out B[X0-Xn][Y0-Yn][Z0-Zn], (n+1)x(n+1)x(n+1) matrix, 
- //2)then interpolate by X, found 3x(n+1)x(n+1) matrix
- //3)then interpolate by Y, found 3x(n+1) matrix 
- //4)Finally interpolate by Z to get Bx,By,Bz 
- //Input:
- // Pos[3]: the position in x,y,z coordinate in cm,origin variable
- // n : calculate the Nth order
- //Output:
- // B[3]: the magnetic field in B_x,B_y,B_z in tesla
- *//////////////////////////////////////////
+    //function: calculate the nth order interpolation
+    //1)found out B[X0-Xn][Y0-Yn][Z0-Zn], (n+1)x(n+1)x(n+1) matrix, 
+    //2)then interpolate by X, found 3x(n+1)x(n+1) matrix
+    //3)then interpolate by Y, found 3x(n+1) matrix 
+    //4)Finally interpolate by Z to get Bx,By,Bz 
+    //Input:
+    // Pos[3]: the position in x,y,z coordinate in cm,origin variable
+    // n : calculate the Nth order
+    //Output:
+    // B[3]: the magnetic field in B_x,B_y,B_z in tesla
+    *//////////////////////////////////////////
 
 #ifdef BFIELD_SEPTUM_DEBU
-	//I do not want to check these in release version, just make sure you provide the right parameters
-	if(n<1) n=1; 
-	if(n>4) n=4; 
+    //I do not want to check these in release version, just make sure you provide the right parameters
+    if(n<1) n=1; 
+    if(n>4) n=4; 
 
-	if (n>=mXNum || n>=mYNum|| n>=mZNum)
-	{
-		printf("\n**Error! Too few points to finish %dth order interpolation!**",n);
-		printf("**Please change the config file to load more data points or use lower order Number!**\n");
-		return false;
-	}
+    if (n>=mXNum || n>=mYNum|| n>=mZNum)
+    {
+        printf("\n**Error! Too few points to finish %dth order interpolation!**",n);
+        printf("**Please change the config file to load more data points or use lower order Number!**\n");
+        return false;
+    }
 #endif
 
-	//just flip by z
-	double x=Pos[0],y=Pos[1],z=Pos[2];
+    //just flip by z
+    double x=Pos[0],y=Pos[1],z=Pos[2];
 
-	int StartIndexX=0,StartIndexY=0,StartIndexZ=0;  //the first point to do the interpolation
-	StartIndexX=int((x-mBField[0][0][0][0])/mStepX);
-	StartIndexY=int((y-mBField[0][0][0][1])/mStepY);
-	StartIndexZ=int((z-mBField[0][0][0][2])/mStepZ);
+    int StartIndexX=0,StartIndexY=0,StartIndexZ=0;  //the first point to do the interpolation
+    StartIndexX=int((x-mBField[0][0][0][0])/mStepX);
+    StartIndexY=int((y-mBField[0][0][0][1])/mStepY);
+    StartIndexZ=int((z-mBField[0][0][0][2])/mStepZ);
 
 
 #ifdef BFIELD_SEPTUM_DEBUG
-	if (StartIndexX<0 || StartIndexX>=mXNum)
-	{
-		if(BFIELD_SEPTUM_DEBUG>=1)
-		printf("\n**Warning!!! X=%.4f is out of range [%.4f,%.4f) !!!**\n",
-			x,mBField[0][0][0][0],mBField[mXNum-1][0][0][0]);
-		B[0]=B[1]=B[2]=0.0;return false;
-	}
-	if (StartIndexY<0 || StartIndexY>=mYNum)
-	{
-		if(BFIELD_SEPTUM_DEBUG>=1)
-		printf("\n**Warning!!! Y=%.4f is out of range [%.4f,%.4f) !!!**\n",
-			y,mBField[0][0][0][1],mBField[0][mYNum-1][0][1]);
-		B[0]=B[1]=B[2]=0.0;return false;
-	}
-	if (StartIndexZ<0 || StartIndexZ>=mZNum)
-	{
-		if(BFIELD_SEPTUM_DEBUG>=1)
-		printf("\n**Warning!!! Z=%.4f is out of range [%.4f,%.4f) !!!**\n",
-			z,mBField[0][0][0][2],mBField[0][0][mZNum-1][2]);
-		B[0]=B[1]=B[2]=0.0;return false;
-	}
+    if (StartIndexX<0 || StartIndexX>=mXNum)
+    {
+        if(BFIELD_SEPTUM_DEBUG>=1)
+            printf("\n**Warning!!! X=%.4f is out of range [%.4f,%.4f) !!!**\n",
+                    x,mBField[0][0][0][0],mBField[mXNum-1][0][0][0]);
+        B[0]=B[1]=B[2]=0.0;return false;
+    }
+    if (StartIndexY<0 || StartIndexY>=mYNum)
+    {
+        if(BFIELD_SEPTUM_DEBUG>=1)
+            printf("\n**Warning!!! Y=%.4f is out of range [%.4f,%.4f) !!!**\n",
+                    y,mBField[0][0][0][1],mBField[0][mYNum-1][0][1]);
+        B[0]=B[1]=B[2]=0.0;return false;
+    }
+    if (StartIndexZ<0 || StartIndexZ>=mZNum)
+    {
+        if(BFIELD_SEPTUM_DEBUG>=1)
+            printf("\n**Warning!!! Z=%.4f is out of range [%.4f,%.4f) !!!**\n",
+                    z,mBField[0][0][0][2],mBField[0][0][mZNum-1][2]);
+        B[0]=B[1]=B[2]=0.0;return false;
+    }
 #endif
 
-	if(mInterpolateOutOfRange==0)
-	{
-		if ((StartIndexX<0 || StartIndexX>=mXNum) || 
-			(StartIndexY<0 || StartIndexY>=mYNum) || 
-			(StartIndexZ<0 || StartIndexZ>=mZNum) )
-		{
-			B[0]=B[1]=B[2]=0.0;return false;
-		}
-	}
+    if(mInterpolateOutOfRange==0)
+    {
+        if ((StartIndexX<0 || StartIndexX>=mXNum) || 
+                (StartIndexY<0 || StartIndexY>=mYNum) || 
+                (StartIndexZ<0 || StartIndexZ>=mZNum) )
+        {
+            B[0]=B[1]=B[2]=0.0;return false;
+        }
+    }
 
-	//choose a best position to interpolate, considering the lower and upper limits
-	if (StartIndexX>mXNum-1-n) StartIndexX=mXNum-1-n;
-	else if (StartIndexX<0) StartIndexX=0;
-	if (StartIndexY>mYNum-1-n) StartIndexY=mYNum-1-n;
-	else if (StartIndexY<0) StartIndexY=0;
-	if (StartIndexZ>mZNum-1-n) StartIndexZ=mZNum-1-n;
-	else if (StartIndexZ<0) StartIndexZ=0;
+    //choose a best position to interpolate, considering the lower and upper limits
+    if (StartIndexX>mXNum-1-n) StartIndexX=mXNum-1-n;
+    else if (StartIndexX<0) StartIndexX=0;
+    if (StartIndexY>mYNum-1-n) StartIndexY=mYNum-1-n;
+    else if (StartIndexY<0) StartIndexY=0;
+    if (StartIndexZ>mZNum-1-n) StartIndexZ=mZNum-1-n;
+    else if (StartIndexZ<0) StartIndexZ=0;
 
-	// interpolate by X first
-	//put the n+1=5 to avoid new and delete, this can save a lot of time
-	double temp,tempBX[3][5][5],tempBY[3][5];
+    // interpolate by X first
+    //put the n+1=5 to avoid new and delete, this can save a lot of time
+    double temp,tempBX[3][5][5],tempBY[3][5];
 
-	int iX,iY,iZ,ii,jj,kk,ll;
-	for (ll=0;ll<=n;ll++)
-	{
-		iZ=StartIndexZ+ll;
-		for (ii=0;ii<=n;ii++)
-		{
-			//initial
-			tempBX[0][ii][ll]=0.;
-			tempBX[1][ii][ll]=0.;
-			tempBX[2][ii][ll]=0.;
-			iY=StartIndexY+ii;		
-			for (kk=0;kk<=n;kk++)
-			{
-				temp=1.;
-				for (jj=0;jj<=n;jj++)
-				{
-					iX=StartIndexX+jj;
-					if(jj!=kk)
-					{
-						temp*=(x-mBField[iX][iY][iZ][0])/(mBField[StartIndexX+kk][iY][iZ][0]-mBField[iX][iY][iZ][0]);
-					}
-				}
-				tempBX[0][ii][ll]+=temp*mBField[StartIndexX+kk][iY][iZ][3];
-				tempBX[1][ii][ll]+=temp*mBField[StartIndexX+kk][iY][iZ][4];
-				tempBX[2][ii][ll]+=temp*mBField[StartIndexX+kk][iY][iZ][5];
-			}
-		}
-	}
-	// interpolate by Y 
-	iX=StartIndexX;
-	for (ii=0;ii<=n;ii++)
-	{
-		//initial
-		for (int i=0;i<3;i++) tempBY[i][ii]=0.;
-		iZ=StartIndexZ+ii;
-		for (kk=0;kk<=n;kk++)
-		{
-			temp=1.;
-			for (jj=0;jj<=n;jj++)
-			{
-				iY=StartIndexY+jj;
-				if(jj!=kk)
-				{
-					temp*=(y-mBField[iX][iY][iZ][1])/(mBField[iX][StartIndexY+kk][iZ][1]-mBField[iX][iY][iZ][1]);
-				}
-			}
-			tempBY[0][ii]+=temp*tempBX[0][kk][ii];			
-			tempBY[1][ii]+=temp*tempBX[1][kk][ii];
-			tempBY[2][ii]+=temp*tempBX[2][kk][ii];
-		}
-	}
-	// interpolate by Z 
-	//initial
-	iX=StartIndexX;
-	iY=StartIndexY;
-	for (int i=0;i<3;i++) B[i]=0.;
-	for (kk=0;kk<=n;kk++)
-	{
-		for(int i=0;i<3;i++ )temp=1.;
-		for (jj=0;jj<=n;jj++)
-		{
-			iZ=StartIndexZ+jj;
-			if(jj!=kk)
-			{
-				temp*=(z-mBField[iX][iY][iZ][2])/(mBField[iX][iY][StartIndexZ+kk][2]-mBField[iX][iY][iZ][2]);
-			}
-		}
-		B[0]+=temp*tempBY[0][kk];			
-		B[1]+=temp*tempBY[1][kk];
-		B[2]+=temp*tempBY[2][kk];
-	}
-	return  true;
+    int iX,iY,iZ,ii,jj,kk,ll;
+    for (ll=0;ll<=n;ll++)
+    {
+        iZ=StartIndexZ+ll;
+        for (ii=0;ii<=n;ii++)
+        {
+            //initial
+            tempBX[0][ii][ll]=0.;
+            tempBX[1][ii][ll]=0.;
+            tempBX[2][ii][ll]=0.;
+            iY=StartIndexY+ii;		
+            for (kk=0;kk<=n;kk++)
+            {
+                temp=1.;
+                for (jj=0;jj<=n;jj++)
+                {
+                    iX=StartIndexX+jj;
+                    if(jj!=kk)
+                    {
+                        temp*=(x-mBField[iX][iY][iZ][0])/(mBField[StartIndexX+kk][iY][iZ][0]-mBField[iX][iY][iZ][0]);
+                    }
+                }
+                tempBX[0][ii][ll]+=temp*mBField[StartIndexX+kk][iY][iZ][3];
+                tempBX[1][ii][ll]+=temp*mBField[StartIndexX+kk][iY][iZ][4];
+                tempBX[2][ii][ll]+=temp*mBField[StartIndexX+kk][iY][iZ][5];
+            }
+        }
+    }
+    // interpolate by Y 
+    iX=StartIndexX;
+    for (ii=0;ii<=n;ii++)
+    {
+        //initial
+        for (int i=0;i<3;i++) tempBY[i][ii]=0.;
+        iZ=StartIndexZ+ii;
+        for (kk=0;kk<=n;kk++)
+        {
+            temp=1.;
+            for (jj=0;jj<=n;jj++)
+            {
+                iY=StartIndexY+jj;
+                if(jj!=kk)
+                {
+                    temp*=(y-mBField[iX][iY][iZ][1])/(mBField[iX][StartIndexY+kk][iZ][1]-mBField[iX][iY][iZ][1]);
+                }
+            }
+            tempBY[0][ii]+=temp*tempBX[0][kk][ii];			
+            tempBY[1][ii]+=temp*tempBX[1][kk][ii];
+            tempBY[2][ii]+=temp*tempBX[2][kk][ii];
+        }
+    }
+    // interpolate by Z 
+    //initial
+    iX=StartIndexX;
+    iY=StartIndexY;
+    for (int i=0;i<3;i++) B[i]=0.;
+    for (kk=0;kk<=n;kk++)
+    {
+        for(int i=0;i<3;i++ )temp=1.;
+        for (jj=0;jj<=n;jj++)
+        {
+            iZ=StartIndexZ+jj;
+            if(jj!=kk)
+            {
+                temp*=(z-mBField[iX][iY][iZ][2])/(mBField[iX][iY][StartIndexZ+kk][2]-mBField[iX][iY][iZ][2]);
+            }
+        }
+        B[0]+=temp*tempBY[0][kk];			
+        B[1]+=temp*tempBY[1][kk];
+        B[2]+=temp*tempBY[2][kk];
+    }
+    return  true;
 }
 
 void BField_Septum::Rotate_Lab2Field(const double LabP[3],double FieldP[3])
@@ -586,7 +586,8 @@ void BField_Septum::Transform_Field2Lab(const double FieldP[3],double LabP[3])
 
 
 /////////////////////////////////////////////////////////////////////
-bool BField_Septum::GetBField(double Pos[3],double B[3]){
+bool BField_Septum::GetBField(double Pos[],double B[]){
+
   //input x,y,z in centimeter, return B field in Tesla
   int i;
   //G4cout << "fancy get" << G4endl;
@@ -651,10 +652,8 @@ bool BField_Septum::GetBField(double Pos[3],double B[3]){
   */
   for (i=0;i<3;i++) {
     //G4cout << flag[i] << G4endl;
-    B[i]=pB[i]*(fMomentum/mDefaultMomentum)*flag[i];
+    B[i]=pB[i]*(fMomentum/mDefaultMomentum)*flag[i]*1e3;
   }
-
-  //G4cout << B[0] << " " << B[1] << " " << B[2] << G4endl;
 
 #ifdef BFIELD_SEPTUM_DEBUG
   if(Global_Debug_Level>=2){
@@ -679,7 +678,7 @@ bool BField_Septum::GetBField(double Pos[3],double B[3]){
 }
 
 /////////////////////////////////////////////////////////////////////
-bool BField_Septum::GetBField(float fPos[3],float fB[3])
+bool BField_Septum::GetBField(float fPos[],float fB[])
 {//input x,y,z in centimeter
   G4cout << "simple get" << G4endl;
 	bool status=false;

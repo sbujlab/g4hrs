@@ -54,10 +54,11 @@ BField_Dipole::BField_Dipole(G4double pBend)
 
 /////////////////////////////////////////////////////////////////////////
 
-BField_Dipole::BField_Dipole(G4double pBend, G4ThreeVector
+BField_Dipole::BField_Dipole(G4double pBend, G4ThreeVector pPivot, G4ThreeVector
 pOrigin, G4RotationMatrix* pMatrix)
 {
    fBend    = pBend   ;
+   fPivot   = pPivot;
    fOrigin  = pOrigin ;
    fpMatrix = pMatrix ;
 }
@@ -72,8 +73,8 @@ BField_Dipole::~BField_Dipole()
 //  Allow displaced origin and rotation 
 //  Extensions by Björn Riese (GSI)
 
-void BField_Dipole::GetFieldValue( const G4double y[7],
-				 G4double B[3]  ) const  
+void BField_Dipole::GetFieldValue( const G4double y[],
+				 G4double B[]  ) const  
 {
   //This old way doesn't work, I believe.
   //G4ThreeVector r_global= G4ThreeVector
@@ -87,14 +88,25 @@ void BField_Dipole::GetFieldValue( const G4double y[7],
   //fpMatrix->colZ() * r_global - fOrigin.z());
 
   G4ThreeVector r_global= G4ThreeVector
-    (y[0] - fOrigin.x(),
-     y[1] - fOrigin.y(),
-     y[2] - fOrigin.z());
+    (y[0] - fOrigin.x() - fPivot.x(),
+     y[1] - fOrigin.y() - fPivot.y(),
+     y[2] - fOrigin.z() - fPivot.z());
 
   G4ThreeVector r_local = G4ThreeVector
     (fpMatrix->colX() * r_global,
      fpMatrix->colY() * r_global,
      fpMatrix->colZ() * r_global);
+
+
+  // Test that this is within reason
+  if( fabs(y[0])>20*m || fabs(y[1])>20*m || fabs(y[2]-13*m)>20*m ){
+      B[0] = 0.0;
+      B[1] = 0.0;
+      B[2] = 0.0;
+      G4cerr << "Warning:  Dipole sampling field far outside defined volume" << G4endl;
+      G4cerr << y[0]/m << " " << y[1]/m << " " << y[2]/m  << G4endl;
+      return;
+    }
 
   //indexed dipole
   //B = ( r / r_0 ) ^ -n  * B_0
