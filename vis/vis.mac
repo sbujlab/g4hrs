@@ -7,7 +7,7 @@
 #
 # Declare that the world volume should be added to the scene
 #
-/vis/scene/add/volume
+/vis/scene/add/volume worlds
 #
 #
 # Attach scene to scenehandler
