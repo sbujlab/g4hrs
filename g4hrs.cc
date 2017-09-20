@@ -34,6 +34,8 @@
 
 #include "G4RunManagerKernel.hh"
 
+#include "G4ParallelWorldPhysics.hh"
+
 //to make gui.mac work
 #include <G4UImanager.hh>
 #include <G4UIExecutive.hh>
@@ -98,7 +100,8 @@ int main(int argc, char** argv){
 
     // Detector geometry
     G4VUserDetectorConstruction* detector = new g4hrsDetectorConstruction();
-    detector->RegisterParallelWorld(new g4hrsParallelWorld());
+	G4String parallelWorldName = "g4hrsparallel";
+    detector->RegisterParallelWorld(new g4hrsParallelWorld(parallelWorldName));
     runManager->SetUserInitialization(detector);
     rmmess->SetDetCon( ((g4hrsDetectorConstruction *) detector) );
 
@@ -123,6 +126,7 @@ int main(int argc, char** argv){
     #endif
     physlist->RegisterPhysics(new G4OpticalPhysics());
     physlist->SetVerboseLevel(verbose);
+    physlist->RegisterPhysics(new G4ParallelWorldPhysics(parallelWorldName));
     runManager->SetUserInitialization(physlist);
 
     //-------------------------------
@@ -158,8 +162,9 @@ int main(int argc, char** argv){
     {
 
 	// G4UIterminal is a (dumb) terminal.
-
-#if defined(G4UI_USE_WIN32)
+#if defined(G4UI_USE_QT)
+	session = new G4UIQt(argc,argv);
+#elif defined(G4UI_USE_WIN32)
 	session = new G4UIWin32();
 #elif defined(G4UI_USE_XM)
 	session = new G4UIXm(argc,argv);
