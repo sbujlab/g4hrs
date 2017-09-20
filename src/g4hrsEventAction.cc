@@ -26,7 +26,11 @@ g4hrsEventAction::~g4hrsEventAction(){
 void g4hrsEventAction::BeginOfEventAction(const G4Event* ev){
 
 	fIO->ClearVirtualBoundaryData();
-  
+ 
+	if(ev->GetEventID() % 1000 == 0) {
+		G4cout << ev->GetEventID() << "\n";
+	}
+ 
   // Start timer at event 0
   if (ev->GetEventID() == 0) fTimer.Start();
   // Pretty ongoing status

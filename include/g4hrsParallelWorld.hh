@@ -18,13 +18,13 @@ class g4hrsParallelWorld : public G4VUserParallelWorld
 {
   public:
 
-    g4hrsParallelWorld();
+    g4hrsParallelWorld(G4String);
     virtual ~g4hrsParallelWorld();
 
   public:
 
     virtual void Construct();
-    virtual void ConstructSD();
+    virtual void ConstructSD(G4LogicalVolume *);
 
   private:
       g4hrsIO *fIO;
@@ -38,6 +38,7 @@ class g4hrsParallelWorld : public G4VUserParallelWorld
 
   private:
       void CreateHRS(G4LogicalVolume *);
+	void CreateSeptum(G4LogicalVolume *);	
 
       double fTargetW;
       double fTargetH;

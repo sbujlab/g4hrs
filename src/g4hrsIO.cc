@@ -173,33 +173,61 @@ void g4hrsIO::InitializeTree(){
 	fTree->Branch("th_col", &fTheta_col,	"th_col/D");
 	fTree->Branch("ph_col", &fPhi_col,	"ph_col/D");
 
-	fTree->Branch("x_q1en", 	&fX_q1en,	"x_q1en/D");
-	fTree->Branch("y_q1en", 	&fY_q1en,	"y_q1en/D");
-	fTree->Branch("z_q1en", 	&fZ_q1en,	"z_q1en/D");
-	fTree->Branch("p_q1en", 	&fP_q1en,	"p_q1en/D");
-	fTree->Branch("th_q1en", &fTheta_q1en,	"th_q1en/D");
-	fTree->Branch("ph_q1en", &fPhi_q1en,	"ph_q1en/D");
+	fTree->Branch("x_q1en_L", 	&fX_q1en_L,	"x_q1en_L/D");
+	fTree->Branch("y_q1en_L", 	&fY_q1en_L,	"y_q1en_L/D");
+	fTree->Branch("z_q1en_L", 	&fZ_q1en_L,	"z_q1en_L/D");
+	fTree->Branch("p_q1en_L", 	&fP_q1en_L,	"p_q1en_L/D");
+	fTree->Branch("th_q1en_L", &fTheta_q1en_L,	"th_q1en_L/D");
+	fTree->Branch("ph_q1en_L", &fPhi_q1en_L,	"ph_q1en_L/D");
 
-	fTree->Branch("x_q1ex", 	&fX_q1ex,	"x_q1ex/D");
-	fTree->Branch("y_q1ex", 	&fY_q1ex,	"y_q1ex/D");
-	fTree->Branch("z_q1ex", 	&fZ_q1ex,	"z_q1ex/D");
-	fTree->Branch("p_q1ex", 	&fP_q1ex,	"p_q1ex/D");
-	fTree->Branch("th_q1ex", &fTheta_q1ex,	"th_q1ex/D");
-	fTree->Branch("ph_q1ex", &fPhi_q1ex,	"ph_q1ex/D");
+	fTree->Branch("x_q1ex_L", 	&fX_q1ex_L,	"x_q1ex_L/D");
+	fTree->Branch("y_q1ex_L", 	&fY_q1ex_L,	"y_q1ex_L/D");
+	fTree->Branch("z_q1ex_L", 	&fZ_q1ex_L,	"z_q1ex_L/D");
+	fTree->Branch("p_q1ex_L", 	&fP_q1ex_L,	"p_q1ex_L/D");
+	fTree->Branch("th_q1ex_L", &fTheta_q1ex_L,	"th_q1ex_L/D");
+	fTree->Branch("ph_q1ex_L", &fPhi_q1ex_L,	"ph_q1ex_L/D");
 
-	fTree->Branch("x_q2en", 	&fX_q2en,	"x_q2en/D");
-	fTree->Branch("y_q2en", 	&fY_q2en,	"y_q2en/D");
-	fTree->Branch("z_q2en", 	&fZ_q2en,	"z_q2en/D");
-	fTree->Branch("p_q2en", 	&fP_q2en,	"p_q2en/D");
-	fTree->Branch("th_q2en", &fTheta_q2en,	"th_q2en/D");
-	fTree->Branch("ph_q2en", &fPhi_q2en,	"ph_q2en/D");
+	fTree->Branch("x_q1en_R", 	&fX_q1en_R,	"x_q1en_R/D");
+	fTree->Branch("y_q1en_R", 	&fY_q1en_R,	"y_q1en_R/D");
+	fTree->Branch("z_q1en_R", 	&fZ_q1en_R,	"z_q1en_R/D");
+	fTree->Branch("p_q1en_R", 	&fP_q1en_R,	"p_q1en_R/D");
+	fTree->Branch("th_q1en_R", &fTheta_q1en_R,	"th_q1en_R/D");
+	fTree->Branch("ph_q1en_R", &fPhi_q1en_R,	"ph_q1en_R/D");
 
-	fTree->Branch("x_q2ex", 	&fX_q2ex,	"x_q2ex/D");
-	fTree->Branch("y_q2ex", 	&fY_q2ex,	"y_q2ex/D");
-	fTree->Branch("z_q2ex", 	&fZ_q2ex,	"z_q2ex/D");
-	fTree->Branch("p_q2ex", 	&fP_q2ex,	"p_q2ex/D");
-	fTree->Branch("th_q2ex", &fTheta_q2ex,	"th_q2ex/D");
-	fTree->Branch("ph_q2ex", &fPhi_q2ex,	"ph_q2ex/D");
+	fTree->Branch("x_q1ex_R", 	&fX_q1ex_R,	"x_q1ex_R/D");
+	fTree->Branch("y_q1ex_R", 	&fY_q1ex_R,	"y_q1ex_R/D");
+	fTree->Branch("z_q1ex_R", 	&fZ_q1ex_R,	"z_q1ex_R/D");
+	fTree->Branch("p_q1ex_R", 	&fP_q1ex_R,	"p_q1ex_R/D");
+	fTree->Branch("th_q1ex_R", &fTheta_q1ex_R,	"th_q1ex_R/D");
+	fTree->Branch("ph_q1ex_R", &fPhi_q1ex_R,	"ph_q1ex_R/D");
+
+	fTree->Branch("x_q2en_L", 	&fX_q2en_L,	"x_q2en_L/D");
+	fTree->Branch("y_q2en_L", 	&fY_q2en_L,	"y_q2en_L/D");
+	fTree->Branch("z_q2en_L", 	&fZ_q2en_L,	"z_q2en_L/D");
+	fTree->Branch("p_q2en_L", 	&fP_q2en_L,	"p_q2en_L/D");
+	fTree->Branch("th_q2en_L", &fTheta_q2en_L,	"th_q2en_L/D");
+	fTree->Branch("ph_q2en_L", &fPhi_q2en_L,	"ph_q2en_L/D");
+
+	fTree->Branch("x_q2ex_L", 	&fX_q2ex_L,	"x_q2ex_L/D");
+	fTree->Branch("y_q2ex_L", 	&fY_q2ex_L,	"y_q2ex_L/D");
+	fTree->Branch("z_q2ex_L", 	&fZ_q2ex_L,	"z_q2ex_L/D");
+	fTree->Branch("p_q2ex_L", 	&fP_q2ex_L,	"p_q2ex_L/D");
+	fTree->Branch("th_q2ex_L", &fTheta_q2ex_L,	"th_q2ex_L/D");
+	fTree->Branch("ph_q2ex_L", &fPhi_q2ex_L,	"ph_q2ex_L/D");
+
+	fTree->Branch("x_q2en_R", 	&fX_q2en_R,	"x_q2en_R/D");
+	fTree->Branch("y_q2en_R", 	&fY_q2en_R,	"y_q2en_R/D");
+	fTree->Branch("z_q2en_R", 	&fZ_q2en_R,	"z_q2en_R/D");
+	fTree->Branch("p_q2en_R", 	&fP_q2en_R,	"p_q2en_R/D");
+	fTree->Branch("th_q2en_R", &fTheta_q2en_R,	"th_q2en_R/D");
+	fTree->Branch("ph_q2en_R", &fPhi_q2en_R,	"ph_q2en_R/D");
+
+	fTree->Branch("x_q2ex_R", 	&fX_q2ex_R,	"x_q2ex_R/D");
+	fTree->Branch("y_q2ex_R", 	&fY_q2ex_R,	"y_q2ex_R/D");
+	fTree->Branch("z_q2ex_R", 	&fZ_q2ex_R,	"z_q2ex_R/D");
+	fTree->Branch("p_q2ex_R", 	&fP_q2ex_R,	"p_q2ex_R/D");
+	fTree->Branch("th_q2ex_R", &fTheta_q2ex_R,	"th_q2ex_R/D");
+	fTree->Branch("ph_q2ex_R", &fPhi_q2ex_R,	"ph_q2ex_R/D");
 
 	fTree->Branch("x_den", 	&fX_den,	"x_den/D");
 	fTree->Branch("y_den", 	&fY_den,	"y_den/D");
@@ -256,6 +284,8 @@ void g4hrsIO::InitializeTree(){
 	fTree->Branch("p_fp", 	&fP_fp,	"p_fp/D");
 	fTree->Branch("th_fp", &fTheta_fp,	"th_fp/D");
 	fTree->Branch("ph_fp", &fPhi_fp,	"ph_fp/D");
+
+
 
     return;
 }
@@ -442,6 +472,77 @@ void g4hrsIO::ClearVirtualBoundaryData() {
 	fSteppingAction->fP_sen = -150.;
 	fSteppingAction->fTheta_sen = -150.;
 	fSteppingAction->fPhi_sen = -150.;
+	
+	fSteppingAction->fX_sm = -150.;
+	fSteppingAction->fY_sm = -150.;
+	fSteppingAction->fZ_sm = -150.;
+	fSteppingAction->fP_sm = -150.;
+	fSteppingAction->fTheta_sm = -150.;
+	fSteppingAction->fPhi_sm = -150.;
+
+	fSteppingAction->fX_sex = -150.;
+	fSteppingAction->fY_sex = -150.;
+	fSteppingAction->fZ_sex = -150.;
+	fSteppingAction->fP_sex = -150.;
+	fSteppingAction->fTheta_sex = -150.;
+	fSteppingAction->fPhi_sex = -150.;
+	
+	fSteppingAction->fX_q1en_L = -150.;
+	fSteppingAction->fY_q1en_L = -150.;
+	fSteppingAction->fZ_q1en_L = -150.;
+	fSteppingAction->fP_q1en_L = -150.;
+	fSteppingAction->fTheta_q1en_L = -150.;
+	fSteppingAction->fPhi_q1en_L = -150.;
+
+	fSteppingAction->fX_q1ex_L = -150.;
+	fSteppingAction->fY_q1ex_L = -150.;
+	fSteppingAction->fZ_q1ex_L = -150.;
+	fSteppingAction->fP_q1ex_L = -150.;
+	fSteppingAction->fTheta_q1ex_L = -150.;
+	fSteppingAction->fPhi_q1ex_L = -150.;
+
+	fSteppingAction->fX_q1en_R = -150.;
+	fSteppingAction->fY_q1en_R = -150.;
+	fSteppingAction->fZ_q1en_R = -150.;
+	fSteppingAction->fP_q1en_R = -150.;
+	fSteppingAction->fTheta_q1en_R = -150.;
+	fSteppingAction->fPhi_q1en_R = -150.;
+
+	fSteppingAction->fX_q1ex_R = -150.;
+	fSteppingAction->fY_q1ex_R = -150.;
+	fSteppingAction->fZ_q1ex_R = -150.;
+	fSteppingAction->fP_q1ex_R = -150.;
+	fSteppingAction->fTheta_q1ex_R = -150.;
+	fSteppingAction->fPhi_q1ex_R = -150.;
+
+	fSteppingAction->fX_q2en_L = -150.;
+	fSteppingAction->fY_q2en_L = -150.;
+	fSteppingAction->fZ_q2en_L = -150.;
+	fSteppingAction->fP_q2en_L = -150.;
+	fSteppingAction->fTheta_q2en_L = -150.;
+	fSteppingAction->fPhi_q2en_L = -150.;
+
+	fSteppingAction->fX_q2ex_L = -150.;
+	fSteppingAction->fY_q2ex_L = -150.;
+	fSteppingAction->fZ_q2ex_L = -150.;
+	fSteppingAction->fP_q2ex_L = -150.;
+	fSteppingAction->fTheta_q2ex_L = -150.;
+	fSteppingAction->fPhi_q2ex_L = -150.;
+
+	fSteppingAction->fX_q2en_R = -150.;
+	fSteppingAction->fY_q2en_R = -150.;
+	fSteppingAction->fZ_q2en_R = -150.;
+	fSteppingAction->fP_q2en_R = -150.;
+	fSteppingAction->fTheta_q2en_R = -150.;
+	fSteppingAction->fPhi_q2en_R = -150.;
+
+	fSteppingAction->fX_q2ex_R = -150.;
+	fSteppingAction->fY_q2ex_R = -150.;
+	fSteppingAction->fZ_q2ex_R = -150.;
+	fSteppingAction->fP_q2ex_R = -150.;
+	fSteppingAction->fTheta_q2ex_R = -150.;
+	fSteppingAction->fPhi_q2ex_R = -150.;
+
 
 }
 
@@ -453,6 +554,77 @@ void g4hrsIO::SetVirtualBoundaryData() {
 	fP_sen = fSteppingAction->fP_sen;
 	fTheta_sen = fSteppingAction->fTheta_sen;
 	fPhi_sen = fSteppingAction->fPhi_sen;
+
+	fX_sm = fSteppingAction->fX_sm;
+	fY_sm = fSteppingAction->fY_sm;
+	fZ_sm = fSteppingAction->fZ_sm;
+	fP_sm = fSteppingAction->fP_sm;
+	fTheta_sm = fSteppingAction->fTheta_sm;
+	fPhi_sm = fSteppingAction->fPhi_sm;
+
+	fX_sex = fSteppingAction->fX_sex;
+	fY_sex = fSteppingAction->fY_sex;
+	fZ_sex = fSteppingAction->fZ_sex;
+	fP_sex = fSteppingAction->fP_sex;
+	fTheta_sex = fSteppingAction->fTheta_sex;
+	fPhi_sex = fSteppingAction->fPhi_sex;
+
+	fX_q1en_L = fSteppingAction->fX_q1en_L;
+	fY_q1en_L = fSteppingAction->fY_q1en_L;
+	fZ_q1en_L = fSteppingAction->fZ_q1en_L;
+	fP_q1en_L = fSteppingAction->fP_q1en_L;
+	fTheta_q1en_L = fSteppingAction->fTheta_q1en_L;
+	fPhi_q1en_L = fSteppingAction->fPhi_q1en_L;
+
+	fX_q1ex_L = fSteppingAction->fX_q1ex_L;
+	fY_q1ex_L = fSteppingAction->fY_q1ex_L;
+	fZ_q1ex_L = fSteppingAction->fZ_q1ex_L;
+	fP_q1ex_L = fSteppingAction->fP_q1ex_L;
+	fTheta_q1ex_L = fSteppingAction->fTheta_q1ex_L;
+	fPhi_q1ex_L = fSteppingAction->fPhi_q1ex_L;
+
+	fX_q1en_R = fSteppingAction->fX_q1en_R;
+	fY_q1en_R = fSteppingAction->fY_q1en_R;
+	fZ_q1en_R = fSteppingAction->fZ_q1en_R;
+	fP_q1en_R = fSteppingAction->fP_q1en_R;
+	fTheta_q1en_R = fSteppingAction->fTheta_q1en_R;
+	fPhi_q1en_R = fSteppingAction->fPhi_q1en_R;
+
+	fX_q1ex_R = fSteppingAction->fX_q1ex_R;
+	fY_q1ex_R = fSteppingAction->fY_q1ex_R;
+	fZ_q1ex_R = fSteppingAction->fZ_q1ex_R;
+	fP_q1ex_R = fSteppingAction->fP_q1ex_R;
+	fTheta_q1ex_R = fSteppingAction->fTheta_q1ex_R;
+	fPhi_q1ex_R = fSteppingAction->fPhi_q1ex_R;
+
+	fX_q2en_L = fSteppingAction->fX_q2en_L;
+	fY_q2en_L = fSteppingAction->fY_q2en_L;
+	fZ_q2en_L = fSteppingAction->fZ_q2en_L;
+	fP_q2en_L = fSteppingAction->fP_q2en_L;
+	fTheta_q2en_L = fSteppingAction->fTheta_q2en_L;
+	fPhi_q2en_L = fSteppingAction->fPhi_q2en_L;
+
+	fX_q2ex_L = fSteppingAction->fX_q2ex_L;
+	fY_q2ex_L = fSteppingAction->fY_q2ex_L;
+	fZ_q2ex_L = fSteppingAction->fZ_q2ex_L;
+	fP_q2ex_L = fSteppingAction->fP_q2ex_L;
+	fTheta_q2ex_L = fSteppingAction->fTheta_q2ex_L;
+	fPhi_q2ex_L = fSteppingAction->fPhi_q2ex_L;
+
+	fX_q2en_R = fSteppingAction->fX_q2en_R;
+	fY_q2en_R = fSteppingAction->fY_q2en_R;
+	fZ_q2en_R = fSteppingAction->fZ_q2en_R;
+	fP_q2en_R = fSteppingAction->fP_q2en_R;
+	fTheta_q2en_R = fSteppingAction->fTheta_q2en_R;
+	fPhi_q2en_R = fSteppingAction->fPhi_q2en_R;
+
+	fX_q2ex_R = fSteppingAction->fX_q2ex_R;
+	fY_q2ex_R = fSteppingAction->fY_q2ex_R;
+	fZ_q2ex_R = fSteppingAction->fZ_q2ex_R;
+	fP_q2ex_R = fSteppingAction->fP_q2ex_R;
+	fTheta_q2ex_R = fSteppingAction->fTheta_q2ex_R;
+	fPhi_q2ex_R = fSteppingAction->fPhi_q2ex_R;
+
 
 }
 

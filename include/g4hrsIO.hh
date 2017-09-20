@@ -191,34 +191,62 @@ class g4hrsIO {
 	G4double fP_col;
 	G4double fTheta_col;
 	G4double fPhi_col;
+	
+	G4double fX_q1en_L;
+	G4double fY_q1en_L;
+	G4double fZ_q1en_L;
+	G4double fP_q1en_L;
+	G4double fTheta_q1en_L;
+	G4double fPhi_q1en_L;
 
-	G4double fX_q1en;
-	G4double fY_q1en;
-	G4double fZ_q1en;
-	G4double fP_q1en;
-	G4double fTheta_q1en;
-	G4double fPhi_q1en;
+	G4double fX_q1ex_L;
+	G4double fY_q1ex_L;
+	G4double fZ_q1ex_L;
+	G4double fP_q1ex_L;
+	G4double fTheta_q1ex_L;
+	G4double fPhi_q1ex_L;
+	
+	G4double fX_q1en_R;
+	G4double fY_q1en_R;
+	G4double fZ_q1en_R;
+	G4double fP_q1en_R;
+	G4double fTheta_q1en_R;
+	G4double fPhi_q1en_R;
 
-	G4double fX_q1ex;
-	G4double fY_q1ex;
-	G4double fZ_q1ex;
-	G4double fP_q1ex;
-	G4double fTheta_q1ex;
-	G4double fPhi_q1ex;
+	G4double fX_q1ex_R;
+	G4double fY_q1ex_R;
+	G4double fZ_q1ex_R;
+	G4double fP_q1ex_R;
+	G4double fTheta_q1ex_R;
+	G4double fPhi_q1ex_R;
 
-	G4double fX_q2en;
-	G4double fY_q2en;
-	G4double fZ_q2en;
-	G4double fP_q2en;
-	G4double fTheta_q2en;
-	G4double fPhi_q2en;
+	G4double fX_q2en_L;
+	G4double fY_q2en_L;
+	G4double fZ_q2en_L;
+	G4double fP_q2en_L;
+	G4double fTheta_q2en_L;
+	G4double fPhi_q2en_L;
 
-	G4double fX_q2ex;
-	G4double fY_q2ex;
-	G4double fZ_q2ex;
-	G4double fP_q2ex;
-	G4double fTheta_q2ex;
-	G4double fPhi_q2ex;
+	G4double fX_q2ex_L;
+	G4double fY_q2ex_L;
+	G4double fZ_q2ex_L;
+	G4double fP_q2ex_L;
+	G4double fTheta_q2ex_L;
+	G4double fPhi_q2ex_L;
+	
+	G4double fX_q2en_R;
+	G4double fY_q2en_R;
+	G4double fZ_q2en_R;
+	G4double fP_q2en_R;
+	G4double fTheta_q2en_R;
+	G4double fPhi_q2en_R;
+
+	G4double fX_q2ex_R;
+	G4double fY_q2ex_R;
+	G4double fZ_q2ex_R;
+	G4double fP_q2ex_R;
+	G4double fTheta_q2ex_R;
+	G4double fPhi_q2ex_R;
 
 	G4double fX_den;
 	G4double fY_den;
@@ -275,6 +303,15 @@ class g4hrsIO {
 	G4double fP_fp;
 	G4double fTheta_fp;
 	G4double fPhi_fp;
+	
+	G4double fX_par;
+	G4double fY_par;
+	G4double fZ_par;
+	G4double fP_par;
+	G4double fTheta_par;
+	G4double fPhi_par;
+
+
 
 
 };

@@ -48,7 +48,7 @@
 #define __DET_STRLEN 200
 #define __MAX_DETS 5000
 
-g4hrsParallelWorld::g4hrsParallelWorld() :G4VUserParallelWorld("g4hrsparallel") {
+g4hrsParallelWorld::g4hrsParallelWorld(G4String parallelWorldName) :G4VUserParallelWorld(parallelWorldName) {
 
     // Default geometry file
 
@@ -106,12 +106,14 @@ g4hrsParallelWorld::~g4hrsParallelWorld() {
 
 void g4hrsParallelWorld::Construct() {
     
-    G4VPhysicalVolume *worldVolume = GetWorld();
+	G4VPhysicalVolume *worldVolume = GetWorld();
+//	CreateSeptum(worldVolume->GetLogicalVolume());
+//	CreateHRS(worldVolume->GetLogicalVolume());
+	ConstructSD(worldVolume->GetLogicalVolume());
 
-    CreateHRS(worldVolume->GetLogicalVolume());
-
-    return;
+	return;
 }
+
 
 void g4hrsParallelWorld::CreateHRS(G4LogicalVolume* motherLogical)
 {
@@ -207,8 +209,8 @@ void g4hrsParallelWorld::CreateHRS(G4LogicalVolume* motherLogical)
 
 	G4VisAttributes* MagFieldVisAtt = new G4VisAttributes(G4Colour(1., 0., 1.));	
 
-        G4VisAttributes *HallVisAtt = new G4VisAttributes(G4Colour(1.0,1.0,1.0));
-        HallVisAtt->SetVisibility(false);
+        G4VisAttributes *HallVisAtt = new G4VisAttributes(G4Colour(0.,1.0,0.));
+//        HallVisAtt->SetVisibility(false);
 
 
 	LHRSContainerLogical->SetVisAttributes(HallVisAtt); 
@@ -369,10 +371,12 @@ void g4hrsParallelWorld::CreateHRS(G4LogicalVolume* motherLogical)
 	pFPCenterY  = pQ3CenterY + ( pQ3Length / 2. + 3.4538 * m + 1.43 * m ) / sqrt(2) ;
 	//}
 	
-	G4double vb_thickness = .00001 * mm;
+	G4double vb_thickness = 0.5 * mm;
 	G4VSolid* FPSolid = new G4Tubs("FPTub",0,pQ3Rout * 2,vb_thickness,0.0,360.0*deg);
-	G4VSolid* PlaneSolid1 = new G4Tubs("PlaneTub",0,pQ1Rout,vb_thickness,0.0,360.0*deg); //circles
-	G4VSolid* PlaneSolid2 = new G4Tubs("PlaneTub",0,pQ2Rout,vb_thickness,0.0,360.0*deg); //circles
+//	G4VSolid* PlaneSolid1 = new G4Tubs("PlaneTub",0,pQ1Rout,vb_thickness,0.0,360.0*deg); //circles
+//	G4VSolid* PlaneSolid2 = new G4Tubs("PlaneTub",0,pQ2Rout,vb_thickness,0.0,360.0*deg); //circles
+	G4VSolid* PlaneSolid1 = new G4Tubs("PlaneTub",0,200.*cm,vb_thickness,0.0,360.0*deg); //circles
+	G4VSolid* PlaneSolid2 = new G4Tubs("PlaneTub",0,200.*cm,vb_thickness,0.0,360.0*deg); //circles
 
 	double X_S0 = 29.5 * cm;
 	double Y_S0 = 35.5 * cm;
@@ -422,26 +426,8 @@ void g4hrsParallelWorld::CreateHRS(G4LogicalVolume* motherLogical)
 	pRotVDCInContainer->rotateX(0.*deg); 
 	G4RotationMatrix *pRotFPInContainer=new G4RotationMatrix();
 	pRotFPInContainer->rotateX(-45*deg); 
-	if(fSnakeModel == 49 || fSnakeModel == 48 || fSnakeModel > 51 ){
-	  double pSeptumX      = 140.0  * cm;
-	  double pSeptumY      = 84.4   * cm;
-	  double pSeptumZ      = 74.0   * cm;
-	  //double pSeptumPlaceZ = 70.414 * cm;
-	  double pSeptumPlaceZ = 69.99937 * cm;
-	  new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPlaceZ - 0.5 * pSeptumZ + 2 * vb_thickness),
-			    LPlaneLogical2,"virtualBoundaryPhys_sen",motherLogical,0,0,0);//sen
-	  new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPlaceZ),
-			    LPlaneLogical2,"virtualBoundaryPhys_sm",motherLogical,0,0,0);//sm
-	  new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPlaceZ + 0.5 * pSeptumZ),
-			    LPlaneLogical2,"virtualBoundaryPhys_sex",motherLogical,0,0,0);//sex
-	  new G4PVPlacement(0,G4ThreeVector(0,0,36. * cm),
-			    LPlaneLogical2,"virtualBoundaryPhys_coil",motherLogical,0,0,0);//coil
-	  new G4PVPlacement(0,G4ThreeVector(0,0,-50. * cm),
-			    LPlaneLogical2,"virtualBoundaryPhys_mid",motherLogical,0,0,0);//mid
-	  
-	}	
-        
-        
+
+	
         double pHallCenter2Col = 1.38 * m;
 	double pPaulColT        = 0.01 * m;
 	double pPaulX = ( - pHallCenter2Col - pPaulColT * 2. ) * cos(fHRSAngle) ;
@@ -449,7 +435,7 @@ void g4hrsParallelWorld::CreateHRS(G4LogicalVolume* motherLogical)
 	if(fSnakeModel == 49 || fSnakeModel == 48 || fSnakeModel > 50 ){
 	  //double pLQ1Pos_Z=(pHallCenter2LQ1FaceMag+pQ1LengthMag/1.0);//SNAKE
 	  new G4PVPlacement(pRotXLHRSdeg,G4ThreeVector(pPaulY,0,-pPaulX),
-			    LPlaneLogical1,"virtualBoundaryPhys_col_LHRS",motherLogical,0,0,0);//q1en
+			    LPlaneLogical1,"virtualBoundaryPhys_col_LHRS",motherLogical,0,0,0);//col
 	  new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pLQ1Pos_Z_en,0),
 			    LPlaneLogical1,"virtualBoundaryPhys_q1en_LHRS",LHRSContainerLogical,0,0,0);//q1en
 	  new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pLQ1Pos_Z_ex,0),
@@ -512,7 +498,7 @@ void g4hrsParallelWorld::CreateHRS(G4LogicalVolume* motherLogical)
 			    RFPLogical,"virtualBoundaryPhys_qz2_RHRS",RHRSContainerLogical,0,0,0);
 
 	}
-
+	
 	//#endif
 	//////////////////////////////////////////////////////////
 
@@ -520,9 +506,247 @@ void g4hrsParallelWorld::CreateHRS(G4LogicalVolume* motherLogical)
 
 }
 
-void g4hrsParallelWorld::ConstructSD() {
+void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 
     // Add detectors here
-    return;
+/*	
+	G4SDManager *SDMan = G4SDManager::GetSDMpointer();
+	G4VSensitiveDetector* virtual45 = new g4hrsGenericDetector("virtual45",45);
+	SDMan->AddNewDetector(virtual45);
+
+	G4VSolid* parallelDetSolid = new G4Box("parallelDetSolid", 500., 500., 0.05);
+        G4LogicalVolume* parallelDetLogical = new G4LogicalVolume(parallelDetSolid,NULL,"parallelDetLogical",0,0,0);		
+	parallelDetLogical->SetSensitiveDetector(virtual45);
+	G4VPhysicalVolume* parallelDetPhys = new G4PVPlacement(0,G4ThreeVector(fTargetX,fTargetY,fTargetZ + 69.99937 - 74./2. + fPivotZOffset - 10.*cm),
+		parallelDetLogical,"parallelDetPhys",motherLogical,0,0);
+*/	
+	///////////////////////////////////
+	// Solids for virtual boundaries //
+	///////////////////////////////////
+	G4double vb_thickness = 0.5 * mm;
+	G4VSolid* FPSolid = new G4Tubs("FPTub",0,75.*cm * 2,vb_thickness,0.0,360.0*deg);
+	G4VSolid* PlaneSolid1 = new G4Tubs("PlaneTub",0,35.*cm,vb_thickness,0.0,360.0*deg); //circles
+	G4VSolid* PlaneSolid2 = new G4Tubs("PlaneTub",0,75.*cm,vb_thickness,0.0,360.0*deg); //circles
+
+	G4LogicalVolume* LPlaneLogical1 = new G4LogicalVolume(PlaneSolid1,0,"LPlaneLogical1",0,0,0);
+	G4LogicalVolume* RPlaneLogical1 = new G4LogicalVolume(PlaneSolid1,0,"RPlaneLogical1",0,0,0);
+	G4LogicalVolume* LPlaneLogical2 = new G4LogicalVolume(PlaneSolid2,0,"LPlaneLogical1",0,0,0);
+	G4LogicalVolume* RPlaneLogical2 = new G4LogicalVolume(PlaneSolid2,0,"RPlaneLogical1",0,0,0);
+
+        G4LogicalVolume* LFPLogical = new G4LogicalVolume(FPSolid,0,"LFPLogical",0,0,0);
+        G4LogicalVolume* RFPLogical = new G4LogicalVolume(FPSolid,0,"RFPLogical",0,0,0);
+
+	G4VisAttributes* virtualBoundaryVisAtt = new G4VisAttributes(G4Colour(1.,0.,0.));	
+
+	LPlaneLogical1->SetVisAttributes(virtualBoundaryVisAtt);	
+	LPlaneLogical2->SetVisAttributes(virtualBoundaryVisAtt);
+	RPlaneLogical1->SetVisAttributes(virtualBoundaryVisAtt);	
+	RPlaneLogical2->SetVisAttributes(virtualBoundaryVisAtt);
+
+
+
+	///////////////////////////////
+	// Septum virtual boundaries //
+	///////////////////////////////
+
+	// Septum virtual boundaries will be placed directly in the (parallel) world volume
+	
+	double pSeptumX      = 140.0  * cm;
+	double pSeptumY      = 84.4   * cm;
+	double pSeptumZ      = 74.0   * cm;
+	//double pSeptumPlaceZ = 70.414 * cm;
+	double pSeptumPlaceZ = 69.99937 * cm;
+	new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPlaceZ - 0.5 * pSeptumZ + 2 * vb_thickness + fPivotZOffset),
+		LPlaneLogical2,"virtualBoundaryPhys_sen",motherLogical,0,0);//sen
+	new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPlaceZ + fPivotZOffset),
+		LPlaneLogical2,"virtualBoundaryPhys_sm",motherLogical,0,0);//sm
+	new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPlaceZ + 0.5 * pSeptumZ + fPivotZOffset),
+	    	LPlaneLogical2,"virtualBoundaryPhys_sex",motherLogical,0,0);//sex
+	new G4PVPlacement(0,G4ThreeVector(0,0,36. * cm + fPivotZOffset),
+	    	LPlaneLogical2,"virtualBoundaryPhys_coil",motherLogical,0,0);//coil
+	new G4PVPlacement(0,G4ThreeVector(0,0,-50. * cm + fPivotZOffset),
+	    	LPlaneLogical2,"virtualBoundaryPhys_mid",motherLogical,0,0);//mid
+
+	
+	////////////////////////////
+	// HRS virtual boundaries //
+	////////////////////////////
+	
+	// LHRS (RHRS) virutal boundaries will be placed in a logical LHRS container (RHRS container) which will be placed in the world volume
+	// Note that the HRS containers are created along -y axis, rotated to along the z axis, then rotated +/- HRS angle
+	// Therefore the placement of virtual boundaries in the HRS containers will not be with respect to the hall axes 
+
+
+	////////////////////
+	// HRS containers //
+	////////////////////
+
+	double pHRSContainerRin=1.46*m,pHRSContainerRout=25*m;//NickieMode it just has to be big enough to fit my VB at FP
+	const int kNPlane_HRSContainer=7;
+	double rInner_HRSContainer[] = {	pHRSContainerRin,
+						pHRSContainerRin,
+						2.5*m,
+						3.7*m,
+						9.0*m,
+						pHRSContainerRout-3.0*m,
+						pHRSContainerRout};
+	
+	double rOuter_HRSContainer[] = {	pHRSContainerRout,
+						pHRSContainerRout,
+						pHRSContainerRout,
+						pHRSContainerRout,
+						pHRSContainerRout,
+						pHRSContainerRout,
+						pHRSContainerRout};
+	
+	double zPlane_HRSContainer[] = {	-2.0*m,
+						1.0*m,
+						1.0*m,
+						2.0*m,
+						2.0*m,
+						11.0*m,
+						11.0*m};
+	
+	
+	G4Polycone* HRSContainerSolid = new G4Polycone("HRSContainer",258.0*deg,24.0*deg,
+		kNPlane_HRSContainer,zPlane_HRSContainer,rInner_HRSContainer,rOuter_HRSContainer);
+
+	G4LogicalVolume* LHRSContainerLogical = new G4LogicalVolume(HRSContainerSolid,
+		0,"LHRSContainerLogical",0,0);
+	G4LogicalVolume* RHRSContainerLogical = new G4LogicalVolume(HRSContainerSolid,
+		0,"RHRSContainerLogical",0,0);
+
+	
+	G4VisAttributes *HallVisAtt = new G4VisAttributes(G4Colour(0.,1.,0.));
+	HallVisAtt->SetVisibility(false);
+
+	LHRSContainerLogical->SetVisAttributes(HallVisAtt); 
+	RHRSContainerLogical->SetVisAttributes(HallVisAtt);
+	
+	G4RotationMatrix *pRotLHRSContainer=new G4RotationMatrix();
+	pRotLHRSContainer->rotateX(-270*deg);
+	pRotLHRSContainer->rotateZ(-fHRSAngle);  
+
+	G4RotationMatrix *pRotRHRSContainer=new G4RotationMatrix();
+	pRotRHRSContainer->rotateX(-270*deg);
+	pRotRHRSContainer->rotateZ(fHRSAngle);  
+
+	new G4PVPlacement(pRotLHRSContainer,G4ThreeVector(0.,0.,0.+fPivotZOffset),
+		LHRSContainerLogical,"LHRSContainerPhys",motherLogical,0,0,0);
+	new G4PVPlacement(pRotRHRSContainer,G4ThreeVector(0,0,0.+fPivotZOffset),
+		RHRSContainerLogical,"RHRSContainerPhys",motherLogical,0,0,0);
+
+	
+	G4RotationMatrix* LHRSRot = new G4RotationMatrix();
+	LHRSRot->rotateY(fHRSAngle); 
+	G4RotationMatrix* RHRSRot = new G4RotationMatrix();
+	RHRSRot->rotateY(-fHRSAngle); 
+	G4RotationMatrix *pRotX90deg=new G4RotationMatrix();
+	pRotX90deg->rotateX(-90*deg); 
+	G4RotationMatrix *pRotX45deg=new G4RotationMatrix();
+	pRotX45deg->rotateX(-45*deg); 
+	G4RotationMatrix *pRotX30deg=new G4RotationMatrix();
+	pRotX30deg->rotateX(60*deg); 
+	G4RotationMatrix *pRotX105deg=new G4RotationMatrix();
+	pRotX105deg->rotateX(165*deg); 
+	G4RotationMatrix *pRotXLHRSdeg=new G4RotationMatrix();
+	pRotXLHRSdeg->rotateY(fHRSAngle); 
+	G4RotationMatrix *pRotXRHRSdeg=new G4RotationMatrix();
+	pRotXRHRSdeg->rotateY(-fHRSAngle); 
+
+
+	//BELOW ARE SNAKE VALUES, NOT NIM VALUES
+	double pTarget = fTargetZ;
+	double pQ1en   = pTarget + 160.0  * cm;
+	double pQ1ex   = pQ1en   +  94.13 * cm;
+	double pQ2en   = pQ1ex   + 115.58 * cm;
+	double pQ2ex   = pQ2en   + 182.66 * cm;
+	//ABOVE ARE SNAKE VALUES, NOT NIM VALUES
+
+
+	///////////////////////////
+	// Q1 virtual boundaries //
+	///////////////////////////
+	double pQ1Length = pQ1ex - pQ1en;	
+        double pHallCenter2LQ1Face = pQ1en;
+        double pLQ1Pos_Z_en=(pHallCenter2LQ1Face);//NIM
+        double pLQ1Pos_Z_ex=(pHallCenter2LQ1Face + pQ1Length);//NIM
+	//LHRS
+	new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pLQ1Pos_Z_en,0),
+		LPlaneLogical1,"virtualBoundaryPhys_q1en_LHRS",LHRSContainerLogical,0,0,0);//q1en	
+	new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pLQ1Pos_Z_ex,0),
+		LPlaneLogical1,"virtualBoundaryPhys_q1ex_LHRS",LHRSContainerLogical,0,0,0);//q1ex
+	//RHRS
+	new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pLQ1Pos_Z_en,0),
+		LPlaneLogical1,"virtualBoundaryPhys_q1en_RHRS",RHRSContainerLogical,0,0,0);//q1en	
+	new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pLQ1Pos_Z_ex,0),
+		LPlaneLogical1,"virtualBoundaryPhys_q1ex_RHRS",RHRSContainerLogical,0,0,0);//q1ex
+	 
+
+
+	///////////////////////////
+	// Q2 virtual boundaries //
+	///////////////////////////
+        double pHallCenter2LQ2Face = pQ2en;
+        double  pHallCenter2RQ2Face = pQ2en;
+        double pQ2Length = pQ2ex - pQ2en;
+        double pLQ2Pos_Z_en=(pHallCenter2LQ2Face);//NIM
+        double pLQ2Pos_Z_ex=(pHallCenter2LQ2Face + pQ2Length);//NIM
+        double pRQ2Pos_Z_en=(pHallCenter2RQ2Face);//NIM
+        double pRQ2Pos_Z_ex=(pHallCenter2RQ2Face + pQ2Length);//NIM
+	new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pLQ2Pos_Z_en,0),		    
+		LPlaneLogical2,"virtualBoundaryPhys_q2en_LHRS",LHRSContainerLogical,0,0,0);//q2en
+	new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pLQ2Pos_Z_ex,0),
+		LPlaneLogical2,"virtualBoundaryPhys_q2ex_LHRS",LHRSContainerLogical,0,0,0);//q2ex
+	new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pRQ2Pos_Z_en,0),
+		RPlaneLogical2,"virtualBoundaryPhys_q2en_RHRS",RHRSContainerLogical,0,0,0);//q2en
+	new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-pRQ2Pos_Z_ex,0),
+		RPlaneLogical2,"virtualBoundaryPhys_q2ex_RHRS",RHRSContainerLogical,0,0,0);//q2ex
+	 
+
+
+	//////////////////////////
+	// D virtual boundaries //
+	//////////////////////////
+	double pLDPos_Z_en = pLQ2Pos_Z_ex + 4.42 * m;
+	double pRDPos_Z_en = pRQ2Pos_Z_ex + 4.42 * m;
+	double pLDPos_X_ex = 2.4603032 * m;
+	double pRDPos_X_ex = 2.4603032 * m;
+	double pLDPos_Z_ex = -15.9006973 * m;        
+	double pRDPos_Z_ex = -15.9006973 * m;
+	new G4PVPlacement(pRotX30deg,G4ThreeVector(0,-pLDPos_Z_en,0),
+		LPlaneLogical2,"virtualBoundaryPhys_den_LHRS",LHRSContainerLogical,0,0,0);//den
+	new G4PVPlacement(pRotX105deg,G4ThreeVector(0, pLDPos_Z_ex,pLDPos_X_ex),
+		LPlaneLogical2,"virtualBoundaryPhys_dex_LHRS",LHRSContainerLogical,0,0,0);//dex
+	new G4PVPlacement(pRotX30deg,G4ThreeVector(0,-pRDPos_Z_en,0),
+		RPlaneLogical2,"virtualBoundaryPhys_den_RHRS",RHRSContainerLogical,0,0,0);//den
+	new G4PVPlacement(pRotX105deg,G4ThreeVector(0, pRDPos_Z_ex,pRDPos_X_ex),
+		RPlaneLogical2,"virtualBoundaryPhys_dex_RHRS",RHRSContainerLogical,0,0,0);//dex
+	  
+  
+
+
+
+
+	return;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
