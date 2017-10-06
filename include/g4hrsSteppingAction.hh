@@ -5,6 +5,8 @@
 #include "G4UserSteppingAction.hh"
 #include "globals.hh"
 
+class hamcPREXTrans;
+
 class g4hrsSteppingAction : public G4UserSteppingAction
 {
   public:
@@ -19,10 +21,38 @@ class g4hrsSteppingAction : public G4UserSteppingAction
     G4bool drawFlag;
 	G4double rad;
     G4bool fEnableKryptonite;
+	hamcPREXTrans* fTransportFunction;
 
   public:
     inline void SetDrawFlag(G4bool val)
     { drawFlag = val; };
+
+	int* np;
+
+	G4double fSeptumAngle;
+	G4double fHRSAngle;
+	G4double fHRSMom;
+		
+	float r0[5];
+	G4double x_tf[10];
+	G4double y_tf[10];
+	G4double z_tf[10];
+	G4double th_tf[10];
+	G4double ph_tf[10];
+
+	G4double fX0;
+	G4double fY0;
+	G4double fZ0;
+	G4double fP0;
+	G4double fTh0;
+	G4double fPh0;
+	
+	G4double fX0_tr;
+	G4double fY0_tr;
+	G4double fZ0_tr;
+	G4double gP0_tr;
+	G4double fTh0_tr;
+	G4double fPh0_tr;
 
 	G4double fX_sen;
 	G4double fY_sen;
@@ -31,12 +61,41 @@ class g4hrsSteppingAction : public G4UserSteppingAction
 	G4double fTheta_sen;
 	G4double fPhi_sen;
 
+	G4double fX_sen_tr;
+	G4double fY_sen_tr;
+	G4double fZ_sen_tr;
+	G4double fP_sen_tr;
+	G4double fTheta_sen_tr;
+	G4double fPhi_sen_tr;
+
+	G4double fX_sen_tf;
+	G4double fY_sen_tf;
+	G4double fZ_sen_tf;
+	G4double fP_sen_tf;
+	G4double fTheta_sen_tf;
+	G4double fPhi_sen_tf;
+
 	G4double fX_sm;
 	G4double fY_sm;
 	G4double fZ_sm;
 	G4double fP_sm;
 	G4double fTheta_sm;
 	G4double fPhi_sm;
+
+	G4double fX_sm_tr;
+	G4double fY_sm_tr;
+	G4double fZ_sm_tr;
+	G4double fP_sm_tr;
+	G4double fTheta_sm_tr;
+	G4double fPhi_sm_tr;
+
+	G4double fX_sm_tf;
+	G4double fY_sm_tf;
+	G4double fZ_sm_tf;
+	G4double fP_sm_tf;
+	G4double fTheta_sm_tf;
+	G4double fPhi_sm_tf;
+
 
 	G4double fX_sex;
 	G4double fY_sex;
@@ -45,6 +104,21 @@ class g4hrsSteppingAction : public G4UserSteppingAction
 	G4double fTheta_sex;
 	G4double fPhi_sex;
 	
+	G4double fX_sex_tr;
+	G4double fY_sex_tr;
+	G4double fZ_sex_tr;
+	G4double fP_sex_tr;
+	G4double fTheta_sex_tr;
+	G4double fPhi_sex_tr;
+
+	G4double fX_sex_tf;
+	G4double fY_sex_tf;
+	G4double fZ_sex_tf;
+	G4double fP_sex_tf;
+	G4double fTheta_sex_tf;
+	G4double fPhi_sex_tf;
+
+
 	G4double fX_coil;
 	G4double fY_coil;
 	G4double fZ_coil;

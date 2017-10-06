@@ -157,12 +157,40 @@ class g4hrsIO {
 	G4double fTheta_sen;
 	G4double fPhi_sen;
 
+	G4double fX_sen_tr;
+	G4double fY_sen_tr;
+	G4double fZ_sen_tr;
+	G4double fP_sen_tr;
+	G4double fTheta_sen_tr;
+	G4double fPhi_sen_tr;
+
+	G4double fX_sen_tf;
+	G4double fY_sen_tf;
+	G4double fZ_sen_tf;
+	G4double fP_sen_tf;
+	G4double fTheta_sen_tf;
+	G4double fPhi_sen_tf;
+
 	G4double fX_sm;
 	G4double fY_sm;
 	G4double fZ_sm;
 	G4double fP_sm;
 	G4double fTheta_sm;
 	G4double fPhi_sm;
+
+	G4double fX_sm_tr;
+	G4double fY_sm_tr;
+	G4double fZ_sm_tr;
+	G4double fP_sm_tr;
+	G4double fTheta_sm_tr;
+	G4double fPhi_sm_tr;
+
+	G4double fX_sm_tf;
+	G4double fY_sm_tf;
+	G4double fZ_sm_tf;
+	G4double fP_sm_tf;
+	G4double fTheta_sm_tf;
+	G4double fPhi_sm_tf;
 
 	G4double fX_sex;
 	G4double fY_sex;
@@ -171,6 +199,20 @@ class g4hrsIO {
 	G4double fTheta_sex;
 	G4double fPhi_sex;
 	
+	G4double fX_sex_tr;
+	G4double fY_sex_tr;
+	G4double fZ_sex_tr;
+	G4double fP_sex_tr;
+	G4double fTheta_sex_tr;
+	G4double fPhi_sex_tr;
+
+	G4double fX_sex_tf;
+	G4double fY_sex_tf;
+	G4double fZ_sex_tf;
+	G4double fP_sex_tf;
+	G4double fTheta_sex_tf;
+	G4double fPhi_sex_tf;
+
 	G4double fX_coil;
 	G4double fY_coil;
 	G4double fZ_coil;

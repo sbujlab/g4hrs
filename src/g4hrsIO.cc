@@ -138,6 +138,20 @@ void g4hrsIO::InitializeTree(){
 	fTree->Branch("th_sen", &fTheta_sen,	"th_sen/D");
 	fTree->Branch("ph_sen", &fPhi_sen,	"ph_sen/D");
 
+	fTree->Branch("x_sen_tr", 	&fX_sen_tr,	"x_sen_tr/D");
+	fTree->Branch("y_sen_tr", 	&fY_sen_tr,	"y_sen_tr/D");
+	fTree->Branch("z_sen_tr", 	&fZ_sen_tr,	"z_sen_tr/D");
+	fTree->Branch("p_sen_tr", 	&fP_sen_tr,	"p_sen_tr/D");
+	fTree->Branch("th_sen_tr", &fTheta_sen_tr,	"th_sen_tr/D");
+	fTree->Branch("ph_sen_tr", &fPhi_sen_tr,	"ph_sen_tr/D");
+
+	fTree->Branch("x_sen_tf", 	&fX_sen_tf,	"x_sen_tf/D");
+	fTree->Branch("y_sen_tf", 	&fY_sen_tf,	"y_sen_tf/D");
+	fTree->Branch("z_sen_tf", 	&fZ_sen_tf,	"z_sen_tf/D");
+	fTree->Branch("p_sen_tf", 	&fP_sen_tf,	"p_sen_tf/D");
+	fTree->Branch("th_sen_tf", &fTheta_sen_tf,	"th_sen_tf/D");
+	fTree->Branch("ph_sen_tf", &fPhi_sen_tf,	"ph_sen_tf/D");
+
 	fTree->Branch("x_sm", 	&fX_sm,	"x_sm/D");
 	fTree->Branch("y_sm", 	&fY_sm,	"y_sm/D");
 	fTree->Branch("z_sm", 	&fZ_sm,	"z_sm/D");
@@ -145,12 +159,40 @@ void g4hrsIO::InitializeTree(){
 	fTree->Branch("th_sm", &fTheta_sm,	"th_sm/D");
 	fTree->Branch("ph_sm", &fPhi_sm,	"ph_sm/D");
 
+	fTree->Branch("x_sm_tr", 	&fX_sm_tr,	"x_sm_tr/D");
+	fTree->Branch("y_sm_tr", 	&fY_sm_tr,	"y_sm_tr/D");
+	fTree->Branch("z_sm_tr", 	&fZ_sm_tr,	"z_sm_tr/D");
+	fTree->Branch("p_sm_tr", 	&fP_sm_tr,	"p_sm_tr/D");
+	fTree->Branch("th_sm_tr", &fTheta_sm_tr,	"th_sm_tr/D");
+	fTree->Branch("ph_sm_tr", &fPhi_sm_tr,	"ph_sm_tr/D");
+
+	fTree->Branch("x_sm_tf", 	&fX_sm_tf,	"x_sm_tf/D");
+	fTree->Branch("y_sm_tf", 	&fY_sm_tf,	"y_sm_tf/D");
+	fTree->Branch("z_sm_tf", 	&fZ_sm_tf,	"z_sm_tf/D");
+	fTree->Branch("p_sm_tf", 	&fP_sm_tf,	"p_sm_tf/D");
+	fTree->Branch("th_sm_tf", &fTheta_sm_tf,	"th_sm_tf/D");
+	fTree->Branch("ph_sm_tf", &fPhi_sm_tf,	"ph_sm_tf/D");
+
 	fTree->Branch("x_sex", 	&fX_sex,	"x_sex/D");
 	fTree->Branch("y_sex", 	&fY_sex,	"y_sex/D");
 	fTree->Branch("z_sex", 	&fZ_sex,	"z_sex/D");
 	fTree->Branch("p_sex", 	&fP_sex,	"p_sex/D");
 	fTree->Branch("th_sex", &fTheta_sex,	"th_sex/D");
 	fTree->Branch("ph_sex", &fPhi_sex,	"ph_sex/D");
+
+	fTree->Branch("x_sex_tr", 	&fX_sex_tr,	"x_sex_tr/D");
+	fTree->Branch("y_sex_tr", 	&fY_sex_tr,	"y_sex_tr/D");
+	fTree->Branch("z_sex_tr", 	&fZ_sex_tr,	"z_sex_tr/D");
+	fTree->Branch("p_sex_tr", 	&fP_sex_tr,	"p_sex_tr/D");
+	fTree->Branch("th_sex_tr", &fTheta_sex_tr,	"th_sex_tr/D");
+	fTree->Branch("ph_sex_tr", &fPhi_sex_tr,	"ph_sex_tr/D");
+
+	fTree->Branch("x_sex_tf", 	&fX_sex_tf,	"x_sex_tf/D");
+	fTree->Branch("y_sex_tf", 	&fY_sex_tf,	"y_sex_tf/D");
+	fTree->Branch("z_sex_tf", 	&fZ_sex_tf,	"z_sex_tf/D");
+	fTree->Branch("p_sex_tf", 	&fP_sex_tf,	"p_sex_tf/D");
+	fTree->Branch("th_sex_tf", &fTheta_sex_tf,	"th_sex_tf/D");
+	fTree->Branch("ph_sex_tf", &fPhi_sex_tf,	"ph_sex_tf/D");
 
 	fTree->Branch("x_coil", 	&fX_coil,	"x_coil/D");
 	fTree->Branch("y_coil", 	&fY_coil,	"y_coil/D");
@@ -473,6 +515,20 @@ void g4hrsIO::ClearVirtualBoundaryData() {
 	fSteppingAction->fTheta_sen = -150.;
 	fSteppingAction->fPhi_sen = -150.;
 	
+	fSteppingAction->fX_sen_tr = -150.;
+	fSteppingAction->fY_sen_tr = -150.;
+	fSteppingAction->fZ_sen_tr = -150.;
+	fSteppingAction->fP_sen_tr = -150.;
+	fSteppingAction->fTheta_sen_tr = -150.;
+	fSteppingAction->fPhi_sen_tr = -150.;
+
+	fSteppingAction->fX_sen_tf = -150.;
+	fSteppingAction->fY_sen_tf = -150.;
+	fSteppingAction->fZ_sen_tf = -150.;
+	fSteppingAction->fP_sen_tf = -150.;
+	fSteppingAction->fTheta_sen_tf = -150.;
+	fSteppingAction->fPhi_sen_tf = -150.;
+
 	fSteppingAction->fX_sm = -150.;
 	fSteppingAction->fY_sm = -150.;
 	fSteppingAction->fZ_sm = -150.;
@@ -480,13 +536,41 @@ void g4hrsIO::ClearVirtualBoundaryData() {
 	fSteppingAction->fTheta_sm = -150.;
 	fSteppingAction->fPhi_sm = -150.;
 
+	fSteppingAction->fX_sm_tr = -150.;
+	fSteppingAction->fY_sm_tr = -150.;
+	fSteppingAction->fZ_sm_tr = -150.;
+	fSteppingAction->fP_sm_tr = -150.;
+	fSteppingAction->fTheta_sm_tr = -150.;
+	fSteppingAction->fPhi_sm_tr = -150.;
+
+	fSteppingAction->fX_sm_tf = -150.;
+	fSteppingAction->fY_sm_tf = -150.;
+	fSteppingAction->fZ_sm_tf = -150.;
+	fSteppingAction->fP_sm_tf = -150.;
+	fSteppingAction->fTheta_sm_tf = -150.;
+	fSteppingAction->fPhi_sm_tf = -150.;
+
 	fSteppingAction->fX_sex = -150.;
 	fSteppingAction->fY_sex = -150.;
 	fSteppingAction->fZ_sex = -150.;
 	fSteppingAction->fP_sex = -150.;
 	fSteppingAction->fTheta_sex = -150.;
 	fSteppingAction->fPhi_sex = -150.;
-	
+
+	fSteppingAction->fX_sex_tr = -150.;
+	fSteppingAction->fY_sex_tr = -150.;
+	fSteppingAction->fZ_sex_tr = -150.;
+	fSteppingAction->fP_sex_tr = -150.;
+	fSteppingAction->fTheta_sex_tr = -150.;
+	fSteppingAction->fPhi_sex_tr = -150.;
+
+	fSteppingAction->fX_sex_tf = -150.;
+	fSteppingAction->fY_sex_tf = -150.;
+	fSteppingAction->fZ_sex_tf = -150.;
+	fSteppingAction->fP_sex_tf = -150.;
+	fSteppingAction->fTheta_sex_tf = -150.;
+	fSteppingAction->fPhi_sex_tf = -150.;
+
 	fSteppingAction->fX_q1en_L = -150.;
 	fSteppingAction->fY_q1en_L = -150.;
 	fSteppingAction->fZ_q1en_L = -150.;
@@ -555,6 +639,20 @@ void g4hrsIO::SetVirtualBoundaryData() {
 	fTheta_sen = fSteppingAction->fTheta_sen;
 	fPhi_sen = fSteppingAction->fPhi_sen;
 
+	fX_sen_tr = fSteppingAction->fX_sen_tr;
+	fY_sen_tr = fSteppingAction->fY_sen_tr;
+	fZ_sen_tr = fSteppingAction->fZ_sen_tr;
+	fP_sen_tr = fSteppingAction->fP_sen_tr;
+	fTheta_sen_tr = fSteppingAction->fTheta_sen_tr;
+	fPhi_sen_tr = fSteppingAction->fPhi_sen_tr;
+
+	fX_sen_tf = fSteppingAction->fX_sen_tf;
+	fY_sen_tf = fSteppingAction->fY_sen_tf;
+	fZ_sen_tf = fSteppingAction->fZ_sen_tf;
+	fP_sen_tf = fSteppingAction->fP_sen_tf;
+	fTheta_sen_tf = fSteppingAction->fTheta_sen_tf;
+	fPhi_sen_tf = fSteppingAction->fPhi_sen_tf;
+
 	fX_sm = fSteppingAction->fX_sm;
 	fY_sm = fSteppingAction->fY_sm;
 	fZ_sm = fSteppingAction->fZ_sm;
@@ -562,12 +660,40 @@ void g4hrsIO::SetVirtualBoundaryData() {
 	fTheta_sm = fSteppingAction->fTheta_sm;
 	fPhi_sm = fSteppingAction->fPhi_sm;
 
+	fX_sm_tr = fSteppingAction->fX_sm_tr;
+	fY_sm_tr = fSteppingAction->fY_sm_tr;
+	fZ_sm_tr = fSteppingAction->fZ_sm_tr;
+	fP_sm_tr = fSteppingAction->fP_sm_tr;
+	fTheta_sm_tr = fSteppingAction->fTheta_sm_tr;
+	fPhi_sm_tr = fSteppingAction->fPhi_sm_tr;
+
+	fX_sm_tf = fSteppingAction->fX_sm_tf;
+	fY_sm_tf = fSteppingAction->fY_sm_tf;
+	fZ_sm_tf = fSteppingAction->fZ_sm_tf;
+	fP_sm_tf = fSteppingAction->fP_sm_tf;
+	fTheta_sm_tf = fSteppingAction->fTheta_sm_tf;
+	fPhi_sm_tf = fSteppingAction->fPhi_sm_tf;
+
 	fX_sex = fSteppingAction->fX_sex;
 	fY_sex = fSteppingAction->fY_sex;
 	fZ_sex = fSteppingAction->fZ_sex;
 	fP_sex = fSteppingAction->fP_sex;
 	fTheta_sex = fSteppingAction->fTheta_sex;
 	fPhi_sex = fSteppingAction->fPhi_sex;
+
+	fX_sex_tr = fSteppingAction->fX_sex_tr;
+	fY_sex_tr = fSteppingAction->fY_sex_tr;
+	fZ_sex_tr = fSteppingAction->fZ_sex_tr;
+	fP_sex_tr = fSteppingAction->fP_sex_tr;
+	fTheta_sex_tr = fSteppingAction->fTheta_sex_tr;
+	fPhi_sex_tr = fSteppingAction->fPhi_sex_tr;
+
+	fX_sex_tf = fSteppingAction->fX_sex_tf;
+	fY_sex_tf = fSteppingAction->fY_sex_tf;
+	fZ_sex_tf = fSteppingAction->fZ_sex_tf;
+	fP_sex_tf = fSteppingAction->fP_sex_tf;
+	fTheta_sex_tf = fSteppingAction->fTheta_sex_tf;
+	fPhi_sex_tf = fSteppingAction->fPhi_sex_tf;
 
 	fX_q1en_L = fSteppingAction->fX_q1en_L;
 	fY_q1en_L = fSteppingAction->fY_q1en_L;
