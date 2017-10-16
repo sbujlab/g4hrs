@@ -542,7 +542,8 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	LPlaneLogical2->SetVisAttributes(virtualBoundaryVisAtt);
 	RPlaneLogical1->SetVisAttributes(virtualBoundaryVisAtt);	
 	RPlaneLogical2->SetVisAttributes(virtualBoundaryVisAtt);
-
+	LFPLogical->SetVisAttributes(virtualBoundaryVisAtt);
+	RFPLogical->SetVisAttributes(virtualBoundaryVisAtt);
 
 
 	///////////////////////////////
@@ -669,6 +670,13 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	double q3l = 1.8268*m;
 	double q3ex_z = q3en_z + (q3l / sqrt(2.));
 	double q3ex_x = q3en_x + (q3l / sqrt(2.)); 
+	double vdc_drift = 3.4538*m;
+	double vdc_z = q3ex_z + (vdc_drift / sqrt(2.));
+	double vdc_x = q3ex_x + (vdc_drift / sqrt(2.));
+	double fp_drift = 1.43*m;
+	double fp_z = vdc_z + (fp_drift / sqrt(2.));
+	double fp_x = vdc_x + (fp_drift / sqrt(2.));
+
 
 	///////////////////////////
 	// Q1 virtual boundaries //
@@ -725,9 +733,32 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 		RPlaneLogical2,"virtualBoundaryPhys_q3en_RHRS",RHRSContainerLogical,0,0,0);//q3en
 	new G4PVPlacement(pRotX45deg,G4ThreeVector(0,-q3ex_z,q3ex_x),
 		RPlaneLogical2,"virtualBoundaryPhys_q3ex_RHRS",RHRSContainerLogical,0,0,0);//q3ex
+
+	////////////////////////////
+	// VDC virtual boundaries //	
+	////////////////////////////
+	//LHRS
+	new G4PVPlacement(0,G4ThreeVector(0,-vdc_z,vdc_x),
+		LFPLogical,"virtualBoundaryPhys_vdc_LHRS",LHRSContainerLogical,0,0,0);//vdc	
+	//RHRS
+	new G4PVPlacement(0,G4ThreeVector(0,-vdc_z,vdc_x),
+		RFPLogical,"virtualBoundaryPhys_vdc_RHRS",RHRSContainerLogical,0,0,0);//vdc	
+
+	///////////////////////////
+	// FP virtual boundaries //	
+	///////////////////////////
+	//LHRS
+	new G4PVPlacement(0,G4ThreeVector(0,-fp_z,fp_x),
+		LFPLogical,"virtualBoundaryPhys_fp_LHRS",LHRSContainerLogical,0,0,0);//vdc
+	//RHRS	
+	new G4PVPlacement(0,G4ThreeVector(0,-fp_z,fp_x),
+		RFPLogical,"virtualBoundaryPhys_fp_RHRS",RHRSContainerLogical,0,0,0);//vdc
+
 	
 	return;
+
 }
+
 
 
 
