@@ -103,8 +103,8 @@ void BField_Dipole::GetFieldValue( const G4double y[],
       B[0] = 0.0;
       B[1] = 0.0;
       B[2] = 0.0;
-      G4cerr << "Warning:  Dipole sampling field far outside defined volume" << G4endl;
-      G4cerr << y[0]/m << " " << y[1]/m << " " << y[2]/m  << G4endl;
+//      G4cerr << "Warning:  Dipole sampling field far outside defined volume" << G4endl;
+//      G4cerr << y[0]/m << " " << y[1]/m << " " << y[2]/m  << G4endl;
       return;
     }
 

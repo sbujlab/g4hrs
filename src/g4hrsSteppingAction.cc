@@ -143,11 +143,11 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 
 		// Must explicitly define transform for septum, as these virtual boundaries are in hall coordinate system
 		G4RotationMatrix rotate_sen, rotate_sm, rotate_sex;
-		rotate_sen.rotateY(fSeptumAngle);
+		rotate_sen.rotateY(septum_angle);
 		rotate_sen.rotateZ(90.*deg);
-		rotate_sm.rotateY((fSeptumAngle+fHRSAngle)/2.);
+		rotate_sm.rotateY((septum_angle + hrs_angle)/2.);
 		rotate_sm.rotateZ(90.*deg);
-		rotate_sex.rotateY(fHRSAngle);
+		rotate_sex.rotateY(hrs_angle);
 		rotate_sex.rotateZ(90.*deg);
 			
 		// Axis transformation from HCS to TCS in each septum region
@@ -442,6 +442,7 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			fY_q3en_tr = position_tr.y();
 			fTh_q3en_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
 			fPh_q3en_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			// Transport function
 			if(goodParticle) {
 				fX_q3en_tf = x_tf[q3en];
 				fTh_q3en_tf = th_tf[q3en];
@@ -479,6 +480,7 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			fY_q3en_tr = position_tr.y();
 			fTh_q3en_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
 			fPh_q3en_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			// Transport function
 			if(goodParticle) {
 				fX_q3en_tf = x_tf[q3en];
 				fTh_q3en_tf = th_tf[q3en];

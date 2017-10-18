@@ -27,7 +27,7 @@ void g4hrsEventAction::BeginOfEventAction(const G4Event* ev){
 
 	fIO->ClearVirtualBoundaryData();
  
-	if(ev->GetEventID() % 1000 == 0) {
+	if(ev->GetEventID() % 100 == 0) {
 		G4cout << ev->GetEventID() << "\n";
 	}
  
@@ -41,10 +41,10 @@ void g4hrsEventAction::BeginOfEventAction(const G4Event* ev){
 //    G4cout << "Event " << ev->GetEventID();
     // Only print duration per event when meaningful (avoid division by zero)
     if (ev->GetEventID() > 0)
-      G4cout << " (" << std::setprecision(3) << std::fixed
-        << 1000.*fTimer.GetRealElapsed()/1000.0 << " ms/event)";
+//      G4cout << " (" << std::setprecision(3) << std::fixed
+  //      << 1000.*fTimer.GetRealElapsed()/1000.0 << " ms/event)";
     // Carriage return without newline
-    G4cout << "\r" << std::flush;
+//    G4cout << "\r" << std::flush;
     // Start timer again
     fTimer.Start();
   }

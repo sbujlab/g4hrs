@@ -644,16 +644,19 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	RHRSRot->rotateY(-fHRSAngle); 
 	G4RotationMatrix *pRotX90deg=new G4RotationMatrix();
 	pRotX90deg->rotateX(-90*deg); 
+	pRotX90deg->rotateZ(90*deg);
 	G4RotationMatrix *pRotX45deg=new G4RotationMatrix();
-	pRotX45deg->rotateX(-45*deg); 
+	pRotX45deg->rotateX(-45*deg);
+	pRotX45deg->rotateZ(90*deg); 
 	G4RotationMatrix *pRotX30deg=new G4RotationMatrix();
-	pRotX30deg->rotateX(60*deg); 
+	pRotX30deg->rotateX(60*deg);
+	pRotX30deg->rotateZ(90*deg); 
 	G4RotationMatrix *pRotX105deg=new G4RotationMatrix();
-	pRotX105deg->rotateX(165*deg); 
-	G4RotationMatrix *pRotXLHRSdeg=new G4RotationMatrix();
-	pRotXLHRSdeg->rotateY(fHRSAngle); 
-	G4RotationMatrix *pRotXRHRSdeg=new G4RotationMatrix();
-	pRotXRHRSdeg->rotateY(-fHRSAngle); 
+	pRotX105deg->rotateX(165*deg);
+	pRotX105deg->rotateZ(90*deg); 
+	G4RotationMatrix *pRotVDC = new G4RotationMatrix();
+	pRotVDC->rotateY(-180*deg);
+	pRotVDC->rotateZ(-90*deg);
 
 
 	// Positions from SNAKE
@@ -738,20 +741,20 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	// VDC virtual boundaries //	
 	////////////////////////////
 	//LHRS
-	new G4PVPlacement(0,G4ThreeVector(0,-vdc_z,vdc_x),
+	new G4PVPlacement(pRotVDC,G4ThreeVector(0,-vdc_z,vdc_x),
 		LFPLogical,"virtualBoundaryPhys_vdc_LHRS",LHRSContainerLogical,0,0,0);//vdc	
 	//RHRS
-	new G4PVPlacement(0,G4ThreeVector(0,-vdc_z,vdc_x),
+	new G4PVPlacement(pRotVDC,G4ThreeVector(0,-vdc_z,vdc_x),
 		RFPLogical,"virtualBoundaryPhys_vdc_RHRS",RHRSContainerLogical,0,0,0);//vdc	
 
 	///////////////////////////
 	// FP virtual boundaries //	
 	///////////////////////////
 	//LHRS
-	new G4PVPlacement(0,G4ThreeVector(0,-fp_z,fp_x),
+	new G4PVPlacement(pRotVDC,G4ThreeVector(0,-fp_z,fp_x),
 		LFPLogical,"virtualBoundaryPhys_fp_LHRS",LHRSContainerLogical,0,0,0);//vdc
 	//RHRS	
-	new G4PVPlacement(0,G4ThreeVector(0,-fp_z,fp_x),
+	new G4PVPlacement(pRotVDC,G4ThreeVector(0,-fp_z,fp_x),
 		RFPLogical,"virtualBoundaryPhys_fp_RHRS",RHRSContainerLogical,0,0,0);//vdc
 
 	
