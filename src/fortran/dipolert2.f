@@ -265,7 +265,7 @@ c  -1.50, 20.26, -200.0                                     -->
 c      print*,in,s2,s3,s4,s5,s6,s7,s8
 c
       call ndip(1)
-      write(8,*)' return from ndip',bx,by,bz
+C      write(8,*)' return from ndip',bx,by,bz
 c**** transform to c-axis system
 c***
       bxdum=bx

@@ -38,7 +38,7 @@
 
 #include "G4Polycone.hh"
 #include "G4Tubs.hh"
-
+#include "G4Cons.hh"
 
 //visual
 #include "G4VisAttributes.hh"
@@ -524,14 +524,17 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	// Solids for virtual boundaries //
 	///////////////////////////////////
 	G4double vb_thickness = 0.5 * mm;
-	G4VSolid* FPSolid = new G4Tubs("FPTub",0,75.*cm * 2,vb_thickness,0.0,360.0*deg);
-	G4VSolid* PlaneSolid1 = new G4Tubs("PlaneTub",0,35.*cm,vb_thickness,0.0,360.0*deg); //circles
-	G4VSolid* PlaneSolid2 = new G4Tubs("PlaneTub",0,75.*cm,vb_thickness,0.0,360.0*deg); //circles
+	G4VSolid* FPSolid = new G4Tubs("FPTub",0,75.*cm * 2,vb_thickness,0.0*deg,360.0*deg);
+	G4VSolid* PlaneSolid1 = new G4Tubs("PlaneTub",0,35.*cm,vb_thickness,0.0*deg,360.0*deg); //circles
+	G4VSolid* PlaneSolid2 = new G4Tubs("PlaneTub",0,75.*cm,vb_thickness,0.0*deg,360.0*deg); //circles
+	G4VSolid* LocalAxis = new G4Cons("LocalAxis",20.*cm, 30.*cm, 0.0*cm, 0.1*cm, 40.*cm, 5.0*deg, 350*deg);
+
 
 	G4LogicalVolume* LPlaneLogical1 = new G4LogicalVolume(PlaneSolid1,0,"LPlaneLogical1",0,0,0);
 	G4LogicalVolume* RPlaneLogical1 = new G4LogicalVolume(PlaneSolid1,0,"RPlaneLogical1",0,0,0);
 	G4LogicalVolume* LPlaneLogical2 = new G4LogicalVolume(PlaneSolid2,0,"LPlaneLogical1",0,0,0);
 	G4LogicalVolume* RPlaneLogical2 = new G4LogicalVolume(PlaneSolid2,0,"RPlaneLogical1",0,0,0);
+	G4LogicalVolume* LocalAxisLog = new G4LogicalVolume(LocalAxis, 0, "LocalAxisLog",0,0,0);
 
         G4LogicalVolume* LFPLogical = new G4LogicalVolume(FPSolid,0,"LFPLogical",0,0,0);
         G4LogicalVolume* RFPLogical = new G4LogicalVolume(FPSolid,0,"RFPLogical",0,0,0);
@@ -544,7 +547,7 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	RPlaneLogical2->SetVisAttributes(virtualBoundaryVisAtt);
 	LFPLogical->SetVisAttributes(virtualBoundaryVisAtt);
 	RFPLogical->SetVisAttributes(virtualBoundaryVisAtt);
-
+	LocalAxisLog->SetVisAttributes(virtualBoundaryVisAtt);
 
 	///////////////////////////////
 	// Septum virtual boundaries //
@@ -655,9 +658,12 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	pRotX105deg->rotateX(165*deg);
 	pRotX105deg->rotateZ(90*deg); 
 	G4RotationMatrix *pRotVDC = new G4RotationMatrix();
-	pRotVDC->rotateY(-180*deg);
-	pRotVDC->rotateZ(-90*deg);
+	pRotVDC->rotateZ(90*deg);
+	G4RotationMatrix *pRotFP = new G4RotationMatrix();
+	pRotFP->rotateX(-45*deg);
+	pRotFP->rotateZ(90*deg);
 
+//	new G4PVPlacement(pRotFP,G4ThreeVector(0,0,0),LocalAxisLog,"localaxis_lhrs",LHRSContainerLogical,0,0,0);
 
 	// Positions from SNAKE
 	double pivotOffset = 104.978*cm;
@@ -751,12 +757,11 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	// FP virtual boundaries //	
 	///////////////////////////
 	//LHRS
-	new G4PVPlacement(pRotVDC,G4ThreeVector(0,-fp_z,fp_x),
+	new G4PVPlacement(pRotFP,G4ThreeVector(0,-fp_z,fp_x),
 		LFPLogical,"virtualBoundaryPhys_fp_LHRS",LHRSContainerLogical,0,0,0);//vdc
 	//RHRS	
-	new G4PVPlacement(pRotVDC,G4ThreeVector(0,-fp_z,fp_x),
+	new G4PVPlacement(pRotFP,G4ThreeVector(0,-fp_z,fp_x),
 		RFPLogical,"virtualBoundaryPhys_fp_RHRS",RHRSContainerLogical,0,0,0);//vdc
-
 	
 	return;
 
