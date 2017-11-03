@@ -19,8 +19,8 @@ g4hrsEMField::g4hrsEMField(): mBField_Septum(0)
 	if(pSetupHRS)
 
 	fSeptumMomentum = 1.063;
-//	fSeptumMapFile = "/home/tyler/g4hrs/g4hrs/src/fields/PREX_septumFieldMap.dat";
 	fSeptumMapFile = "PREX_septumFieldMap.dat";
+//	fSeptumMapFile = "PREX_juliette_May2017ERR_1300Am2.dat";	
 
         // FIXME - this should not be hardcoded
 	if(fSeptumMomentum != 0 && fSeptumMapFile != "") {
