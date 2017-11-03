@@ -5075,6 +5075,7 @@ c
       dimension x(m)
       dimension xmin(10),xmax(10),scale(10),xmean(10)
       dimension coeff( 14)
+c      print *,"FORTRAN R0 ",x(  1),x(  2),x(  3),x(  4),x(  5)
       data ncoeff/ 13/
       data avdat/  0.1199169E+00/
       data xmin/
@@ -5136,6 +5137,7 @@ c
      3  +coeff( 12)        *x32        
      4  +coeff( 13)*x11*x21            
 c
+c      print *,"FORTRAN sen",x_sp_sen
       return
       end
       function t_sp_sen    (x,m)

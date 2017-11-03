@@ -31,7 +31,7 @@ class g4hrsSteppingAction : public G4UserSteppingAction
 
 	G4double fSeptumAngle;	// septum angle obtained from messenger (constant)
 	G4double fHRSAngle;	// HRS angle obtained from messenger (constant)
-	G4double fHRSMom;
+	G4double fHRSMomentum;
 	G4double septum_angle;	// local septum angle (changes sign depending on L/R HRS)
 	G4double hrs_angle;	// local hrs angle (changes sign depending on L/R HRS)
 	bool goodParticle;

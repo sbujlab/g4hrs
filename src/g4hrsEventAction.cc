@@ -28,7 +28,7 @@ void g4hrsEventAction::BeginOfEventAction(const G4Event* ev){
 	fIO->ClearVirtualBoundaryData();
  
 //	if(ev->GetEventID() % 100 == 0) {
-		G4cout << ev->GetEventID() << "\n";
+//		G4cout << ev->GetEventID() << "\n";
 //	}
  
   // Start timer at event 0

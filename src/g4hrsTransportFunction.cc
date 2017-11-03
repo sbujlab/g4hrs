@@ -1,6 +1,7 @@
 #include "g4hrsTransportFunction.hh"
 #include "prex_forward.hh"
 #include <cmath>
+#include "G4ios.hh"
 
 g4hrsTransportFunction::g4hrsTransportFunction() {
 }
@@ -12,12 +13,17 @@ bool g4hrsTransportFunction::CallTransportFunction(float* R0, double* x_tf, doub
 
 	int nelement = 5;
 	bool goodParticle = true;	
-
-	// [sen] = sen
+	
+//	G4cout << "GEANT4 R0" << G4endl;
+//	for(int i = 0; i<5; i++){G4cout << R0[i] << G4endl;}
+	
+	// [sen] = sen	
 	x_tf[sen] = x_sp_sen_(R0, &nelement)/1000.;
 	t_tf[sen] = atan(t_sp_sen_(R0, &nelement));
 	y_tf[sen] = y_sp_sen_(R0, &nelement)/1000.;
 	p_tf[sen] = atan(p_sp_sen_(R0, &nelement));
+	
+//	G4cout << "GEANT4 sen " << x_tf[sen] << "\n";
 	
 	// [sm] = sm
 	x_tf[sm] = x_sp_sm_(R0, &nelement)/1000.;

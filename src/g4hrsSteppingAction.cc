@@ -25,7 +25,7 @@ g4hrsSteppingAction::g4hrsSteppingAction()
 	//FIXME set in macro
 	fSeptumAngle = 5.*deg;
 	fHRSAngle = 12.5*deg;
-	fHRSMom = 1.063*GeV;
+	fHRSMomentum = 1.063*GeV;
 
 	nelements = 5;
 
@@ -113,17 +113,14 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			fX0_tr = position0_tr.x();
 			fY0_tr = position0_tr.y();
 			fZ0_tr = position0_tr.z();
-			double dx = sin(momentum0_tr.theta())*cos(momentum0_tr.phi());
-			double dy = sin(momentum0_tr.theta())*sin(momentum0_tr.phi());
-			double dz = cos(momentum0_tr.theta());
-			fTh0_tr = dx/dz;
-			fPh0_tr = dy/dz;
+			fTh0_tr = momentum0_tr.x()/momentum0_tr.z();
+			fPh0_tr = momentum0_tr.y()/momentum0_tr.z();
 
 			r0[0] = (float)fX0_tr;
-			r0[1] = (float)(tan(fTh0_tr));
+			r0[1] = (float)(fTh0_tr);
 			r0[2] = (float)(fY0_tr*sign);			
-			r0[3] = (float)(tan(fPh0_tr)*sign);
-			r0[4] = (float)(fP0/fHRSMom);	
+			r0[3] = (float)(fPh0_tr*sign);
+			r0[4] = (float)((fP0-fHRSMomentum)/fHRSMomentum);	
 
 			// Only need to call transport functions once for event
 			goodParticle = fTransportFunction->CallTransportFunction(r0, x_tf, th_tf, y_tf, ph_tf); 	
@@ -173,8 +170,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			fX_sen_tr = pos_tr.x(); 			
 			fY_sen_tr = pos_tr.y(); 			
 			fZ_sen_tr = pos_tr.z(); 			
-			fTh_sen_tr = (sin(mom_tr.theta())*cos(mom_tr.phi()))/cos(mom_tr.theta());	
-			fPh_sen_tr = (sin(mom_tr.theta())*sin(mom_tr.phi()))/cos(mom_tr.theta());	
+			fTh_sen_tr = mom_tr.x()/mom_tr.z();	
+			fPh_sen_tr = mom_tr.y()/mom_tr.z();	
 			// Transport function
 			if(goodParticle) {
 				fX_sen_tf = x_tf[sen];				
@@ -195,8 +192,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			fX_sm_tr = pos_tr.x(); 			
 			fY_sm_tr = pos_tr.y(); 			
 			fZ_sm_tr = pos_tr.z(); 			
-			fTh_sm_tr = (sin(mom_tr.theta())*cos(mom_tr.phi()))/cos(mom_tr.theta());	
-			fPh_sm_tr = (sin(mom_tr.theta())*sin(mom_tr.phi()))/cos(mom_tr.theta());	
+			fTh_sm_tr = mom_tr.x()/mom_tr.z();	
+			fPh_sm_tr = mom_tr.y()/mom_tr.z();	
 			// Transport function
 			if(goodParticle) {
 				fX_sm_tf = x_tf[sm];				
@@ -217,8 +214,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			fX_sex_tr = pos_tr.x(); 			
 			fY_sex_tr = pos_tr.y(); 			
 			fZ_sex_tr = pos_tr.z(); 			
-			fTh_sex_tr = (sin(mom_tr.theta())*cos(mom_tr.phi()))/cos(mom_tr.theta());	
-			fPh_sex_tr = (sin(mom_tr.theta())*sin(mom_tr.phi()))/cos(mom_tr.theta());	
+			fTh_sex_tr = mom_tr.x()/mom_tr.z();	
+			fPh_sex_tr = mom_tr.y()/mom_tr.z();	
 			// Transport function
 			if(goodParticle) {
 				fX_sex_tf = x_tf[sex];				
@@ -242,8 +239,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_q1en_tr = position_tr.x();
 			fY_q1en_tr = position_tr.y();
-			fTh_q1en_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_q1en_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_q1en_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_q1en_tr = momentum_tr.y()/momentum_tr.z();
 		} else if(volName.find("virtualBoundaryPhys_q1ex_LHRS") != G4String::npos) {
 			// HCS
 			fX_q1ex = x/1000.;
@@ -254,8 +251,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_q1ex_tr = position_tr.x();
 			fY_q1ex_tr = position_tr.y();
-			fTh_q1ex_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_q1ex_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_q1ex_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_q1ex_tr = momentum_tr.y()/momentum_tr.z();
 			// Transport function
 			if(goodParticle) {
 				fX_q1ex_tf = x_tf[q1ex];
@@ -273,8 +270,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_q1en_tr = position_tr.x();
 			fY_q1en_tr = position_tr.y();
-			fTh_q1en_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_q1en_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_q1en_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_q1en_tr = momentum_tr.y()/momentum_tr.z();
 		} else if(volName.find("virtualBoundaryPhys_q1ex_RHRS") != G4String::npos) {
 			// HCS
 			fX_q1ex = x/1000.;
@@ -285,8 +282,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_q1ex_tr = position_tr.x();
 			fY_q1ex_tr = position_tr.y();
-			fTh_q1ex_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_q1ex_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_q1ex_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_q1ex_tr = momentum_tr.y()/momentum_tr.z();
 			// Transport function
 			if(goodParticle) {
 				fX_q1ex_tf = x_tf[q1ex];
@@ -304,8 +301,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_q2en_tr = position_tr.x();
 			fY_q2en_tr = position_tr.y();
-			fTh_q2en_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_q2en_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_q2en_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_q2en_tr = momentum_tr.y()/momentum_tr.z();
 		} else if(volName.find("virtualBoundaryPhys_q2ex_LHRS") != G4String::npos) {
 			// HCS
 			fX_q2ex = x/1000.;
@@ -316,8 +313,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_q2ex_tr = position_tr.x();
 			fY_q2ex_tr = position_tr.y();
-			fTh_q2ex_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_q2ex_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_q2ex_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_q2ex_tr = momentum_tr.y()/momentum_tr.z();
 			// Transport function
 			if(goodParticle) {
 				fX_q2ex_tf = x_tf[q2ex];
@@ -335,8 +332,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_q2en_tr = position_tr.x();
 			fY_q2en_tr = position_tr.y();
-			fTh_q2en_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_q2en_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_q2en_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_q2en_tr = momentum_tr.y()/momentum_tr.z();
 		} else if(volName.find("virtualBoundaryPhys_q2ex_RHRS") != G4String::npos) {
 			// HCS
 			fX_q2ex = x/1000.;
@@ -347,8 +344,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_q2ex_tr = position_tr.x();
 			fY_q2ex_tr = position_tr.y();
-			fTh_q2ex_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_q2ex_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_q2ex_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_q2ex_tr = momentum_tr.y()/momentum_tr.z();
 			// Transport function
 			if(goodParticle) {
 				fX_q2ex_tf = x_tf[q2ex];
@@ -366,8 +363,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_den_tr = position_tr.x();
 			fY_den_tr = position_tr.y();
-			fTh_den_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_den_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_den_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_den_tr = momentum_tr.y()/momentum_tr.z();
 			if(goodParticle) {
 				fX_den_tf = x_tf[den];
 				fTh_den_tf = th_tf[den];
@@ -384,8 +381,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_dex_tr = position_tr.x();
 			fY_dex_tr = position_tr.y();
-			fTh_dex_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_dex_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_dex_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_dex_tr = momentum_tr.y()/momentum_tr.z();
 			// Transport function
 			if(goodParticle) {
 				fX_dex_tf = x_tf[dex];
@@ -403,8 +400,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_den_tr = position_tr.x();
 			fY_den_tr = position_tr.y();
-			fTh_den_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_den_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_den_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_den_tr = momentum_tr.y()/momentum_tr.z();
 			if(goodParticle) {
 				fX_den_tf = x_tf[den];
 				fTh_den_tf = th_tf[den];
@@ -421,8 +418,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_dex_tr = position_tr.x();
 			fY_dex_tr = position_tr.y();
-			fTh_dex_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_dex_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_dex_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_dex_tr = momentum_tr.y()/momentum_tr.z();
 			// Transport function
 			if(goodParticle) {
 				fX_dex_tf = x_tf[dex];
@@ -440,8 +437,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_q3en_tr = position_tr.x();
 			fY_q3en_tr = position_tr.y();
-			fTh_q3en_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_q3en_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_q3en_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_q3en_tr = momentum_tr.y()/momentum_tr.z();
 			// Transport function
 			if(goodParticle) {
 				fX_q3en_tf = x_tf[q3en];
@@ -459,8 +456,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_q3ex_tr = position_tr.x();
 			fY_q3ex_tr = position_tr.y();
-			fTh_q3ex_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_q3ex_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_q3ex_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_q3ex_tr = momentum_tr.y()/momentum_tr.z();
 			// Transport function
 			if(goodParticle) {
 				fX_q3ex_tf = x_tf[q3ex];
@@ -478,8 +475,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_q3en_tr = position_tr.x();
 			fY_q3en_tr = position_tr.y();
-			fTh_q3en_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_q3en_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_q3en_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_q3en_tr = momentum_tr.y()/momentum_tr.z();
 			// Transport function
 			if(goodParticle) {
 				fX_q3en_tf = x_tf[q3en];
@@ -497,8 +494,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_q3ex_tr = position_tr.x();
 			fY_q3ex_tr = position_tr.y();
-			fTh_q3ex_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_q3ex_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_q3ex_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_q3ex_tr = momentum_tr.y()/momentum_tr.z();
 			// Transport function
 			if(goodParticle) {
 				fX_q3ex_tf = x_tf[q3ex];
@@ -516,8 +513,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_vdc_tr = position_tr.x();
 			fY_vdc_tr = position_tr.y();
-			fTh_vdc_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_vdc_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_vdc_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_vdc_tr = momentum_tr.y()/momentum_tr.z();
  		} else if(volName.find("virtualBoundaryPhys_vdc_RHRS") != G4String::npos) {
 			// HCS
 			fX_vdc = x/1000.;
@@ -528,8 +525,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_vdc_tr = position_tr.x();
 			fY_vdc_tr = position_tr.y();
-			fTh_vdc_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_vdc_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_vdc_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_vdc_tr = momentum_tr.y()/momentum_tr.z();
  		} else if(volName.find("virtualBoundaryPhys_fp_LHRS") != G4String::npos) {
 			// HCS
 			fX_fp = x/1000.;
@@ -540,8 +537,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_fp_tr = position_tr.x();
 			fY_fp_tr = position_tr.y();
-			fTh_fp_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_fp_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_fp_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_fp_tr = momentum_tr.y()/momentum_tr.z();
 			// Transport function
 			if(goodParticle) {
 				fX_fp_tf = x_tf[fp];
@@ -559,8 +556,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			// TCS
 			fX_fp_tr = position_tr.x();
 			fY_fp_tr = position_tr.y();
-			fTh_fp_tr = (sin(momentum_tr.theta())*cos(momentum_tr.phi()))/cos(momentum_tr.theta());	
-			fPh_fp_tr = (sin(momentum_tr.theta())*sin(momentum_tr.phi()))/cos(momentum_tr.theta());
+			fTh_fp_tr = momentum_tr.x()/momentum_tr.z();	
+			fPh_fp_tr = momentum_tr.y()/momentum_tr.z();
 			// Transport function
 			if(goodParticle) {
 				fX_fp_tf = x_tf[fp];
