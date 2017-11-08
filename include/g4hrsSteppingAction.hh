@@ -29,11 +29,11 @@ class g4hrsSteppingAction : public G4UserSteppingAction
 
 	int nelements;
 
-	G4double fSeptumAngle;	// septum angle obtained from messenger (constant)
-	G4double fHRSAngle;	// HRS angle obtained from messenger (constant)
-	G4double fHRSMomentum;
-	G4double septum_angle;	// local septum angle (changes sign depending on L/R HRS)
-	G4double hrs_angle;	// local hrs angle (changes sign depending on L/R HRS)
+	G4double fSeptumAngle;		// septum angle obtained from messenger (constant)
+	G4double fHRSAngle;		// HRS angle obtained from messenger (constant)
+	G4double septum_angle;		// local septum angle (changes sign depending on L/R HRS)
+	G4double hrs_angle;		// local HRS angle (changes sign depending on L/R HRS)
+	G4double fHRSMomentum; 		// HRS central momentum
 	bool goodParticle;
 	double sign; 	// y/phi sign flip for using transport function on left arm
 

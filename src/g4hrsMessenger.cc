@@ -407,17 +407,20 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 		G4double angle = sepAngCmd->GetNewDoubleValue(newValue);
 		femfieldsetup->fSeptumAngle = angle;
 		fdetcon->fSeptumAngle = angle;
+		fStepAct->fSeptumAngle = angle;
 	}
 
 	if( cmd == hrsAngCmd ) {
 		G4double angle = hrsAngCmd->GetNewDoubleValue(newValue);
 		femfieldsetup->fHRSAngle = angle;
 		fdetcon->fHRSAngle = angle;
+		fStepAct->fHRSAngle = angle;
 	}
 
 	if( cmd == hrsMomCmd ) {
 		G4double p = hrsMomCmd->GetNewDoubleValue(newValue);
 		femfieldsetup->fHRSMomentum = p;
+		fStepAct->fHRSMomentum = p;
 	}
 	
 	if( cmd == hrsSetupCmd ) {
@@ -445,8 +448,6 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
     }
 
     if ( cmd == tgtMatCmd ){
-//	fBeamTarg->fTargetMaterial = newValue;
-//	fdetcon->fTargetMaterial = newValue;
   	fBeamTarg->SetTargetMaterial(newValue);
   }
 

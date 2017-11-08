@@ -22,11 +22,10 @@ g4hrsSteppingAction::g4hrsSteppingAction()
 	rad = 1.;
     fEnableKryptonite = true;
 	fTransportFunction = new g4hrsTransportFunction();
-	//FIXME set in macro
+	
 	fSeptumAngle = 5.*deg;
 	fHRSAngle = 12.5*deg;
 	fHRSMomentum = 1.063*GeV;
-
 	nelements = 5;
 
 }
@@ -90,7 +89,6 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 				septum_angle = -fSeptumAngle; 
 				hrs_angle = -fHRSAngle;
 				sign = -1.;
-				
 			}
 			if(momentum0.x() < 0.){
 				fRHRS = 1;
