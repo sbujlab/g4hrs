@@ -108,6 +108,22 @@ g4hrsMessenger::g4hrsMessenger(){
 	sepMapCmd->SetGuidance("Set septum map file");
 	sepMapCmd->SetParameterName("sepmap",false);
 
+	quad1Cmd = new G4UIcmdWithADouble("g4hrs/quad1",this);
+	quad1Cmd->SetGuidance("Set field constant for Q1");
+	quad1Cmd->SetParameterName("quad1",false);
+
+	quad2Cmd = new G4UIcmdWithADouble("g4hrs/quad2",this);
+	quad2Cmd->SetGuidance("Set field constant for Q2");
+	quad2Cmd->SetParameterName("quad2",false);
+
+	quad3Cmd = new G4UIcmdWithADouble("g4hrs/quad3",this);
+	quad3Cmd->SetGuidance("Set field constant for Q3");
+	quad3Cmd->SetParameterName("quad3",false);
+
+	dipoleCmd = new G4UIcmdWithADouble("g4hrs/dipole",this);
+	dipoleCmd->SetGuidance("Set field constant for dipole");
+	dipoleCmd->SetParameterName("dipole",false);
+
     tgtLenCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/targlen",this);
     tgtLenCmd->SetGuidance("Target length");
     tgtLenCmd->SetParameterName("targlen", false);
@@ -435,6 +451,26 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 
 	if( cmd == sepMapCmd ) {
 		femfield->fSeptumMapFile = newValue;
+	}
+	
+	if ( cmd == quad1Cmd ) {
+		G4double kappa = quad1Cmd->GetNewDoubleValue(newValue);
+		femfieldsetup->KAPPA1 = kappa;
+	}
+
+	if ( cmd == quad2Cmd ) {
+		G4double kappa = quad2Cmd->GetNewDoubleValue(newValue);
+		femfieldsetup->KAPPA2 = kappa;
+	}
+
+	if ( cmd == quad3Cmd ) {
+		G4double kappa = quad3Cmd->GetNewDoubleValue(newValue);
+		femfieldsetup->KAPPA3 = kappa;
+	}
+
+	if ( cmd == dipoleCmd ) {
+		G4double field = dipoleCmd->GetNewDoubleValue(newValue);
+		femfieldsetup->dipoleField = field;
 	}
 
     if( cmd == tgtLenCmd ){
