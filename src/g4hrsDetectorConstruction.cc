@@ -1919,3 +1919,11 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 }
 
 
+g4hrsEMField* g4hrsDetectorConstruction::GetEMFieldFromSetup(){
+	
+	return fEMFieldSetup->GetEMField();
+	
+}
+
+
+

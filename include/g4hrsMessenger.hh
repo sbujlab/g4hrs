@@ -37,7 +37,7 @@ class g4hrsMessenger : public G4UImessenger {
 	void SetEvAct( g4hrsEventAction *ev ){ fevact = ev; }
 	void SetStepAct( g4hrsSteppingAction *st ){ fStepAct = st; }
 	void SetPhysList( G4VModularPhysicsList *l ){ fPhysicsList = l; }
-	void SetEmFieldSetup( g4hrsEMFieldSetup *emset ) { femfieldsetup = emset;}
+	void SetEmFieldSetup( g4hrsEMFieldSetup *emset ) { femfieldsetup = emset; }
 	void SetEMField( g4hrsEMField *em ) { femfield = em; } 
 
 	void SetNewValue(G4UIcommand* cmd, G4String newValue);
@@ -72,10 +72,6 @@ class g4hrsMessenger : public G4UImessenger {
 	G4UIcmdWithAnInteger		*hrsSetupCmd;
 	G4UIcmdWithADoubleAndUnit	*sepMomCmd;
 	G4UIcmdWithAString		*sepMapCmd;
-	G4UIcmdWithADouble		*quad1Cmd;
-	G4UIcmdWithADouble		*quad2Cmd;
-	G4UIcmdWithADouble		*quad3Cmd;
-	G4UIcmdWithADouble		*dipoleCmd;
 
 	G4UIcmdWithADoubleAndUnit *tgtLenCmd;
 	G4UIcmdWithADoubleAndUnit *tgtPosCmd;

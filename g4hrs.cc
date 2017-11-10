@@ -16,8 +16,7 @@
 #include "g4hrsSteppingAction.hh"
 #include "g4hrsDetectorConstruction.hh"
 #include "g4hrsParallelWorld.hh"
-#include "g4hrsEMFieldSetup.hh"
-#include "g4hrsEMField.hh"
+
 #include "g4hrsIO.hh"
 #include "g4hrsMessenger.hh"
 
@@ -108,9 +107,8 @@ int main(int argc, char** argv){
 
     ((g4hrsDetectorConstruction *) detector)->SetIO(io);
 
-    //rmmess->SetEmFieldSetup(((g4hrsDetectorConstruction *) detector)->GetEMFieldSetup());
-    	rmmess->SetEmFieldSetup(g4hrsEMFieldSetup::Getg4hrsEMFieldSetup());
-	rmmess->SetEMField(g4hrsEMFieldSetup::Getg4hrsEMFieldSetup()->GetEMField());
+    rmmess->SetEmFieldSetup(((g4hrsDetectorConstruction *) detector)->GetEMFieldSetup());
+    rmmess->SetEMField(((g4hrsDetectorConstruction *) detector)->GetEMFieldFromSetup());
 
     // Parallel geometry for virtual boundaries
 

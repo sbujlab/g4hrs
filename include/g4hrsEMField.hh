@@ -14,6 +14,7 @@
 class g4hrsEMField : public G4MagneticField
 {
 public:
+
 	g4hrsEMField() ;                
 	~g4hrsEMField() ;  
 

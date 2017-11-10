@@ -11,8 +11,13 @@
 //////////////////////////////////////////////////////////////////////////
 //
 //  Constructors:
+
 g4hrsEMField::g4hrsEMField(): mBField_Septum(0)
 {
+
+	bool pSetupHRS= true;
+	if(pSetupHRS)
+
 	fSeptumMomentum = 1.063;
 	fSeptumMapFile = "PREX_septumFieldMap.dat";
 //	fSeptumMapFile = "PREX_juliette_May2017ERR_1300Am2.dat";	

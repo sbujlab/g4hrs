@@ -44,6 +44,8 @@ class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
 	double fHRSAngle;
 	double fSeptumAngle;
 	G4String fTargetMaterial;
+	g4hrsEMFieldSetup* GetEMFieldSetup() {return fEMFieldSetup;}
+	g4hrsEMField* GetEMFieldFromSetup();
 	int    fSetupHRS;
 
   private:

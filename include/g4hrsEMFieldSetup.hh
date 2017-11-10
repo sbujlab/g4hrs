@@ -25,6 +25,7 @@ class G4MagIntegratorStepper;
 class G4MagInt_Driver; 
 class G4UniformMagField;
 
+
 class g4hrsEMField;
 
 class g4hrsEMFieldSetup 
@@ -40,6 +41,7 @@ public:
 	g4hrsEMFieldSetup() ;         
 	~g4hrsEMFieldSetup() ;  
 
+	void SetStepper();
 	void UpdateField();
 
 	inline  void SetStepperType( G4int val) { fStepperType = val ; }
@@ -50,7 +52,7 @@ public:
 	
 	G4FieldManager* GetFieldManager(){return fFieldManager;}
 
-	g4hrsEMField* GetEMField(){return fEMfield;}
+	g4hrsEMField* GetEMField() {return fEMfield;}
 
 	//Local field  FZB1
 	void UpdateFieldFZBL1();
@@ -84,18 +86,13 @@ public:
 	void SetBField3VFZBR4(G4double fieldGradient);
 	G4FieldManager* GetFieldManagerFZBR4(){return fLocalFieldManagerFZBR4;}
 
-	G4int		fSnakeModel;
-	G4double	fHRSMomentum;
-	G4double	fHRSAngle;
-	G4double	fSeptumAngle;
-	G4double	KAPPA1;			
-	G4double	KAPPA2;
-	G4double	KAPPA3;
-	G4double	dipoleField;
-
+	G4int                       fSnakeModel;
+	G4double                    fHRSMomentum;
+	G4double                    fHRSAngle;
+	G4double                    fSeptumAngle;
 
 private:
-  g4hrsEMField*			fEMfield;
+  g4hrsEMField*                 fEMfield; 
   G4FieldManager*             fFieldManager;
   G4ChordFinder*              fChordFinder ;
   G4EqMagElectricField*       fEquation ;
