@@ -118,15 +118,14 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
 	/////////////////////////
 	
 	// Default settings
-	// 5 deg
+	// PREX, 5 deg
 	KAPPA1 = sos ? 0.260387 * tesla / 1.063 * fHRSMomentum/GeV: -0.8476  * tesla / snakemagnumber; //test3
 	KAPPA2 =  0.93528 * tesla / snakemagnumber;//so don't worry!
 	KAPPA3 =  1.15762 * tesla / snakemagnumber;
 
 	// Alternate settings
 /*
-	// 4 deg
-	G4cout << "IN 4 DEGREE MODE!" << G4endl;
+	// CREX, 4 deg
 	KAPPA1 = -0.7146 * tesla / snakemagnumber * l_sup / l_sos * a_sos / a_sup;
 	KAPPA1 *= 0.85;//this is acceptable as a first edit of Seamus
 	//KAPPA1 *= 0.8;//Dustin wants me to tighten the transverse part
