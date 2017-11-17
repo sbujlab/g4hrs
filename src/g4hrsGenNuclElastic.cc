@@ -114,22 +114,20 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
 
     double cthmin = cos(fTh_min);
     double cthmax = cos(fTh_max);
-
+//	G4cout << "cos(thmin), cos(thmax): " << cthmin << " , " << cthmax << G4endl;
     double icth_b = 1.0/(1.0-cthmax);
     double icth_a = 1.0/(1.0-cthmin);
 
     double sampv = 1.0/CLHEP::RandFlat::shoot(icth_b, icth_a);
-
+//	G4cout << "sampv: " << sampv << G4endl;
     assert( -1.0 < sampv && sampv < 1.0 );
 
     double th = acos(1.0-sampv);
-
     // Value to reweight cross section by to account for non-uniform
     // sampling
     double samp_fact = sampv*sampv*(icth_a-icth_b)/(cthmin-cthmax);
-
+  
     double ph = CLHEP::RandFlat::shoot(fPh_min, fPh_max);
-
     double ef    = proton_mass_c2*beamE/(proton_mass_c2 + beamE*(1.0-cos(th)));;
 
     double q2  = 2.0*beamE*ef*(1.0-cos(th));

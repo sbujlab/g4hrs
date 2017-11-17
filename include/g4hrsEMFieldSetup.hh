@@ -90,6 +90,10 @@ public:
 	G4double                    fHRSMomentum;
 	G4double                    fHRSAngle;
 	G4double                    fSeptumAngle;
+	G4double		KAPPA1;
+	G4double		KAPPA2;	    
+	G4double		KAPPA3;
+	G4double		dipoleField;
 
 private:
   g4hrsEMField*                 fEMfield; 

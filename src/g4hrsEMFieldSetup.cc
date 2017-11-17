@@ -97,9 +97,10 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
   }
   
   G4int    quads_on = 1;
-  G4double KAPPA1 =  0.;
-  G4double KAPPA2 =  0.;
-  G4double KAPPA3 =  0.;
+  KAPPA1 =  0.;
+  KAPPA2 =  0.;
+  KAPPA3 =  0.;
+  dipoleField = 0.;
   G4int sos = 1;
   if( fSnakeModel >= 52 ){
     sos = 1;
@@ -217,8 +218,8 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
     //KAPPA3 =  0.1794  * tesla / snakemagnumber / .300  / m; //STD tune
 
   }
-  //G4double dipoleField = -0.4192 * tesla; //using dipolert2 from SNAKE, thin vb, this one is reconciled with SNAKE
-  G4double dipoleField = -0.4205 * tesla; //matches nicely with DATA (not snake comparison) 
+  // dipoleField = -0.4192 * tesla; //using dipolert2 from SNAKE, thin vb, this one is reconciled with SNAKE
+  dipoleField = -0.4205 * tesla; //matches nicely with DATA (not snake comparison) 
   if( fSnakeModel == 53 || fSnakeModel == 55 ){
     //dipoleField *= 2.2 / 1.063;
     dipoleField *= fHRSMomentum /( 1.063 *GeV);

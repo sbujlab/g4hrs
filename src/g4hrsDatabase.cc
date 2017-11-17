@@ -113,20 +113,20 @@ double g4hrsDatabase::Interpolate(double thisE, double thisTh, int stretch, int 
 
 
 	for(int i=1; i<n_E; i++) {
+		e0 = energy[i-1];
+		e1 = energy[i];
+		i0 = i-1;
+		i1 = i;
 		if(energy[i-1] < thisE && energy[i] > thisE) {
-			e0 = energy[i-1];
-			e1 = energy[i];
-			i0 = i-1;
-			i1 = i;
 			break; 
 		}  
 	} 	
 	for(int j=1; j<n_Th; j++) {
+		th0 = angle[j-1];
+		th1 = angle[j];
+		j0 = j-1;
+		j1 = j;
 		if(angle[j-1] < thisTh && angle[j] > thisTh) {
-			th0 = angle[j-1];
-			th1 = angle[j];
-			j0 = j-1;
-			j1 = j;
 			break;
 		}
 	}	
