@@ -117,7 +117,7 @@ double g4hrsDatabase::Interpolate(double thisE, double thisTh, int stretch, int 
 		e1 = energy[i];
 		i0 = i-1;
 		i1 = i;
-		if(energy[i-1] < thisE && energy[i] > thisE) {
+		if(energy[i-1] < thisE && energy[i] >= thisE) {
 			break; 
 		}  
 	} 	
@@ -126,7 +126,7 @@ double g4hrsDatabase::Interpolate(double thisE, double thisTh, int stretch, int 
 		th1 = angle[j];
 		j0 = j-1;
 		j1 = j;
-		if(angle[j-1] < thisTh && angle[j] > thisTh) {
+		if(angle[j-1] < thisTh && angle[j] >= thisTh) {
 			break;
 		}
 	}	
