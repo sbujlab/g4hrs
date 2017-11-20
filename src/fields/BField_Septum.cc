@@ -102,7 +102,7 @@ bool BField_Septum::ReadMap(const char *filename)
 	//FIXME: Are these necessary?  Hard-coding for now to test, fix/delete later.
 	mUseUniformB = 0;
 	mUniformB[0] = 0.; mUniformB[1] = 0.; mUniformB[2] = 0.; 
-	mFieldUnit = 1.0;	
+	mFieldUnit = 10e-4;	// map is in Gauss, want Tesla	
 	mRotAxis[0] = 0.; mRotAxis[1] = 0.; mRotAxis[2] = 0.;
 	mRotAngle[0] = 0.; mRotAngle[1] = 0.; mRotAngle[2] = 0.;
 
