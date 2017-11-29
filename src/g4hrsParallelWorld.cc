@@ -529,7 +529,6 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	G4VSolid* PlaneSolid2 = new G4Tubs("PlaneTub",0,75.*cm,vb_thickness,0.0*deg,360.0*deg); //circles
 	G4VSolid* LocalAxis = new G4Cons("LocalAxis",20.*cm, 30.*cm, 0.0*cm, 0.1*cm, 40.*cm, 5.0*deg, 350*deg);
 
-
 	G4LogicalVolume* LPlaneLogical1 = new G4LogicalVolume(PlaneSolid1,0,"LPlaneLogical1",0,0,0);
 	G4LogicalVolume* RPlaneLogical1 = new G4LogicalVolume(PlaneSolid1,0,"RPlaneLogical1",0,0,0);
 	G4LogicalVolume* LPlaneLogical2 = new G4LogicalVolume(PlaneSolid2,0,"LPlaneLogical1",0,0,0);
@@ -663,7 +662,7 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	pRotFP->rotateX(-45*deg);
 	pRotFP->rotateZ(90*deg);
 
-//	new G4PVPlacement(pRotFP,G4ThreeVector(0,0,0),LocalAxisLog,"localaxis_lhrs",LHRSContainerLogical,0,0,0);
+//	new G4PVPlacement(0,G4ThreeVector(0,0,0),LocalAxisLog,"localaxis_lhrs",motherLogical,0,0,0);
 
 	// Positions from SNAKE
 	double pivotOffset = 104.978*cm;
@@ -685,7 +684,6 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	double fp_drift = 1.43*m;
 	double fp_z = vdc_z + (fp_drift / sqrt(2.));
 	double fp_x = vdc_x + (fp_drift / sqrt(2.));
-
 
 	///////////////////////////
 	// Q1 virtual boundaries //

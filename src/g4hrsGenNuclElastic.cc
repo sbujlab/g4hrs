@@ -126,7 +126,7 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
     // Value to reweight cross section by to account for non-uniform
     // sampling
     double samp_fact = sampv*sampv*(icth_a-icth_b)/(cthmin-cthmax);
-  
+  	
     double ph = CLHEP::RandFlat::shoot(fPh_min, fPh_max);
     double ef    = proton_mass_c2*beamE/(proton_mass_c2 + beamE*(1.0-cos(th)));;
 

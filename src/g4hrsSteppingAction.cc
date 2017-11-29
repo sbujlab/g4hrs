@@ -53,23 +53,28 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 	G4StepPoint* prePoint = aStep->GetPreStepPoint(); 
 	
 	if(fTrack->GetParentID()==0) {
-	
-		G4double x = fTrack->GetPosition().x();
-		G4double y = fTrack->GetPosition().y();
-		G4double z = fTrack->GetPosition().z();
+
+		// Get individual x,y,z coordinates in meters to output to ROOT	
+		G4double x = fTrack->GetPosition().x()/1000.;
+		G4double y = fTrack->GetPosition().y()/1000.;
+		G4double z = fTrack->GetPosition().z()/1000.;
+		// Get position 3-vector in millimeters to get current volume from Navigator
 		G4ThreeVector position = fTrack->GetPosition();
+		// Get momentum 3-vector
 		G4ThreeVector momentum = fTrack->GetMomentum();
 
 		if(fTrack->GetCurrentStepNumber()<=1) {
-			fX0 = prePoint->GetPosition().x()/1000.;
-			fY0 = prePoint->GetPosition().y()/1000.;
-			fZ0 = prePoint->GetPosition().z()/1000.;
-			fP0 = prePoint->GetMomentum().mag();
-			fTh0 = prePoint->GetMomentum().getTheta();
-			fPh0 = prePoint->GetMomentum().getPhi();	
-
-			G4ThreeVector position0 = prePoint->GetPosition();	
+		
+			G4ThreeVector position0 = prePoint->GetPosition()/1000.;	
 			G4ThreeVector momentum0 = prePoint->GetMomentum();
+		
+			fX0 = position0.x();
+			fY0 = position0.y();
+			fZ0 = position0.z();
+			fP0 = momentum0.mag();
+			fTh0 = momentum0.getTheta();
+			fPh0 = momentum0.getPhi();	
+
 			
 			// Test transform with special position/angle		
 	/*
@@ -107,7 +112,7 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			//Transform
 			G4ThreeVector position0_tr = transport_targ.TransformPoint(position0);
 			G4ThreeVector momentum0_tr = transport_targ.TransformPoint(momentum0);
-		
+
 			fX0_tr = position0_tr.x();
 			fY0_tr = position0_tr.y();
 			fZ0_tr = position0_tr.z();
@@ -124,450 +129,453 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			goodParticle = fTransportFunction->CallTransportFunction(r0, x_tf, th_tf, y_tf, ph_tf); 	
 		
 		}
-
-		
-
 	
+		// Center of LHRS focal plane in HCS for coordinate transform test
+//		G4ThreeVector lfp_hcs = G4ThreeVector(21770.815*sin(fHRSAngle),8330.421,1053.79+21770.815*cos(fHRSAngle));
+	
+
 		// Navigator of parallel world to get volume name (to identify virtual boundaries) and hall to transport coordinate transformation
 		G4Navigator* fParallelNavigator = G4TransportationManager::GetTransportationManager()->GetNavigator("g4hrsparallel");
+		G4String volName = fParallelNavigator->LocateGlobalPointAndSetup(position)->GetName();
 
-		G4String volName = fParallelNavigator->LocateGlobalPointAndSetup(G4ThreeVector(x,y,z))->GetName();
-		G4AffineTransform trans = fParallelNavigator->GetGlobalToLocalTransform();
-		G4ThreeVector position_tr = trans.TransformPoint(position);	
-		G4ThreeVector momentum_tr = trans.TransformPoint(momentum);
-
-		// Must explicitly define transform for septum, as these virtual boundaries are in hall coordinate system
-		G4RotationMatrix rotate_sen, rotate_sm, rotate_sex;
-		rotate_sen.rotateY(septum_angle);
-		rotate_sen.rotateZ(90.*deg);
-		rotate_sm.rotateY((septum_angle + hrs_angle)/2.);
-		rotate_sm.rotateZ(90.*deg);
-		rotate_sex.rotateY(hrs_angle);
-		rotate_sex.rotateZ(90.*deg);
-			
-		// Axis transformation from HCS to TCS in each septum region
-		G4AffineTransform transportAxis_sen = G4AffineTransform(rotate_sen);
-		G4AffineTransform transportAxis_sm = G4AffineTransform(rotate_sm);
-		G4AffineTransform transportAxis_sex = G4AffineTransform(rotate_sex);
+		if(volName.find("virtualBoundaryPhys") != G4String::npos) { 
 		
-		// Since we will be transforming POINTS (not AXES), we want the INVERSE of the axis transformation
-		G4AffineTransform transport_sen = transportAxis_sen.Inverse();
-		G4AffineTransform transport_sm = transportAxis_sm.Inverse();
-		G4AffineTransform transport_sex = transportAxis_sex.Inverse();
+			G4AffineTransform trans = fParallelNavigator->GetGlobalToLocalTransform();
+			G4ThreeVector position_tr = trans.TransformPoint(position)/1000.;	
+			G4ThreeVector momentum_tr = trans.TransformPoint(momentum);
 
-		if(volName.find("virtualBoundaryPhys_sen") != G4String::npos) {
-			// HCS
-			fX_sen = x/1000.;
-			fY_sen = y/1000.;
-			fZ_sen = z/1000.;
-			fTh_sen = momentum.theta()/rad;
-			fPh_sen = momentum.phi()/rad;
-			// TCS
-			G4ThreeVector pos_tr = transport_sen.TransformPoint(G4ThreeVector(fX_sen, fY_sen, fZ_sen));
-			G4ThreeVector mom_tr = transport_sen.TransformPoint(momentum);
-			fX_sen_tr = pos_tr.x(); 			
-			fY_sen_tr = pos_tr.y(); 			
-			fZ_sen_tr = pos_tr.z(); 			
-			fTh_sen_tr = mom_tr.x()/mom_tr.z();	
-			fPh_sen_tr = mom_tr.y()/mom_tr.z();	
-			// Transport function
-			if(goodParticle) {
-				fX_sen_tf = x_tf[sen];				
-				fTh_sen_tf = th_tf[sen];				
-				fY_sen_tf = y_tf[sen]*sign;	//				
-				fPh_sen_tf = ph_tf[sen]*sign;	// Swap y/phi back if in left arm			
+			// Must explicitly define transform for septum, as these virtual boundaries are in hall coordinate system
+			G4RotationMatrix rotate_sen, rotate_sm, rotate_sex;
+			rotate_sen.rotateY(septum_angle);
+			rotate_sen.rotateZ(90.*deg);
+			rotate_sm.rotateY((septum_angle + hrs_angle)/2.);
+			rotate_sm.rotateZ(90.*deg);
+			rotate_sex.rotateY(hrs_angle);
+			rotate_sex.rotateZ(90.*deg);
+				
+			// Axis transformation from HCS to TCS in each septum region
+			G4AffineTransform transportAxis_sen = G4AffineTransform(rotate_sen);
+			G4AffineTransform transportAxis_sm = G4AffineTransform(rotate_sm);
+			G4AffineTransform transportAxis_sex = G4AffineTransform(rotate_sex);
+			
+			// Since we will be transforming POINTS (not AXES), we want the INVERSE of the axis transformation
+			G4AffineTransform transport_sen = transportAxis_sen.Inverse();
+			G4AffineTransform transport_sm = transportAxis_sm.Inverse();
+			G4AffineTransform transport_sex = transportAxis_sex.Inverse();
+
+			if(volName == "virtualBoundaryPhys_sen") {
+				// HCS
+				fX_sen = x;
+				fY_sen = y;
+				fZ_sen = z;
+				fTh_sen = momentum.theta()/rad;
+				fPh_sen = momentum.phi()/rad;
+				// TCS
+				G4ThreeVector pos_tr = transport_sen.TransformPoint(G4ThreeVector(fX_sen, fY_sen, fZ_sen));
+				G4ThreeVector mom_tr = transport_sen.TransformPoint(momentum);
+				fX_sen_tr = pos_tr.x(); 			
+				fY_sen_tr = pos_tr.y(); 			
+				fZ_sen_tr = pos_tr.z(); 			
+				fTh_sen_tr = mom_tr.x()/mom_tr.z();	
+				fPh_sen_tr = mom_tr.y()/mom_tr.z();	
+				// Transport function
+				if(goodParticle) {
+					fX_sen_tf = x_tf[sen];				
+					fTh_sen_tf = th_tf[sen];				
+					fY_sen_tf = y_tf[sen]*sign;	//				
+					fPh_sen_tf = ph_tf[sen]*sign;	// Swap y/phi back if in left arm			
+				}
+			} else if(volName == "virtualBoundaryPhys_sm") {
+				// HCS
+				fX_sm = x;
+				fY_sm = y;
+				fZ_sm = z;
+				fTh_sm = momentum.theta()/rad;
+				fPh_sm = momentum.phi()/rad;
+				// TCS
+				G4ThreeVector pos_tr = transport_sm.TransformPoint(G4ThreeVector(fX_sm, fY_sm, fZ_sm));
+				G4ThreeVector mom_tr = transport_sm.TransformPoint(momentum);
+				fX_sm_tr = pos_tr.x(); 			
+				fY_sm_tr = pos_tr.y(); 			
+				fZ_sm_tr = pos_tr.z(); 			
+				fTh_sm_tr = mom_tr.x()/mom_tr.z();	
+				fPh_sm_tr = mom_tr.y()/mom_tr.z();	
+				// Transport function
+				if(goodParticle) {
+					fX_sm_tf = x_tf[sm];				
+					fTh_sm_tf = th_tf[sm];				
+					fY_sm_tf = y_tf[sm]*sign;		 				
+					fPh_sm_tf = ph_tf[sm]*sign;				
+				}
+			} else if(volName == "virtualBoundaryPhys_sex") {
+				// HCS
+				fX_sex = x;
+				fY_sex = y;
+				fZ_sex = z;
+				fTh_sex = momentum.theta()/rad;
+				fPh_sex = momentum.phi()/rad;
+				// TCS
+				G4ThreeVector pos_tr = transport_sex.TransformPoint(G4ThreeVector(fX_sex, fY_sex, fZ_sex));
+				G4ThreeVector mom_tr = transport_sex.TransformPoint(momentum);
+				fX_sex_tr = pos_tr.x(); 			
+				fY_sex_tr = pos_tr.y(); 			
+				fZ_sex_tr = pos_tr.z(); 			
+				fTh_sex_tr = mom_tr.x()/mom_tr.z();	
+				fPh_sex_tr = mom_tr.y()/mom_tr.z();	
+				// Transport function
+				if(goodParticle) {
+					fX_sex_tf = x_tf[sex];				
+					fTh_sex_tf = th_tf[sex];				
+					fY_sex_tf = y_tf[sex]*sign;				
+					fPh_sex_tf = ph_tf[sex]*sign;				
+				}
+			} else if(volName == "virtualBoundaryPhys_col") {
+				fX_col = x;
+				fY_col = y;
+				fZ_col = z;
+				fTh_col = momentum.theta()/rad;
+				fPh_col = momentum.phi()/rad;
+			} else if(volName == "virtualBoundaryPhys_q1en_LHRS") {
+				// HCS
+				fX_q1en = x;
+				fY_q1en = y;
+				fZ_q1en = z;
+				fTh_q1en = momentum.theta()/rad;
+				fPh_q1en = momentum.phi()/rad;
+				// TCS
+				fX_q1en_tr = position_tr.x();
+				fY_q1en_tr = position_tr.y();
+				fTh_q1en_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_q1en_tr = momentum_tr.y()/momentum_tr.z();
+			} else if(volName == "virtualBoundaryPhys_q1ex_LHRS") {
+				// HCS
+				fX_q1ex = x;
+				fY_q1ex = y;
+				fZ_q1ex = z;
+				fTh_q1ex = momentum.theta()/rad;
+				fPh_q1ex = momentum.phi()/rad;
+				// TCS
+				fX_q1ex_tr = position_tr.x();
+				fY_q1ex_tr = position_tr.y();
+				fTh_q1ex_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_q1ex_tr = momentum_tr.y()/momentum_tr.z();
+				// Transport function
+				if(goodParticle) {
+					fX_q1ex_tf = x_tf[q1ex];
+					fTh_q1ex_tf = th_tf[q1ex];
+					fY_q1ex_tf = -y_tf[q1ex];
+					fPh_q1ex_tf = -ph_tf[q1ex];
+				}
+			} else if(volName == "virtualBoundaryPhys_q1en_RHRS") {
+				// HCS
+				fX_q1en = x;
+				fY_q1en = y;
+				fZ_q1en = z;
+				fTh_q1en = momentum.theta()/rad;
+				fPh_q1en = momentum.phi()/rad;
+				// TCS
+				fX_q1en_tr = position_tr.x();
+				fY_q1en_tr = position_tr.y();
+				fTh_q1en_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_q1en_tr = momentum_tr.y()/momentum_tr.z();
+			} else if(volName == "virtualBoundaryPhys_q1ex_RHRS") {
+				// HCS
+				fX_q1ex = x;
+				fY_q1ex = y;
+				fZ_q1ex = z;
+				fTh_q1ex = momentum.theta()/rad;
+				fPh_q1ex = momentum.phi()/rad;
+				// TCS
+				fX_q1ex_tr = position_tr.x();
+				fY_q1ex_tr = position_tr.y();
+				fTh_q1ex_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_q1ex_tr = momentum_tr.y()/momentum_tr.z();
+				// Transport function
+				if(goodParticle) {
+					fX_q1ex_tf = x_tf[q1ex];
+					fTh_q1ex_tf = th_tf[q1ex];
+					fY_q1ex_tf = y_tf[q1ex];
+					fPh_q1ex_tf = ph_tf[q1ex];
+				}
+			} else if(volName == "virtualBoundaryPhys_q2en_LHRS") {
+				// HCS
+				fX_q2en = x;
+				fY_q2en = y;
+				fZ_q2en = z;
+				fTh_q2en = momentum.theta()/rad;
+				fPh_q2en = momentum.phi()/rad;
+				// TCS
+				fX_q2en_tr = position_tr.x();
+				fY_q2en_tr = position_tr.y();
+				fTh_q2en_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_q2en_tr = momentum_tr.y()/momentum_tr.z();
+			} else if(volName == "virtualBoundaryPhys_q2ex_LHRS") {
+				// HCS
+				fX_q2ex = x;
+				fY_q2ex = y;
+				fZ_q2ex = z;
+				fTh_q2ex = momentum.theta()/rad;
+				fPh_q2ex = momentum.phi()/rad;
+				// TCS
+				fX_q2ex_tr = position_tr.x();
+				fY_q2ex_tr = position_tr.y();
+				fTh_q2ex_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_q2ex_tr = momentum_tr.y()/momentum_tr.z();
+				// Transport function
+				if(goodParticle) {
+					fX_q2ex_tf = x_tf[q2ex];
+					fTh_q2ex_tf = th_tf[q2ex];
+					fY_q2ex_tf = -y_tf[q2ex];
+					fPh_q2ex_tf = -ph_tf[q2ex];
+				}
+			} else if(volName == "virtualBoundaryPhys_q2en_RHRS") {
+				// HCS
+				fX_q2en = x;
+				fY_q2en = y;
+				fZ_q2en = z;
+				fTh_q2en = momentum.theta()/rad;
+				fPh_q2en = momentum.phi()/rad;
+				// TCS
+				fX_q2en_tr = position_tr.x();
+				fY_q2en_tr = position_tr.y();
+				fTh_q2en_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_q2en_tr = momentum_tr.y()/momentum_tr.z();
+			} else if(volName == "virtualBoundaryPhys_q2ex_RHRS") {
+				// HCS
+				fX_q2ex = x;
+				fY_q2ex = y;
+				fZ_q2ex = z;
+				fTh_q2ex = momentum.theta()/rad;
+				fPh_q2ex = momentum.phi()/rad;
+				// TCS
+				fX_q2ex_tr = position_tr.x();
+				fY_q2ex_tr = position_tr.y();
+				fTh_q2ex_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_q2ex_tr = momentum_tr.y()/momentum_tr.z();
+				// Transport function
+				if(goodParticle) {
+					fX_q2ex_tf = x_tf[q2ex];
+					fTh_q2ex_tf = th_tf[q2ex];
+					fY_q2ex_tf = y_tf[q2ex];
+					fPh_q2ex_tf = ph_tf[q2ex];
+				}
+			} else if(volName == "virtualBoundaryPhys_den_LHRS") {
+				// HCS
+				fX_den = x;
+				fY_den = y;
+				fZ_den = z;
+				fTh_den = momentum.theta()/rad;
+				fPh_den = momentum.phi()/rad;
+				// TCS
+				fX_den_tr = position_tr.x();
+				fY_den_tr = position_tr.y();
+				fTh_den_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_den_tr = momentum_tr.y()/momentum_tr.z();
+				if(goodParticle) {
+					fX_den_tf = x_tf[den];
+					fTh_den_tf = th_tf[den];
+					fY_den_tf = -y_tf[den];
+					fPh_den_tf = -ph_tf[den];
+				}
+			} else if(volName == "virtualBoundaryPhys_dex_LHRS") {
+				// HCS
+				fX_dex = x;
+				fY_dex = y;
+				fZ_dex = z;
+				fTh_dex = momentum.theta()/rad;
+				fPh_dex = momentum.phi()/rad;
+				// TCS
+				fX_dex_tr = position_tr.x();
+				fY_dex_tr = position_tr.y();
+				fTh_dex_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_dex_tr = momentum_tr.y()/momentum_tr.z();
+				// Transport function
+				if(goodParticle) {
+					fX_dex_tf = x_tf[dex];
+					fTh_dex_tf = th_tf[dex];
+					fY_dex_tf = -y_tf[dex];
+					fPh_dex_tf = -ph_tf[dex];
+				}
+			} else if(volName == "virtualBoundaryPhys_den_RHRS") {
+				// HCS
+				fX_den = x;
+				fY_den = y;
+				fZ_den = z;
+				fTh_den = momentum.theta()/rad;
+				fPh_den = momentum.phi()/rad;
+				// TCS
+				fX_den_tr = position_tr.x();
+				fY_den_tr = position_tr.y();
+				fTh_den_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_den_tr = momentum_tr.y()/momentum_tr.z();
+				if(goodParticle) {
+					fX_den_tf = x_tf[den];
+					fTh_den_tf = th_tf[den];
+					fY_den_tf = y_tf[den];
+					fPh_den_tf = ph_tf[den];
+				}
+			} else if(volName == "virtualBoundaryPhys_dex_RHRS") {
+				// HCS
+				fX_dex = x;
+				fY_dex = y;
+				fZ_dex = z;
+				fTh_dex = momentum.theta()/rad;
+				fPh_dex = momentum.phi()/rad;
+				// TCS
+				fX_dex_tr = position_tr.x();
+				fY_dex_tr = position_tr.y();
+				fTh_dex_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_dex_tr = momentum_tr.y()/momentum_tr.z();
+				// Transport function
+				if(goodParticle) {
+					fX_dex_tf = x_tf[dex];
+					fTh_dex_tf = th_tf[dex];
+					fY_dex_tf = y_tf[dex];
+					fPh_dex_tf = ph_tf[dex];
+				}
+			} else if(volName == "virtualBoundaryPhys_q3en_LHRS") {
+				// HCS
+				fX_q3en = x;
+				fY_q3en = y;
+				fZ_q3en = z;
+				fTh_q3en = momentum.theta()/rad;
+				fPh_q3en = momentum.phi()/rad;
+				// TCS
+				fX_q3en_tr = position_tr.x();
+				fY_q3en_tr = position_tr.y();
+				fTh_q3en_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_q3en_tr = momentum_tr.y()/momentum_tr.z();
+				// Transport function
+				if(goodParticle) {
+					fX_q3en_tf = x_tf[q3en];
+					fTh_q3en_tf = th_tf[q3en];
+					fY_q3en_tf = -y_tf[q3en];
+					fPh_q3en_tf = -ph_tf[q3en];
+				}
+			} else if(volName == "virtualBoundaryPhys_q3ex_LHRS") {
+				// HCS
+				fX_q3ex = x;
+				fY_q3ex = y;
+				fZ_q3ex = z;
+				fTh_q3ex = momentum.theta()/rad;
+				fPh_q3ex = momentum.phi()/rad;
+				// TCS
+				fX_q3ex_tr = position_tr.x();
+				fY_q3ex_tr = position_tr.y();
+				fTh_q3ex_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_q3ex_tr = momentum_tr.y()/momentum_tr.z();
+				// Transport function
+				if(goodParticle) {
+					fX_q3ex_tf = x_tf[q3ex];
+					fTh_q3ex_tf = th_tf[q3ex];
+					fY_q3ex_tf = -y_tf[q3ex];
+					fPh_q3ex_tf = -ph_tf[q3ex];
+				}
+			} else if(volName == "virtualBoundaryPhys_q3en_RHRS") {
+				// HCS
+				fX_q3en = x;
+				fY_q3en = y;
+				fZ_q3en = z;
+				fTh_q3en = momentum.theta()/rad;
+				fPh_q3en = momentum.phi()/rad;
+				// TCS
+				fX_q3en_tr = position_tr.x();
+				fY_q3en_tr = position_tr.y();
+				fTh_q3en_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_q3en_tr = momentum_tr.y()/momentum_tr.z();
+				// Transport function
+				if(goodParticle) {
+					fX_q3en_tf = x_tf[q3en];
+					fTh_q3en_tf = th_tf[q3en];
+					fY_q3en_tf = y_tf[q3en];
+					fPh_q3en_tf = ph_tf[q3en];
+				}
+			} else if(volName == "virtualBoundaryPhys_q3ex_RHRS") {
+				// HCS
+				fX_q3ex = x;
+				fY_q3ex = y;
+				fZ_q3ex = z;
+				fTh_q3ex = momentum.theta()/rad;
+				fPh_q3ex = momentum.phi()/rad;
+				// TCS
+				fX_q3ex_tr = position_tr.x();
+				fY_q3ex_tr = position_tr.y();
+				fTh_q3ex_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_q3ex_tr = momentum_tr.y()/momentum_tr.z();
+				// Transport function
+				if(goodParticle) {
+					fX_q3ex_tf = x_tf[q3ex];
+					fTh_q3ex_tf = th_tf[q3ex];
+					fY_q3ex_tf = y_tf[q3ex];
+					fPh_q3ex_tf = ph_tf[q3ex];
+				}
+			} else if(volName == "virtualBoundaryPhys_vdc_LHRS") {
+				// HCS
+				fX_vdc = x;
+				fY_vdc = y;
+				fZ_vdc = z;
+				fTh_vdc = momentum.theta()/rad;
+				fPh_vdc = momentum.phi()/rad;
+				// TCS
+				fX_vdc_tr = position_tr.x();
+				fY_vdc_tr = position_tr.y();
+				fTh_vdc_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_vdc_tr = momentum_tr.y()/momentum_tr.z();
+			} else if(volName == "virtualBoundaryPhys_vdc_RHRS") {
+				// HCS
+				fX_vdc = x;
+				fY_vdc = y;
+				fZ_vdc = z;
+				fTh_vdc = momentum.theta()/rad;
+				fPh_vdc = momentum.phi()/rad;
+				// TCS
+				fX_vdc_tr = position_tr.x();
+				fY_vdc_tr = position_tr.y();
+				fTh_vdc_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_vdc_tr = momentum_tr.y()/momentum_tr.z();
+			} else if(volName == "virtualBoundaryPhys_fp_LHRS") {
+				// HCS
+				fX_fp = x;
+				fY_fp = y;
+				fZ_fp = z;
+				fTh_fp = momentum.theta()/rad;
+				fPh_fp = momentum.phi()/rad;
+				// TCS
+				fX_fp_tr = position_tr.x();
+				fY_fp_tr = position_tr.y();
+				fTh_fp_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_fp_tr = momentum_tr.y()/momentum_tr.z();
+				// Transport function
+				if(goodParticle) {
+					fX_fp_tf = x_tf[fp];
+					fTh_fp_tf = th_tf[fp];
+					fY_fp_tf = -y_tf[fp];
+					fPh_fp_tf = -ph_tf[fp];
+				}
+			} else if(volName == "virtualBoundaryPhys_fp_RHRS") {
+				// HCS
+				fX_fp = x;
+				fY_fp = y;
+				fZ_fp = z;
+				fTh_fp = momentum.theta()/rad;
+				fPh_fp = momentum.phi()/rad;
+				// TCS
+				fX_fp_tr = position_tr.x();
+				fY_fp_tr = position_tr.y();
+				fTh_fp_tr = momentum_tr.x()/momentum_tr.z();	
+				fPh_fp_tr = momentum_tr.y()/momentum_tr.z();
+				// Transport function
+				if(goodParticle) {
+					fX_fp_tf = x_tf[fp];
+					fTh_fp_tf = th_tf[fp];
+					fY_fp_tf = y_tf[fp];
+					fPh_fp_tf = ph_tf[fp];
+				}
 			}
-		} else if(volName.find("virtualBoundaryPhys_sm") != G4String::npos) {
-			// HCS
-			fX_sm = x/1000.;
-			fY_sm = y/1000.;
-			fZ_sm = z/1000.;
-			fTh_sm = momentum.theta()/rad;
-			fPh_sm = momentum.phi()/rad;
-			// TCS
-			G4ThreeVector pos_tr = transport_sm.TransformPoint(G4ThreeVector(fX_sm, fY_sm, fZ_sm));
-			G4ThreeVector mom_tr = transport_sm.TransformPoint(momentum);
-			fX_sm_tr = pos_tr.x(); 			
-			fY_sm_tr = pos_tr.y(); 			
-			fZ_sm_tr = pos_tr.z(); 			
-			fTh_sm_tr = mom_tr.x()/mom_tr.z();	
-			fPh_sm_tr = mom_tr.y()/mom_tr.z();	
-			// Transport function
-			if(goodParticle) {
-				fX_sm_tf = x_tf[sm];				
-				fTh_sm_tf = th_tf[sm];				
-				fY_sm_tf = y_tf[sm]*sign;		 				
-				fPh_sm_tf = ph_tf[sm]*sign;				
-			}
-		} else if(volName.find("virtualBoundaryPhys_sex") != G4String::npos) {
-			// HCS
-			fX_sex = x/1000.;
-			fY_sex = y/1000.;
-			fZ_sex = z/1000.;
-			fTh_sex = momentum.theta()/rad;
-			fPh_sex = momentum.phi()/rad;
-			// TCS
-			G4ThreeVector pos_tr = transport_sex.TransformPoint(G4ThreeVector(fX_sex, fY_sex, fZ_sex));
-			G4ThreeVector mom_tr = transport_sex.TransformPoint(momentum);
-			fX_sex_tr = pos_tr.x(); 			
-			fY_sex_tr = pos_tr.y(); 			
-			fZ_sex_tr = pos_tr.z(); 			
-			fTh_sex_tr = mom_tr.x()/mom_tr.z();	
-			fPh_sex_tr = mom_tr.y()/mom_tr.z();	
-			// Transport function
-			if(goodParticle) {
-				fX_sex_tf = x_tf[sex];				
-				fTh_sex_tf = th_tf[sex];				
-				fY_sex_tf = y_tf[sex]*sign;				
-				fPh_sex_tf = ph_tf[sex]*sign;				
-			}
-		} else if(volName.find("virtualBoundaryPhys_col") != G4String::npos) {
-			fX_col = x/1000.;
-			fY_col = y/1000.;
-			fZ_col = z/1000.;
-			fTh_col = momentum.theta()/rad;
-			fPh_col = momentum.phi()/rad;
-		} else if(volName.find("virtualBoundaryPhys_q1en_LHRS") != G4String::npos) {
-			// HCS
-			fX_q1en = x/1000.;
-			fY_q1en = y/1000.;
-			fZ_q1en = z/1000.;
-			fTh_q1en = momentum.theta()/rad;
-			fPh_q1en = momentum.phi()/rad;
-			// TCS
-			fX_q1en_tr = position_tr.x();
-			fY_q1en_tr = position_tr.y();
-			fTh_q1en_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_q1en_tr = momentum_tr.y()/momentum_tr.z();
-		} else if(volName.find("virtualBoundaryPhys_q1ex_LHRS") != G4String::npos) {
-			// HCS
-			fX_q1ex = x/1000.;
-			fY_q1ex = y/1000.;
-			fZ_q1ex = z/1000.;
-			fTh_q1ex = momentum.theta()/rad;
-			fPh_q1ex = momentum.phi()/rad;
-			// TCS
-			fX_q1ex_tr = position_tr.x();
-			fY_q1ex_tr = position_tr.y();
-			fTh_q1ex_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_q1ex_tr = momentum_tr.y()/momentum_tr.z();
-			// Transport function
-			if(goodParticle) {
-				fX_q1ex_tf = x_tf[q1ex];
-				fTh_q1ex_tf = th_tf[q1ex];
-				fY_q1ex_tf = -y_tf[q1ex];
-				fPh_q1ex_tf = -ph_tf[q1ex];
-			}
-		} else if(volName.find("virtualBoundaryPhys_q1en_RHRS") != G4String::npos) {
-			// HCS
-			fX_q1en = x/1000.;
-			fY_q1en = y/1000.;
-			fZ_q1en = z/1000.;
-			fTh_q1en = momentum.theta()/rad;
-			fPh_q1en = momentum.phi()/rad;
-			// TCS
-			fX_q1en_tr = position_tr.x();
-			fY_q1en_tr = position_tr.y();
-			fTh_q1en_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_q1en_tr = momentum_tr.y()/momentum_tr.z();
-		} else if(volName.find("virtualBoundaryPhys_q1ex_RHRS") != G4String::npos) {
-			// HCS
-			fX_q1ex = x/1000.;
-			fY_q1ex = y/1000.;
-			fZ_q1ex = z/1000.;
-			fTh_q1ex = momentum.theta()/rad;
-			fPh_q1ex = momentum.phi()/rad;
-			// TCS
-			fX_q1ex_tr = position_tr.x();
-			fY_q1ex_tr = position_tr.y();
-			fTh_q1ex_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_q1ex_tr = momentum_tr.y()/momentum_tr.z();
-			// Transport function
-			if(goodParticle) {
-				fX_q1ex_tf = x_tf[q1ex];
-				fTh_q1ex_tf = th_tf[q1ex];
-				fY_q1ex_tf = y_tf[q1ex];
-				fPh_q1ex_tf = ph_tf[q1ex];
-			}
-		} else if(volName.find("virtualBoundaryPhys_q2en_LHRS") != G4String::npos) {
-			// HCS
-			fX_q2en = x/1000.;
-			fY_q2en = y/1000.;
-			fZ_q2en = z/1000.;
-			fTh_q2en = momentum.theta()/rad;
-			fPh_q2en = momentum.phi()/rad;
-			// TCS
-			fX_q2en_tr = position_tr.x();
-			fY_q2en_tr = position_tr.y();
-			fTh_q2en_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_q2en_tr = momentum_tr.y()/momentum_tr.z();
-		} else if(volName.find("virtualBoundaryPhys_q2ex_LHRS") != G4String::npos) {
-			// HCS
-			fX_q2ex = x/1000.;
-			fY_q2ex = y/1000.;
-			fZ_q2ex = z/1000.;
-			fTh_q2ex = momentum.theta()/rad;
-			fPh_q2ex = momentum.phi()/rad;
-			// TCS
-			fX_q2ex_tr = position_tr.x();
-			fY_q2ex_tr = position_tr.y();
-			fTh_q2ex_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_q2ex_tr = momentum_tr.y()/momentum_tr.z();
-			// Transport function
-			if(goodParticle) {
-				fX_q2ex_tf = x_tf[q2ex];
-				fTh_q2ex_tf = th_tf[q2ex];
-				fY_q2ex_tf = -y_tf[q2ex];
-				fPh_q2ex_tf = -ph_tf[q2ex];
-			}
-		} else if(volName.find("virtualBoundaryPhys_q2en_RHRS") != G4String::npos) {
-			// HCS
-			fX_q2en = x/1000.;
-			fY_q2en = y/1000.;
-			fZ_q2en = z/1000.;
-			fTh_q2en = momentum.theta()/rad;
-			fPh_q2en = momentum.phi()/rad;
-			// TCS
-			fX_q2en_tr = position_tr.x();
-			fY_q2en_tr = position_tr.y();
-			fTh_q2en_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_q2en_tr = momentum_tr.y()/momentum_tr.z();
-		} else if(volName.find("virtualBoundaryPhys_q2ex_RHRS") != G4String::npos) {
-			// HCS
-			fX_q2ex = x/1000.;
-			fY_q2ex = y/1000.;
-			fZ_q2ex = z/1000.;
-			fTh_q2ex = momentum.theta()/rad;
-			fPh_q2ex = momentum.phi()/rad;
-			// TCS
-			fX_q2ex_tr = position_tr.x();
-			fY_q2ex_tr = position_tr.y();
-			fTh_q2ex_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_q2ex_tr = momentum_tr.y()/momentum_tr.z();
-			// Transport function
-			if(goodParticle) {
-				fX_q2ex_tf = x_tf[q2ex];
-				fTh_q2ex_tf = th_tf[q2ex];
-				fY_q2ex_tf = y_tf[q2ex];
-				fPh_q2ex_tf = ph_tf[q2ex];
-			}
-		} else if(volName.find("virtualBoundaryPhys_den_LHRS") != G4String::npos) {
-			// HCS
-			fX_den = x/1000.;
-			fY_den = y/1000.;
-			fZ_den = z/1000.;
-			fTh_den = momentum.theta()/rad;
-			fPh_den = momentum.phi()/rad;
-			// TCS
-			fX_den_tr = position_tr.x();
-			fY_den_tr = position_tr.y();
-			fTh_den_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_den_tr = momentum_tr.y()/momentum_tr.z();
-			if(goodParticle) {
-				fX_den_tf = x_tf[den];
-				fTh_den_tf = th_tf[den];
-				fY_den_tf = -y_tf[den];
-				fPh_den_tf = -ph_tf[den];
-			}
-		} else if(volName.find("virtualBoundaryPhys_dex_LHRS") != G4String::npos) {
-			// HCS
-			fX_dex = x/1000.;
-			fY_dex = y/1000.;
-			fZ_dex = z/1000.;
-			fTh_dex = momentum.theta()/rad;
-			fPh_dex = momentum.phi()/rad;
-			// TCS
-			fX_dex_tr = position_tr.x();
-			fY_dex_tr = position_tr.y();
-			fTh_dex_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_dex_tr = momentum_tr.y()/momentum_tr.z();
-			// Transport function
-			if(goodParticle) {
-				fX_dex_tf = x_tf[dex];
-				fTh_dex_tf = th_tf[dex];
-				fY_dex_tf = -y_tf[dex];
-				fPh_dex_tf = -ph_tf[dex];
-			}
-		} else if(volName.find("virtualBoundaryPhys_den_RHRS") != G4String::npos) {
-			// HCS
-			fX_den = x/1000.;
-			fY_den = y/1000.;
-			fZ_den = z/1000.;
-			fTh_den = momentum.theta()/rad;
-			fPh_den = momentum.phi()/rad;
-			// TCS
-			fX_den_tr = position_tr.x();
-			fY_den_tr = position_tr.y();
-			fTh_den_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_den_tr = momentum_tr.y()/momentum_tr.z();
-			if(goodParticle) {
-				fX_den_tf = x_tf[den];
-				fTh_den_tf = th_tf[den];
-				fY_den_tf = y_tf[den];
-				fPh_den_tf = ph_tf[den];
-			}
-		} else if(volName.find("virtualBoundaryPhys_dex_RHRS") != G4String::npos) {
-			// HCS
-			fX_dex = x/1000.;
-			fY_dex = y/1000.;
-			fZ_dex = z/1000.;
-			fTh_dex = momentum.theta()/rad;
-			fPh_dex = momentum.phi()/rad;
-			// TCS
-			fX_dex_tr = position_tr.x();
-			fY_dex_tr = position_tr.y();
-			fTh_dex_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_dex_tr = momentum_tr.y()/momentum_tr.z();
-			// Transport function
-			if(goodParticle) {
-				fX_dex_tf = x_tf[dex];
-				fTh_dex_tf = th_tf[dex];
-				fY_dex_tf = y_tf[dex];
-				fPh_dex_tf = ph_tf[dex];
-			}
-		} else if(volName.find("virtualBoundaryPhys_q3en_LHRS") != G4String::npos) {
-			// HCS
-			fX_q3en = x/1000.;
-			fY_q3en = y/1000.;
-			fZ_q3en = z/1000.;
-			fTh_q3en = momentum.theta()/rad;
-			fPh_q3en = momentum.phi()/rad;
-			// TCS
-			fX_q3en_tr = position_tr.x();
-			fY_q3en_tr = position_tr.y();
-			fTh_q3en_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_q3en_tr = momentum_tr.y()/momentum_tr.z();
-			// Transport function
-			if(goodParticle) {
-				fX_q3en_tf = x_tf[q3en];
-				fTh_q3en_tf = th_tf[q3en];
-				fY_q3en_tf = -y_tf[q3en];
-				fPh_q3en_tf = -ph_tf[q3en];
-			}
-		} else if(volName.find("virtualBoundaryPhys_q3ex_LHRS") != G4String::npos) {
-			// HCS
-			fX_q3ex = x/1000.;
-			fY_q3ex = y/1000.;
-			fZ_q3ex = z/1000.;
-			fTh_q3ex = momentum.theta()/rad;
-			fPh_q3ex = momentum.phi()/rad;
-			// TCS
-			fX_q3ex_tr = position_tr.x();
-			fY_q3ex_tr = position_tr.y();
-			fTh_q3ex_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_q3ex_tr = momentum_tr.y()/momentum_tr.z();
-			// Transport function
-			if(goodParticle) {
-				fX_q3ex_tf = x_tf[q3ex];
-				fTh_q3ex_tf = th_tf[q3ex];
-				fY_q3ex_tf = -y_tf[q3ex];
-				fPh_q3ex_tf = -ph_tf[q3ex];
-			}
-		} else if(volName.find("virtualBoundaryPhys_q3en_RHRS") != G4String::npos) {
-			// HCS
-			fX_q3en = x/1000.;
-			fY_q3en = y/1000.;
-			fZ_q3en = z/1000.;
-			fTh_q3en = momentum.theta()/rad;
-			fPh_q3en = momentum.phi()/rad;
-			// TCS
-			fX_q3en_tr = position_tr.x();
-			fY_q3en_tr = position_tr.y();
-			fTh_q3en_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_q3en_tr = momentum_tr.y()/momentum_tr.z();
-			// Transport function
-			if(goodParticle) {
-				fX_q3en_tf = x_tf[q3en];
-				fTh_q3en_tf = th_tf[q3en];
-				fY_q3en_tf = y_tf[q3en];
-				fPh_q3en_tf = ph_tf[q3en];
-			}
-		} else if(volName.find("virtualBoundaryPhys_q3ex_RHRS") != G4String::npos) {
-			// HCS
-			fX_q3ex = x/1000.;
-			fY_q3ex = y/1000.;
-			fZ_q3ex = z/1000.;
-			fTh_q3ex = momentum.theta()/rad;
-			fPh_q3ex = momentum.phi()/rad;
-			// TCS
-			fX_q3ex_tr = position_tr.x();
-			fY_q3ex_tr = position_tr.y();
-			fTh_q3ex_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_q3ex_tr = momentum_tr.y()/momentum_tr.z();
-			// Transport function
-			if(goodParticle) {
-				fX_q3ex_tf = x_tf[q3ex];
-				fTh_q3ex_tf = th_tf[q3ex];
-				fY_q3ex_tf = y_tf[q3ex];
-				fPh_q3ex_tf = ph_tf[q3ex];
-			}
-		} else if(volName.find("virtualBoundaryPhys_vdc_LHRS") != G4String::npos) {
-			// HCS
-			fX_vdc = x/1000.;
-			fY_vdc = y/1000.;
-			fZ_vdc = z/1000.;
-			fTh_vdc = momentum.theta()/rad;
-			fPh_vdc = momentum.phi()/rad;
-			// TCS
-			fX_vdc_tr = position_tr.x();
-			fY_vdc_tr = position_tr.y();
-			fTh_vdc_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_vdc_tr = momentum_tr.y()/momentum_tr.z();
- 		} else if(volName.find("virtualBoundaryPhys_vdc_RHRS") != G4String::npos) {
-			// HCS
-			fX_vdc = x/1000.;
-			fY_vdc = y/1000.;
-			fZ_vdc = z/1000.;
-			fTh_vdc = momentum.theta()/rad;
-			fPh_vdc = momentum.phi()/rad;
-			// TCS
-			fX_vdc_tr = position_tr.x();
-			fY_vdc_tr = position_tr.y();
-			fTh_vdc_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_vdc_tr = momentum_tr.y()/momentum_tr.z();
- 		} else if(volName.find("virtualBoundaryPhys_fp_LHRS") != G4String::npos) {
-			// HCS
-			fX_fp = x/1000.;
-			fY_fp = y/1000.;
-			fZ_fp = z/1000.;
-			fTh_fp = momentum.theta()/rad;
-			fPh_fp = momentum.phi()/rad;
-			// TCS
-			fX_fp_tr = position_tr.x();
-			fY_fp_tr = position_tr.y();
-			fTh_fp_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_fp_tr = momentum_tr.y()/momentum_tr.z();
-			// Transport function
-			if(goodParticle) {
-				fX_fp_tf = x_tf[fp];
-				fTh_fp_tf = th_tf[fp];
-				fY_fp_tf = -y_tf[fp];
-				fPh_fp_tf = -ph_tf[fp];
-			}
-		} else if(volName.find("virtualBoundaryPhys_fp_LHRS") != G4String::npos) {
-			// HCS
-			fX_fp = x/1000.;
-			fY_fp = y/1000.;
-			fZ_fp = z/1000.;
-			fTh_fp = momentum.theta()/rad;
-			fPh_fp = momentum.phi()/rad;
-			// TCS
-			fX_fp_tr = position_tr.x();
-			fY_fp_tr = position_tr.y();
-			fTh_fp_tr = momentum_tr.x()/momentum_tr.z();	
-			fPh_fp_tr = momentum_tr.y()/momentum_tr.z();
-			// Transport function
-			if(goodParticle) {
-				fX_fp_tf = x_tf[fp];
-				fTh_fp_tf = th_tf[fp];
-				fY_fp_tf = y_tf[fp];
-				fPh_fp_tf = ph_tf[fp];
-			}
-		}
+	
+		} //end if volName contains virtualBoundaryPhys
  
 	}  // end if ParentID == 0
  
 
 }
-
-

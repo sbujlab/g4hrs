@@ -102,7 +102,8 @@ bool BField_Septum::ReadMap(const char *filename)
 	//FIXME: Are these necessary?  Hard-coding for now to test, fix/delete later.
 	mUseUniformB = 0;
 	mUniformB[0] = 0.; mUniformB[1] = 0.; mUniformB[2] = 0.; 
-	mFieldUnit = 10e-4;	// map is in Gauss, want Tesla	
+//	mFieldUnit = 0.4*1e-4*1e-3;		// if map is in Gauss
+	mFieldUnit = 1.;		// if map is in milliTesla
 	mRotAxis[0] = 0.; mRotAxis[1] = 0.; mRotAxis[2] = 0.;
 	mRotAngle[0] = 0.; mRotAngle[1] = 0.; mRotAngle[2] = 0.;
 
@@ -292,7 +293,9 @@ bool BField_Septum::ReadMap(const char *filename)
 				{
 					mBField[indexX][indexY][indexZ][col]=tempLine[col];
 					//cout << indexX << " " << indexY << " " << indexZ << " " << mBField[indexX][indexY][indexZ][col] << endl;
-					if(col>=3 && col<=5) mBField[indexX][indexY][indexZ][col]*=mFieldUnit; //change unit to tesla
+					if(col>=3 && col<=5) { 
+						mBField[indexX][indexY][indexZ][col]*=mFieldUnit; //change unit to tesla
+					}
 				}
 			}
 		}
