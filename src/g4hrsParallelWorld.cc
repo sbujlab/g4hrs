@@ -167,7 +167,7 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	double pSeptumZ      = 74.0   * cm;
 	//double pSeptumPlaceZ = 70.414 * cm;
 	double pSeptumPlaceZ = 69.99937 * cm;
-	new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPlaceZ - 0.5 * pSeptumZ + 2 * vb_thickness + fPivotZOffset),
+	new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPlaceZ - 0.5 * pSeptumZ + fPivotZOffset),
 		LPlaneLogical2,"virtualBoundaryPhys_sen",motherLogical,0,0);//sen
 	new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPlaceZ + fPivotZOffset),
 		LPlaneLogical2,"virtualBoundaryPhys_sm",motherLogical,0,0);//sm

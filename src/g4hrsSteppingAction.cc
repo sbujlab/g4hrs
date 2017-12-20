@@ -54,11 +54,11 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 	
 	if(fTrack->GetParentID()==0) {
 
-		// Get individual x,y,z coordinates in meters to output to ROOT	
+		// Get hall coordinates in meters to output to ROOT	
 		G4double x = fTrack->GetPosition().x()/1000.;
 		G4double y = fTrack->GetPosition().y()/1000.;
 		G4double z = fTrack->GetPosition().z()/1000.;
-		// Get position 3-vector in millimeters to get current volume from Navigator
+		// Get position 3-vector in millimeters for transforms
 		G4ThreeVector position = fTrack->GetPosition();
 		// Get momentum 3-vector
 		G4ThreeVector momentum = fTrack->GetMomentum();
@@ -130,21 +130,32 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 		
 		}
 	
+/* TROUBLESHOOTING 
 		// Center of LHRS focal plane in HCS for coordinate transform test
-//		G4ThreeVector lfp_hcs = G4ThreeVector(21770.815*sin(fHRSAngle),8330.421,1053.79+21770.815*cos(fHRSAngle));
-	
-
+		G4ThreeVector fphc = G4ThreeVector(21770.815*sin(fHRSAngle),8330.421,1053.79+21770.815*cos(fHRSAngle));
+		// Unit momentum or central trajectory exiting dipole in HCS for coordinate transform test
+		G4ThreeVector cthc = G4ThreeVector(cos(45.*deg)*sin(fHRSAngle),sin(45.*deg),cos(45.*deg)*cos(fHRSAngle));
+*/
+		
+		
 		// Navigator of parallel world to get volume name (to identify virtual boundaries) and hall to transport coordinate transformation
 		G4Navigator* fParallelNavigator = G4TransportationManager::GetTransportationManager()->GetNavigator("g4hrsparallel");
 		G4String volName = fParallelNavigator->LocateGlobalPointAndSetup(position)->GetName();
 
 		if(volName.find("virtualBoundaryPhys") != G4String::npos) { 
 		
-			G4AffineTransform trans = fParallelNavigator->GetGlobalToLocalTransform();
-			G4ThreeVector position_tr = trans.TransformPoint(position)/1000.;	
-			G4ThreeVector momentum_tr = trans.TransformPoint(momentum);
 
+			//This gets the full transform (rotation + translation) that is required for transforming POSITION		
+			G4AffineTransform position_transform = fParallelNavigator->GetGlobalToLocalTransform();
+			//However, the MOMENTUM transform requires rotation ONLY!! 
+			G4RotationMatrix momentum_rotation = position_transform.NetRotation();
+			G4AffineTransform momentum_transform = G4AffineTransform(momentum_rotation);
+
+			G4ThreeVector position_tr = position_transform.TransformPoint(position)/1000.;	
+			G4ThreeVector momentum_tr = momentum_transform.TransformPoint(momentum);
+	
 			// Must explicitly define transform for septum, as these virtual boundaries are in hall coordinate system
+			//Rotations
 			G4RotationMatrix rotate_sen, rotate_sm, rotate_sex;
 			rotate_sen.rotateY(septum_angle);
 			rotate_sen.rotateZ(90.*deg);
@@ -152,17 +163,65 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			rotate_sm.rotateZ(90.*deg);
 			rotate_sex.rotateY(hrs_angle);
 			rotate_sex.rotateZ(90.*deg);
-				
-			// Axis transformation from HCS to TCS in each septum region
-			G4AffineTransform transportAxis_sen = G4AffineTransform(rotate_sen);
-			G4AffineTransform transportAxis_sm = G4AffineTransform(rotate_sm);
-			G4AffineTransform transportAxis_sex = G4AffineTransform(rotate_sex);
-			
-			// Since we will be transforming POINTS (not AXES), we want the INVERSE of the axis transformation
-			G4AffineTransform transport_sen = transportAxis_sen.Inverse();
-			G4AffineTransform transport_sm = transportAxis_sm.Inverse();
-			G4AffineTransform transport_sex = transportAxis_sex.Inverse();
+			//Translations
+			double pivotZOffset = 105.379*cm;
+			double septumZPosition = 69.99937*cm; //from snake, matches values in world and parallel world construction
+			septumZPosition+=pivotZOffset; //put origin at target center, not Hall A pivot
+			double septumLength = 74.*cm;
+			double z_sen = septumZPosition - septumLength/2.;
+			double x_sen = z_sen*tan(fSeptumAngle);
+			//Length of chord connecting central trajectory at septum entrance and septum exit
+			double chord = septumLength/cos((fHRSAngle+fSeptumAngle)/2.);
+			//Radius of circle for central trajectory in ideal septum
+			double R = sqrt((chord*chord)/(2.*(1-cos(fHRSAngle-fSeptumAngle))));
+			//Center of aforementioned circle
+			double xc = R*cos(fSeptumAngle) + x_sen;
+			double zc = z_sen - R*sin(fSeptumAngle);
+			//x,z position of central trajectory at septum middle
+			double z_sm = septumZPosition;
+			double x_sm = xc - sqrt(R*R - (z_sm - zc)*(z_sm - zc));
+			//x,z position of central trajectory at septum exit
+			double z_sex = septumZPosition + septumLength/2.;
+			double x_sex = xc - sqrt(R*R - (z_sex - zc)*(z_sex - zc));
+		
+			if(fRHRS) {
+				x_sen*=-1.;
+				x_sm*=-1.;
+				x_sex*=-1.;
+			}
+	
+			G4ThreeVector translate_sen = G4ThreeVector(x_sen,0.,z_sen);
+			G4ThreeVector translate_sm = G4ThreeVector(x_sm,0.,z_sm);
+			G4ThreeVector translate_sex = G4ThreeVector(x_sex,0.,z_sex);
 
+			G4AffineTransform position_transform_sen = G4AffineTransform(rotate_sen,translate_sen);
+			position_transform_sen.Invert();
+			G4AffineTransform position_transform_sm  = G4AffineTransform(rotate_sm, translate_sm );
+			position_transform_sm.Invert();
+			G4AffineTransform position_transform_sex = G4AffineTransform(rotate_sex,translate_sex);
+			position_transform_sex.Invert();
+
+			G4AffineTransform momentum_transform_sen = G4AffineTransform(rotate_sen);
+			momentum_transform_sen.Invert();
+			G4AffineTransform momentum_transform_sm  = G4AffineTransform(rotate_sm);
+			momentum_transform_sm.Invert();
+			G4AffineTransform momentum_transform_sex = G4AffineTransform(rotate_sex);
+			momentum_transform_sex.Invert();
+			
+			//TROUBLESHOOTING
+			G4ThreeVector senhc = G4ThreeVector(x_sen,-2.,z_sen);
+			G4ThreeVector semhc = G4ThreeVector(x_sm,0.,z_sm);
+			G4ThreeVector sexhc = G4ThreeVector(x_sex,0.,z_sex);
+			G4ThreeVector senct = G4ThreeVector(sin(fSeptumAngle),0.,cos(fSeptumAngle));
+			G4ThreeVector semct = G4ThreeVector(sin((fSeptumAngle+fHRSAngle)/2.),0.,cos((fSeptumAngle+fHRSAngle)/2.));
+			G4ThreeVector sexct = G4ThreeVector(sin(fHRSAngle),0.,cos(fHRSAngle));
+			G4ThreeVector sentr = position_transform_sen.TransformPoint(senhc);
+			G4ThreeVector sencttr = momentum_transform_sen.TransformPoint(senct);
+			G4ThreeVector semtr = position_transform_sm.TransformPoint(semhc);
+			G4ThreeVector semcttr = momentum_transform_sm.TransformPoint(semct);
+			G4ThreeVector sextr = position_transform_sex.TransformPoint(sexhc);
+			G4ThreeVector sexcttr = momentum_transform_sex.TransformPoint(sexct);
+	
 			if(volName == "virtualBoundaryPhys_sen") {
 				// HCS
 				fX_sen = x;
@@ -171,8 +230,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 				fTh_sen = momentum.theta()/rad;
 				fPh_sen = momentum.phi()/rad;
 				// TCS
-				G4ThreeVector pos_tr = transport_sen.TransformPoint(G4ThreeVector(fX_sen, fY_sen, fZ_sen));
-				G4ThreeVector mom_tr = transport_sen.TransformPoint(momentum);
+				G4ThreeVector pos_tr = position_transform_sen.TransformPoint(position)/1000.;
+				G4ThreeVector mom_tr = momentum_transform_sen.TransformPoint(momentum);
 				fX_sen_tr = pos_tr.x(); 			
 				fY_sen_tr = pos_tr.y(); 			
 				fZ_sen_tr = pos_tr.z(); 			
@@ -193,8 +252,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 				fTh_sm = momentum.theta()/rad;
 				fPh_sm = momentum.phi()/rad;
 				// TCS
-				G4ThreeVector pos_tr = transport_sm.TransformPoint(G4ThreeVector(fX_sm, fY_sm, fZ_sm));
-				G4ThreeVector mom_tr = transport_sm.TransformPoint(momentum);
+				G4ThreeVector pos_tr = position_transform_sm.TransformPoint(position)/1000.;
+				G4ThreeVector mom_tr = momentum_transform_sm.TransformPoint(momentum);
 				fX_sm_tr = pos_tr.x(); 			
 				fY_sm_tr = pos_tr.y(); 			
 				fZ_sm_tr = pos_tr.z(); 			
@@ -215,8 +274,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 				fTh_sex = momentum.theta()/rad;
 				fPh_sex = momentum.phi()/rad;
 				// TCS
-				G4ThreeVector pos_tr = transport_sex.TransformPoint(G4ThreeVector(fX_sex, fY_sex, fZ_sex));
-				G4ThreeVector mom_tr = transport_sex.TransformPoint(momentum);
+				G4ThreeVector pos_tr = position_transform_sex.TransformPoint(position)/1000.;
+				G4ThreeVector mom_tr = momentum_transform_sex.TransformPoint(momentum);
 				fX_sex_tr = pos_tr.x(); 			
 				fY_sex_tr = pos_tr.y(); 			
 				fZ_sex_tr = pos_tr.z(); 			
