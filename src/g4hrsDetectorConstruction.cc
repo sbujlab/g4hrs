@@ -118,6 +118,9 @@ G4VPhysicalVolume* g4hrsDetectorConstruction::Construct() {
     int z, nelements;
     double a, density;
 
+//    g4hrsMaterial::g4hrsMaterial();
+    mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
+
      // Air
     G4Element* N = new G4Element("Nitrogen", "N", z=7 , a=14.01*g/mole);
     G4Element* O = new G4Element("Oxygen"  , "O", z=8 , a=16.00*g/mole);
@@ -128,12 +131,10 @@ G4VPhysicalVolume* g4hrsDetectorConstruction::Construct() {
 
     G4VSolid *worldSolid = new G4Box("worldbox", 50.0*m, 50.0*m, 50.0*m ); 
     G4LogicalVolume *worldLog = new G4LogicalVolume(worldSolid, Air, "worldLog", 0, 0, 0);
+//    G4LogicalVolume *worldLog = new G4LogicalVolume(worldSolid, mMaterialManager->vacuum, "worldLog", 0, 0, 0);
 
     fWorldVolume = new G4PVPlacement(0, G4ThreeVector(), worldLog, "world", 0, false, 0);
     
-//    g4hrsMaterial::g4hrsMaterial();
-    mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
-
     CreateTarget(worldLog);
     CreateSeptum(worldLog);
 //    CreateTargetChamber(worldLog);
@@ -178,6 +179,7 @@ void g4hrsDetectorConstruction::CreateTarget(G4LogicalVolume *pMotherLogVol){
     G4VSolid* targetSolid  = new G4Tubs("targetBox", 0.0, fTargetW, fTargetL / 2.0, 0, 360*deg );
 //    G4LogicalVolume* targetLogical = new G4LogicalVolume(targetSolid,Pb_Mat,"targetLogical",0,0,0);
     G4LogicalVolume* targetLogical = new G4LogicalVolume(targetSolid,targ_material,"targetLogical",0,0,0); // Tyler test
+//    G4LogicalVolume* targetLogical = new G4LogicalVolume(targetSolid,mMaterialManager->vacuum,"targetLogical",0,0,0); // Tyler test
 
     G4VPhysicalVolume *phystarg = new G4PVPlacement(0,G4ThreeVector(fTargetX, fTargetY, fTargetZ),
         targetLogical,"targetPhys",pMotherLogVol,0,0);

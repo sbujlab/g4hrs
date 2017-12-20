@@ -366,6 +366,7 @@ g4hrsVertex g4hrsBeamTarget::SampleVertex(SampType_t samp){
                     zinvol + (*it)->GetFrameTranslation().z()  
                     - ((G4Tubs *) (*it)->GetLogicalVolume()->GetSolid())->GetZHalfLength() );
 
+//		fVer = G4ThreeVector(0.,0.,0.);
             G4double masssum = 0.0;
             const G4int *atomvec = mat->GetAtomsVector();
             const G4ElementVector *elvec = mat->GetElementVector();
