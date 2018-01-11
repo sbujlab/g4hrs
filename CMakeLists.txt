@@ -59,9 +59,10 @@ include(${Geant4_USE_FILE})
 
 
 #debugging symbols, complains
-#set(CMAKE_CXX_FLAGS "-Wall")
+#set(CMAKE_CXX_FLAGS "-Wall -pg")
 #set(CMAKE_CXX_FLAGS "-g -Wall -g -Woverloaded-virtual")
 set(CMAKE_CXX_FLAGS "-ggdb -pg -O0 -g3 -Wall -ggdb")
+set(CMAKE_Fortran_FLAGS "-pg")
 
 # C++11 standard if avialable
 include(CheckCXXCompilerFlag)
