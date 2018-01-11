@@ -19,12 +19,14 @@
 /g4hrs/hrsmom 1.063 GeV
 /g4hrs/septummap ../g4hrs/src/fields/PREX_septumFieldMap.dat
 
+# This must be explicitly called
+/run/initialize
+
+# Target parameters must be set AFTER /run/initialize
+# (target physical volume must already exist)
 /g4hrs/targlen 0.5 mm
 /g4hrs/targpos 0.0 mm
 /g4hrs/targmat Pb208
-
-# This must be explicitly called
-/run/initialize
 
 /g4hrs/beamcurr 70e-6 A
 /g4hrs/beamene 1.063 GeV

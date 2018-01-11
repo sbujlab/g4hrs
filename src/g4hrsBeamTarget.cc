@@ -14,6 +14,7 @@
 
 #include "g4hrsBeamTarget.hh"
 #include "g4hrsMultScatt.hh"
+#include "g4hrsMaterial.hh"
 
 #include <math.h>
 
@@ -236,7 +237,25 @@ void g4hrsBeamTarget::SetTargetPos(G4double z){
 }
 
 void g4hrsBeamTarget::SetTargetMaterial(G4String targMat) {
-	fTargetMaterial = targMat;
+
+	G4Material* targ_material;
+    	mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
+	if(targMat == "Pb208") {
+		targ_material = mMaterialManager->lead208;	
+	}
+	else if(targMat == "Ca40") {
+		targ_material = mMaterialManager->calcium40;	
+	}
+	else if(targMat == "Ca48") {
+		targ_material = mMaterialManager->calcium48;	
+	} else {
+		G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
+		":  Invalid target material selected" << G4endl; 
+		exit(1);
+	}
+	G4GeometryManager::GetInstance()->OpenGeometry(fTargVol);
+	((G4LogicalVolume *) fTargVol->GetLogicalVolume())->SetMaterial(targ_material);
+	G4GeometryManager::GetInstance()->CloseGeometry(true, false, fTargVol);
 	G4RunManager* runManager = G4RunManager::GetRunManager();
 	runManager->GeometryHasBeenModified();
 	UpdateInfo();

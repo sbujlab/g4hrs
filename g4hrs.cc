@@ -110,10 +110,6 @@ int main(int argc, char** argv){
     rmmess->SetEmFieldSetup(((g4hrsDetectorConstruction *) detector)->GetEMFieldSetup());
     rmmess->SetEMField(((g4hrsDetectorConstruction *) detector)->GetEMFieldFromSetup());
 
-    // Parallel geometry for virtual boundaries
-
-
-
     // Physics we want to use
     G4int verbose = 0;
     G4PhysListFactory factory;
@@ -177,7 +173,10 @@ int main(int argc, char** argv){
     }
 
     g4hrsRunData *rundata = g4hrsRun::GetRun()->GetData();
-    runManager->Initialize();
+
+
+//	Don't initialize here, initialize in macro		
+//    	runManager->Initialize();
 
 #ifdef G4VIS_USE
     // Visualization, if you choose to have it!

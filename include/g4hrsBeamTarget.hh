@@ -27,6 +27,7 @@
 class G4VPhysicalVolume;
 class G4Material;
 class g4hrsMultScatt;
+class g4hrsMaterial;
 
 class g4hrsBeamTarget {
     private: 
@@ -38,7 +39,8 @@ class g4hrsBeamTarget {
 	std::vector <G4VPhysicalVolume *> fDownstreamVols;
 	std::vector <G4VPhysicalVolume *> fAllVols;
 	G4VPhysicalVolume *fTargVol;
-
+	
+      	g4hrsMaterial *mMaterialManager;
 
 
     public:
