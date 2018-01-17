@@ -13,16 +13,16 @@ g4hrsTune::g4hrsTune() {
 	fTune = this;
 	
 	// Default values
+	snakeMagnet = -3.76320471828;
 	kappaQuad1 = -0.8476 * tesla / snakeMagnet;
 	kappaQuad2 = 0.8680 * tesla / snakeMagnet;
 	bendDipole = -0.4192 * tesla;
 	kappaQuad3 = 1.1748 * tesla / snakeMagnet;
 	septumAngle = 5.*deg;
 	septumMomentum = 1.063*GeV;
-	septumCurrent = 520*(ampere/meter2);
+	septumCurrent = 528*ampere;
 	HRSAngle = 12.5*deg;
 	HRSMomentum = 1.063*GeV;
-	snakeMagnet = -3.76320471828;
 
 	//Copy+pasted from EMFieldSetup, in case these values are needed down the road	
 /*

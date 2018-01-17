@@ -58,12 +58,12 @@ BField_Septum::BField_Septum(double pMomentum, const char *mapfile)
 	fTune = g4hrsTune::GetTune();	
 
 	fDefaultMomentum = 1.063*GeV;			// assume PREX default
-	fDefaultCurrentDensity = 1320*(ampere/m2);	// septum field map generated with I/m2 = 1320 A/m2
+	fDefaultCurrentDensity = 1320*ampere;		// septum field map generated with I/m2 = 1320 A/m2
 	fMomentum = fTune->septumMomentum;
 	fCurrentDensity = fTune->septumCurrent;
 	fFieldUnit = 1.e-4*tesla;			//septum field map is in Gauss 
 	
-	if( (fMomentum/fDefaultMomentum - 1.) < 1.e-3 && (fCurrentDensity/fDefaultCurrentDensity - 1.) < 1.e-3) {
+	if( (fMomentum/fDefaultMomentum - 1.) > 1.e-3 && (fCurrentDensity/fDefaultCurrentDensity - 1.) > 1.e-3) {
 		G4cout << " *** WARNING *** \n *** Septum field is being scaled by both MOMENTUM and CURRENT DENSITY *** \n *** You have been warned! *** \n";		
 	}
 	
