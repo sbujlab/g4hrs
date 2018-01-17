@@ -11,6 +11,8 @@
 #include "G4MagneticField.hh"
 #include "BField_Septum.hh" //Septum Field class
 
+class g4hrsTune;
+
 class g4hrsEMField : public G4MagneticField
 {
 public:
@@ -35,9 +37,10 @@ private:
 	bool bUseUniformBField;
 
 	BField_Septum*  mBField_Septum;
-
+	
 	G4ThreeVector BField3V;
 
+	g4hrsTune* fTune;
 };
 
 #endif

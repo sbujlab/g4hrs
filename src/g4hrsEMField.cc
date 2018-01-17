@@ -7,7 +7,7 @@
 //
 //  
 #include "g4hrsEMField.hh"
-
+#include "g4hrsTune.hh"
 //////////////////////////////////////////////////////////////////////////
 //
 //  Constructors:
@@ -18,16 +18,12 @@ g4hrsEMField::g4hrsEMField(): mBField_Septum(0)
 	bool pSetupHRS= true;
 	if(pSetupHRS)
 
-	fSeptumMomentum = 1.063;
-//	fSeptumMapFile = "PREX_septumFieldMap.dat";
+	fTune = g4hrsTune::GetTune();
+
+	fSeptumMomentum = fTune->septumMomentum;
 	fSeptumMapFile = "PREX_septumFieldMap_1320A-m2.dat";	
 
-        // FIXME - this should not be hardcoded
-	if(fSeptumMomentum != 0 && fSeptumMapFile != "") {
-
-//		mBField_Septum = new BField_Septum(pHRSMomentum,"PREX_septumFieldMap.dat");
-		mBField_Septum = new BField_Septum(fSeptumMomentum,fSeptumMapFile);
-	}
+	mBField_Septum = new BField_Septum(fSeptumMomentum,fSeptumMapFile);
 
 	bUseUniformBField=false;
 	BField3V.set(0,0,0);

@@ -18,6 +18,7 @@
 #include "g4hrsGenFlat.hh"
 #include "g4hrsEMFieldSetup.hh"
 #include "g4hrsEMField.hh"
+#include "g4hrsTune.hh"
 
 #include "G4UImanager.hh"
 #include "G4RunManager.hh"
@@ -37,12 +38,13 @@ g4hrsMessenger::g4hrsMessenger(){
     fBeamTarg     = NULL;
     fStepAct      = NULL;
     fPhysicsList  = NULL;
-    femfieldsetup = NULL;		
-    femfield	  = NULL;		
-    
+//    femfieldsetup = NULL;		
+//    femfield	  = NULL;		
 
-    // Grab singleton beam/target
-    fBeamTarg = g4hrsBeamTarget::GetBeamTarget();
+    	// Grab singleton beam/target
+    	fBeamTarg = g4hrsBeamTarget::GetBeamTarget();
+	// Grab singleton tune
+	ftune = g4hrsTune::GetTune();
 
     detfilesCmd = new G4UIcmdWithAString("/g4hrs/setgeofile",this);
     detfilesCmd->SetGuidance("Set geometry GDML files");
@@ -107,6 +109,26 @@ g4hrsMessenger::g4hrsMessenger(){
 	sepMapCmd = new G4UIcmdWithAString("/g4hrs/septummap",this);
 	sepMapCmd->SetGuidance("Set septum map file");
 	sepMapCmd->SetParameterName("sepmap",false);
+
+	sepCurCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/septumcur",this);
+	sepCurCmd->SetGuidance("Set septum current density");
+	sepCurCmd->SetParameterName("sepcur",false);
+
+	q1kappaCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/quad1",this);
+	q1kappaCmd->SetGuidance("Set magnet setting for Q1");
+	q1kappaCmd->SetParameterName("kappa1",false);
+
+	q2kappaCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/quad2",this);
+	q2kappaCmd->SetGuidance("Set magnet setting for Q2");
+	q2kappaCmd->SetParameterName("kappa2",false);
+
+	dBendCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/dipole",this);
+	dBendCmd->SetGuidance("Set magnet setting for dipole");
+	dBendCmd->SetParameterName("dbend",false);
+
+	q3kappaCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/quad3",this);
+	q3kappaCmd->SetGuidance("Set magnet setting for Q3");
+	q3kappaCmd->SetParameterName("kappa3",false);
 
     tgtLenCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/targlen",this);
     tgtLenCmd->SetGuidance("Target length");
@@ -400,27 +422,30 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 
 	if( cmd == snakeModCmd ) {
 		G4int snake = snakeModCmd->GetNewIntValue(newValue);
-		femfieldsetup->fSnakeModel = snake;
+//		femfieldsetup->fSnakeModel = snake;
 	}
 
 	if( cmd == sepAngCmd ) {
 		G4double angle = sepAngCmd->GetNewDoubleValue(newValue);
-		femfieldsetup->fSeptumAngle = angle;
+//		femfieldsetup->fSeptumAngle = angle;
 		fdetcon->fSeptumAngle = angle;
 		fStepAct->fSeptumAngle = angle;
+		ftune->septumAngle = angle;
 	}
 
 	if( cmd == hrsAngCmd ) {
 		G4double angle = hrsAngCmd->GetNewDoubleValue(newValue);
-		femfieldsetup->fHRSAngle = angle;
+//		femfieldsetup->fHRSAngle = angle;
 		fdetcon->fHRSAngle = angle;
 		fStepAct->fHRSAngle = angle;
+		ftune->HRSAngle = angle;
 	}
 
 	if( cmd == hrsMomCmd ) {
 		G4double p = hrsMomCmd->GetNewDoubleValue(newValue);
-		femfieldsetup->fHRSMomentum = p;
+//		femfieldsetup->fHRSMomentum = p;
 		fStepAct->fHRSMomentum = p;
+		ftune->HRSMomentum = p;
 	}
 	
 	if( cmd == hrsSetupCmd ) {
@@ -430,11 +455,37 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 
 	if( cmd == sepMomCmd ) {
 		G4double p = sepMomCmd->GetNewDoubleValue(newValue);
-		femfield->fSeptumMomentum = p; 
+//		femfield->fSeptumMomentum = p; 
+		ftune->septumMomentum = p;
 	}
 
 	if( cmd == sepMapCmd ) {
-		femfield->fSeptumMapFile = newValue;
+//		femfield->fSeptumMapFile = newValue;
+	}
+
+	if( cmd == sepCurCmd) {
+		G4double current = sepCurCmd->GetNewDoubleValue(newValue);
+		ftune->septumCurrent = current;
+	} 
+
+	if( cmd == q1kappaCmd) {
+		G4double k = q1kappaCmd->GetNewDoubleValue(newValue);
+		ftune->kappaQuad1 = k;
+	}
+
+	if( cmd == q2kappaCmd) {
+		G4double k = q2kappaCmd->GetNewDoubleValue(newValue);
+		ftune->kappaQuad2 = k;
+	}
+
+	if( cmd == dBendCmd) {
+		G4double bend = dBendCmd->GetNewDoubleValue(newValue);
+		ftune->bendDipole = bend;
+	}
+
+	if( cmd == q3kappaCmd) {
+		G4double k = q3kappaCmd->GetNewDoubleValue(newValue);
+		ftune->kappaQuad3 = k;
 	}
 
     if( cmd == tgtLenCmd ){

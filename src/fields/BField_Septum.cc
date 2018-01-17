@@ -8,6 +8,7 @@
 #include "G4UImanager.hh"
 
 #include "g4hrsUsageManager.hh"
+#include "g4hrsTune.hh"
 
 #include <iostream>
 #include <stdio.h>
@@ -54,15 +55,29 @@ BField_Septum::BField_Septum(double pMomentum, const char *mapfile)
 		SetGlobalDebugLevel("BField_Septum::BField_Septum()", (int)BFIELD_SEPTUM_DEBUG);
 #endif
 
-	fInstance=this;
+	fTune = g4hrsTune::GetTune();	
 
+	fDefaultMomentum = 1.063*GeV;			// assume PREX default
+	fDefaultCurrentDensity = 1320*(ampere/m2);	// septum field map generated with I/m2 = 1320 A/m2
+	fMomentum = fTune->septumMomentum;
+	fCurrentDensity = fTune->septumCurrent;
+	fFieldUnit = 1.e-4*tesla;			//septum field map is in Gauss 
+	
+	if( (fMomentum/fDefaultMomentum - 1.) < 1.e-3 && (fCurrentDensity/fDefaultCurrentDensity - 1.) < 1.e-3) {
+		G4cout << " *** WARNING *** \n *** Septum field is being scaled by both MOMENTUM and CURRENT DENSITY *** \n *** You have been warned! *** \n";		
+	}
+	
+	fFieldScale = (fMomentum/fDefaultMomentum)*(fCurrentDensity/fDefaultCurrentDensity);
+
+	mUseUniformB = 0;
+	mUniformB[0] = 0.; mUniformB[1] = 0.; mUniformB[2] = 0.; 
+	mRotAxis[0] = 0.; mRotAxis[1] = 0.; mRotAxis[2] = 0.;
+	mRotAngle[0] = 0.; mRotAngle[1] = 0.; mRotAngle[2] = 0.;
+
+
+	fInstance=this;
 	this->ReadMap(mapfile);
 
-	//update the Current Ratio if necessary
-	if(fabs(pMomentum)>1.0E-5) 
-	  SetMomentum(pMomentum);
-	//SetMomentum(mDefaultMomentumL,mDefaultMomentumR);
-	
 }
 
 BField_Septum::~BField_Septum()
@@ -95,17 +110,6 @@ bool BField_Septum::ReadMap(const char *filename)
 	// Initialization parameters are now read in from a header in the map itself   
 	mNPara = 6;
 	mInterpolateOutOfRange = 0;
-
-	//FIXME: Set in macro!
-	mDefaultMomentum = 1.063;
-
-	//FIXME: Are these necessary?  Hard-coding for now to test, fix/delete later.
-	mUseUniformB = 0;
-	mUniformB[0] = 0.; mUniformB[1] = 0.; mUniformB[2] = 0.; 
-	mFieldUnit = 0.4*1e-4*tesla;		// if map is in Gauss
-//	mFieldUnit = 1000.*tesla;		// if map is in milliTesla
-	mRotAxis[0] = 0.; mRotAxis[1] = 0.; mRotAxis[2] = 0.;
-	mRotAngle[0] = 0.; mRotAngle[1] = 0.; mRotAngle[2] = 0.;
 
 	char strLog[1024];
 	sprintf(strLog,"BField_Septum::ReadMap() is loading field map %s......\n",filename);
@@ -178,20 +182,13 @@ bool BField_Septum::ReadMap(const char *filename)
 	// These commands were run AFTER the BField_Septum.ini was read, but BEFORE the map was read
 	// Therefore they are placed after the initialization header is read, but before the field map is read
 
-	if(fabs(mDefaultMomentum)<1.0E-5 ) 
-	{
-		cerr<<"\n##DefaultMomentumL is invaid ("<<mDefaultMomentum
-			<<") in BField_Septum.ini. I quit... \n";
-		exit(1);
-	}
-
+	// Translation/rotation of field
+	// Not sure if this is necessary? Keeping for now...
 	mDoShift=(mOrigin[0]*mOrigin[0]+mOrigin[1]*mOrigin[1]+mOrigin[2]*mOrigin[2]>0)?true:false;
 	//mDoRotation=(fabs(mRotAngle[0])+fabs(mRotAngle[1])+fabs(mRotAngle[2])>0)?true:false;
-
 	mDoRotation=false;
 	// Default constructor. Gives a unit matrix
 	CLHEP::HepRotation pRot[3];
-
 	for(int i=0;i<3;i++)
 	{
 		if(mRotAxis[i]==0 || fabs(mRotAngle[i])<1.0E-10) continue;
@@ -200,11 +197,11 @@ bool BField_Septum::ReadMap(const char *filename)
 		else if(mRotAxis[i]==2) pRot[i].rotateY(mRotAngle[i]);
 		else if(mRotAxis[i]==3) pRot[i].rotateZ(mRotAngle[i]);
 	}
-
 	mRotL2F=new CLHEP::HepRotation();
 	mRotF2L=new CLHEP::HepRotation();
 	*mRotL2F=pRot[2]*pRot[1]*pRot[0];
 	*mRotF2L=mRotL2F->inverse(); 
+
 #ifdef BFIELD_SEPTUM_DEBUG
 	double rad2deg=180./acos(-1.0);
 	if(Global_Debug_Level>=1)
@@ -214,6 +211,7 @@ bool BField_Septum::ReadMap(const char *filename)
 			<<"  psi="<<mRotL2F->getPsi()*rad2deg<<endl;
 	}
 #endif
+
 
 	mXNum=int((mXmax-mXmin)/mStepX)+1;
 	if (mXNum<2)
@@ -294,7 +292,7 @@ bool BField_Septum::ReadMap(const char *filename)
 					mBField[indexX][indexY][indexZ][col]=tempLine[col];
 					//cout << indexX << " " << indexY << " " << indexZ << " " << mBField[indexX][indexY][indexZ][col] << endl;
 					if(col>=3 && col<=5) { 
-						mBField[indexX][indexY][indexZ][col]*=mFieldUnit; //change unit to tesla
+						mBField[indexX][indexY][indexZ][col]*=(fFieldUnit*fFieldScale);
 					}
 				}
 			}
@@ -607,13 +605,13 @@ bool BField_Septum::GetBField(double Pos[],double B[]){
     }
   */
   
-  double pPos[3],pB[3]={0,0,0},flag[3]={1.0,1.0,1.0};
+  double pPos[3],pB[3]={0,0,0};
   //shift and rotate the origin to the field coordinate
   if(mDoShift || mDoRotation) Transform_Lab2Field(Pos,pPos);
   else{
     for (i=0;i<3;i++) pPos[i]=Pos[i];
 
-    if(mUseUniformB==1){
+    if(mUseUniformB){
       if( abs( Pos[0] ) > 8.4 && abs( Pos[0] ) < 38.8 && abs( Pos[1] ) < 12.2 && abs( Pos[2] ) < 37.0 ){// Make sure you are in the septum - quite ideal...
 	for (i=0;i<3;i++) B[i]=mUniformB[i];
 	return true;
@@ -622,7 +620,6 @@ bool BField_Septum::GetBField(double Pos[],double B[]){
 	return true;
       }
     }
-
   }
   
   
@@ -635,7 +632,10 @@ bool BField_Septum::GetBField(double Pos[],double B[]){
   //double pPosAtMap[]={pPos[0],pPos[1],fabs(pPos[2])};
   double pPosAtMap[]={pPos[0],pPos[1],pPos[2]};
   
-  if(!Interpolation(pPosAtMap,pB,1)) {B[0]=B[1]=B[2]=0.0; return false;}
+	if(!Interpolation(pPosAtMap,pB,1)) {
+		B[0]=B[1]=B[2]=0.0; 
+		return false;
+	}
   
 #ifdef BFIELD_SEPTUM_DEBUG
   if(Global_Debug_Level>=3){
@@ -647,16 +647,9 @@ bool BField_Septum::GetBField(double Pos[],double B[]){
   }
 #endif
   
-  //apply real current ratio and the flag
-  /*
-  G4cout << "Nickie is double checking: " << G4endl;
-  G4cout << mCurrentRatioL << " " << mCurrentRatioR << G4endl;
-  G4cout << B[0] << " " << B[1] << " " << B[2] << G4endl;
-  */
-  for (i=0;i<3;i++) {
-    //G4cout << flag[i] << G4endl;
-    B[i]=pB[i]*(fMomentum/mDefaultMomentum)*flag[i]*1e3;
-  }
+  	for (i=0;i<3;i++) {
+    		B[i]=pB[i];
+  	}
 
 #ifdef BFIELD_SEPTUM_DEBUG
   if(Global_Debug_Level>=2){

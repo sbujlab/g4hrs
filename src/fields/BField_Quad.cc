@@ -24,9 +24,6 @@ BField_Quad::BField_Quad(G4double pGradient, G4ThreeVector pPivot, G4ThreeVector
    fQuadNumber  = pQuadNumber;
    fSnakeModel = 49;
 
-   //FIXME
-   fHRSMomentum = 1.068*GeV;
-
 }
 
 /////////////////////////////////////////////////////////////////////////

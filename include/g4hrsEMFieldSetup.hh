@@ -25,8 +25,8 @@ class G4MagIntegratorStepper;
 class G4MagInt_Driver; 
 class G4UniformMagField;
 
-
 class g4hrsEMField;
+class g4hrsTune;
 
 class g4hrsEMFieldSetup 
 {
@@ -93,10 +93,15 @@ public:
 	G4double		KAPPA1;
 	G4double		KAPPA2;	    
 	G4double		KAPPA3;
-	G4double		dipoleField;
+	G4double		DPBEND;
+	G4double		fDefaultMomentum;
+	G4double		snakemagnumber;
+	G4int			sos;
+	G4int			quads_on;
 
 private:
   g4hrsEMField*                 fEMfield; 
+  	g4hrsTune*		fTune;
   G4FieldManager*             fFieldManager;
   G4ChordFinder*              fChordFinder ;
   G4EqMagElectricField*       fEquation ;

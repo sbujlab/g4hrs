@@ -107,8 +107,8 @@ int main(int argc, char** argv){
 
     ((g4hrsDetectorConstruction *) detector)->SetIO(io);
 
-    rmmess->SetEmFieldSetup(((g4hrsDetectorConstruction *) detector)->GetEMFieldSetup());
-    rmmess->SetEMField(((g4hrsDetectorConstruction *) detector)->GetEMFieldFromSetup());
+//    rmmess->SetEmFieldSetup(((g4hrsDetectorConstruction *) detector)->GetEMFieldSetup());
+//    rmmess->SetEMField(((g4hrsDetectorConstruction *) detector)->GetEMFieldFromSetup());
 
     // Physics we want to use
     G4int verbose = 0;

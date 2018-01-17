@@ -9,6 +9,8 @@
 #include <CLHEP/Vector/ThreeVector.h>
 using namespace CLHEP;
 
+class g4hrsTune;
+
 class BField_Septum
 {
 public:
@@ -23,8 +25,6 @@ public:
 	virtual ~BField_Septum();
 	bool GetBField(double Pos[],double B[]);
 	bool GetBField(float fPos[],float fB[]);
-	
-	void SetMomentum(double pMomentum){fMomentum = pMomentum;}
 
 private:
 	bool ReadIni(const char *filename);
@@ -62,7 +62,7 @@ private:
 	//mBField[indexX][indexY][indexZ][4] By
 	//mBField[indexX][indexY][indexZ][5] Bz
 	double ****mBField;
-
+	g4hrsTune* fTune;
 	//parameters from ini file
 	int    mUseUniformB;
 	double mUniformB[3];
@@ -74,14 +74,17 @@ private:
 	double mOrigin[3];	// shift from hall center to septum center
 	double mTarget[3];	// shift from target center to hall center
 
-	double mFieldUnit;
+	double fFieldUnit;
 	int    mFirstDataLine;
 	int    mNPara;
 	int	   mRotAxis[3];
 	double mRotAngle[3];
 
-	double mDefaultMomentum;
+	double fDefaultMomentum;
+	double fDefaultCurrentDensity;
 	double fMomentum;
+	double fCurrentDensity;
+	double fFieldScale;
 
 	bool   mDoShift, mDoRotation;
 	int    mZNum,mXNum,mYNum;

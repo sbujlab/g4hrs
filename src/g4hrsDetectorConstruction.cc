@@ -76,7 +76,7 @@ g4hrsDetectorConstruction::g4hrsDetectorConstruction() {
     fSetupStdScatChamber = 0;
 
 	// create septum and HRS fields
-    	fEMFieldSetup = new g4hrsEMFieldSetup();
+//    	fEMFieldSetup = new g4hrsEMFieldSetup();
     
     //#SetupHRS have the following candidates: 
     //# 0: do nothing; 1: will build septum, sieve and VB; 
@@ -113,7 +113,7 @@ G4VPhysicalVolume* g4hrsDetectorConstruction::Construct() {
     
     G4VPhysicalVolume *worldVolume;
 
-//    fEMFieldSetup = new g4hrsEMFieldSetup();
+    fEMFieldSetup = new g4hrsEMFieldSetup();
     
     int z, nelements;
     double a, density;
