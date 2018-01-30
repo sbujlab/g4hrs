@@ -148,6 +148,15 @@ class g4hrsIO {
 	void ClearVirtualBoundaryData();
 	void SetVirtualBoundaryData();
     private:
+
+	int numVB;
+	int numVar;
+
+	G4double VBdata[14][12];
+
+	char VBName[14][6];
+	char VarName[12][5];
+
 	g4hrsSteppingAction* fSteppingAction;
 
 	G4int fLHRS;
