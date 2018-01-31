@@ -40,8 +40,7 @@ g4hrsEvent *g4hrsVEventGen::GenerateEvent() {
 
     return thisev;
 }
-
-
+	
 void g4hrsVEventGen::PolishEvent(g4hrsEvent *ev) {
     /*!
        Here it's our job to:

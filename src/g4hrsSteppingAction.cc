@@ -18,6 +18,9 @@ g4hrsSteppingAction::g4hrsSteppingAction()
 :drawFlag(false)
 {
 
+	numTF = 12;
+	numTFvar = 4;
+
 	numVB = 14;
 	numVar = 6;
 	VBnames[0] = "virtualBoundaryPhys_sen";
@@ -53,8 +56,10 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
     G4Track* fTrack = aStep->GetTrack();
     G4Material* material = fTrack->GetMaterial();
 
-    // Don't continue in these materials
-  
+	// Don't continue in these materials
+	// Don't track secondaries
+	// Don't track low energy (<0.9 GeV) particles
+
 	if(	((  material->GetName()=="Tungsten"
 		||  material->GetName()=="Copper" )
 		&&  fEnableKryptonite )
@@ -69,207 +74,207 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 	////////////////////////////////////////////////
 	// Virtual boundaries and transport functions //
 	////////////////////////////////////////////////
+	
+	if(fTrack->GetParentID() == 0) { 
+	
+		G4StepPoint* prePoint = aStep->GetPreStepPoint(); 
 		
-	G4StepPoint* prePoint = aStep->GetPreStepPoint(); 
-	
-	// Get hall coordinates in meters to output to ROOT	
-	G4double x = fTrack->GetPosition().x()/1000.;
-	G4double y = fTrack->GetPosition().y()/1000.;
-	G4double z = fTrack->GetPosition().z()/1000.;
-	// Get position 3-vector in millimeters for transforms
-	G4ThreeVector position = fTrack->GetPosition();
-	// Get momentum 3-vector
-	G4ThreeVector momentum = fTrack->GetMomentum();
-/*
-	if(fTrack->GetCurrentStepNumber()<=1) {
-	
-		G4ThreeVector position0 = prePoint->GetPosition()/1000.;	
-		G4ThreeVector momentum0 = prePoint->GetMomentum();
-	
-		fX0 = position0.x();
-		fY0 = position0.y();
-		fZ0 = position0.z();
-		fP0 = momentum0.mag();
-		fTh0 = momentum0.getTheta();
-		fPh0 = momentum0.getPhi();	
+		// Get hall coordinates in meters to output to ROOT	
+		G4double x = fTrack->GetPosition().x()/1000.;
+		G4double y = fTrack->GetPosition().y()/1000.;
+		G4double z = fTrack->GetPosition().z()/1000.;
+		// Get position 3-vector in millimeters for transforms
+		G4ThreeVector position = fTrack->GetPosition();
+		// Get momentum 3-vector
+		G4ThreeVector momentum = fTrack->GetMomentum();
 
+		if(fTrack->GetCurrentStepNumber()<=1) {
 		
-		// Test transform with special position/angle		
+			G4ThreeVector position0 = prePoint->GetPosition()/1000.;	
+			G4ThreeVector momentum0 = prePoint->GetMomentum();
+		
+			fX0 = position0.x();
+			fY0 = position0.y();
+			fZ0 = position0.z();
+			fTh0 = momentum0.getTheta();
+			fPh0 = momentum0.getPhi();	
+			fP0 = momentum0.mag();
 
-		fX0 = 0.*mm;
-		fY0 = 0.*mm;
-		fZ0 = 0.;
-		fP0 = 1.063*GeV;
-		fTh0 = 5.*deg;
-		fPh0 = 0.*deg;
-		G4ThreeVector position0 = G4ThreeVector(fX0, fY0, fZ0);
-		G4ThreeVector momentum0 = G4ThreeVector(fP0*sin(fTh0)*cos(fPh0),fP0*sin(fTh0)*sin(fPh0),fP0*cos(fTh0));
-
-
-
-		if(momentum0.x() > 0.){
-			fLHRS = 1;
-			septum_angle = -fSeptumAngle; 
-			hrs_angle = -fHRSAngle;
-			sign = -1.;
-		}
-		if(momentum0.x() < 0.){
-			fRHRS = 1;
-			septum_angle = fSeptumAngle;
-			hrs_angle = fHRSAngle;
-			sign = +1.;
-		}
-
-		G4RotationMatrix rotate_targ;
-		rotate_targ.rotateY(septum_angle);	
-		rotate_targ.rotateZ(90.*deg);
-						
-		G4AffineTransform transportAxis_targ = G4AffineTransform(rotate_targ);
-		G4AffineTransform transport_targ = transportAxis_targ.Inverse();
-
-		//Transform
-		G4ThreeVector position0_tr = transport_targ.TransformPoint(position0);
-		G4ThreeVector momentum0_tr = transport_targ.TransformPoint(momentum0);
-
-		fX0_tr = position0_tr.x();
-		fY0_tr = position0_tr.y();
-		fZ0_tr = position0_tr.z();
-		fTh0_tr = momentum0_tr.x()/momentum0_tr.z();
-		fPh0_tr = momentum0_tr.y()/momentum0_tr.z();
-
-		r0[0] = (float)fX0_tr;
-		r0[1] = (float)(fTh0_tr);
-		r0[2] = (float)(fY0_tr*sign);			
-		r0[3] = (float)(fPh0_tr*sign);
-		r0[4] = (float)((fP0-fHRSMomentum)/fHRSMomentum);	
-
-		// Only need to call transport functions once for event
-		goodParticle = fTransportFunction->CallTransportFunction(r0, x_tf, th_tf, y_tf, ph_tf); 	
-	
-	}
-*/
-
-/* TROUBLESHOOTING 
-	// Center of LHRS focal plane in HCS for coordinate transform test
-	G4ThreeVector fphc = G4ThreeVector(21770.815*sin(fHRSAngle),8330.421,1053.79+21770.815*cos(fHRSAngle));
-	// Unit momentum or central trajectory exiting dipole in HCS for coordinate transform test
-	G4ThreeVector cthc = G4ThreeVector(cos(45.*deg)*sin(fHRSAngle),sin(45.*deg),cos(45.*deg)*cos(fHRSAngle));
-*/
-	
-	
-	// Navigator of parallel world to get volume name (to identify virtual boundaries) and hall to transport coordinate transformation
-	G4Navigator* fParallelNavigator = G4TransportationManager::GetTransportationManager()->GetNavigator("g4hrsparallel");
-	G4String volName = fParallelNavigator->LocateGlobalPointAndSetup(position)->GetName();
-
-	if(volName.find("virtualBoundaryPhys") != G4String::npos) { 
-
-		// Must explicitly define transform for septum, as these virtual boundaries are in hall coordinate system
-		//Rotations
-		G4RotationMatrix rotate_sen, rotate_sm, rotate_sex;
-		rotate_sen.rotateY(septum_angle);
-		rotate_sen.rotateZ(90.*deg);
-		rotate_sm.rotateY((septum_angle + hrs_angle)/2.);
-		rotate_sm.rotateZ(90.*deg);
-		rotate_sex.rotateY(hrs_angle);
-		rotate_sex.rotateZ(90.*deg);
-		//Translations
-		double pivotZOffset = 105.379*cm;
-		double septumZPosition = 69.99937*cm; //from snake, matches values in world and parallel world construction
-		septumZPosition+=pivotZOffset; //put origin at target center, not Hall A pivot
-		double septumLength = 74.*cm;
-		double z_sen = septumZPosition - septumLength/2.;
-		double x_sen = z_sen*tan(fSeptumAngle);
-		//Length of chord connecting central trajectory at septum entrance and septum exit
-		double chord = septumLength/cos((fHRSAngle+fSeptumAngle)/2.);
-		//Radius of circle for central trajectory in ideal septum
-		double R = sqrt((chord*chord)/(2.*(1-cos(fHRSAngle-fSeptumAngle))));
-		//Center of aforementioned circle
-		double xc = R*cos(fSeptumAngle) + x_sen;
-		double zc = z_sen - R*sin(fSeptumAngle);
-		//x,z position of central trajectory at septum middle
-		double z_sm = septumZPosition;
-		double x_sm = xc - sqrt(R*R - (z_sm - zc)*(z_sm - zc));
-		//x,z position of central trajectory at septum exit
-		double z_sex = septumZPosition + septumLength/2.;
-		double x_sex = xc - sqrt(R*R - (z_sex - zc)*(z_sex - zc));
-	
-		if(fRHRS) {
-			x_sen*=-1.;
-			x_sm*=-1.;
-			x_sex*=-1.;
-		}
-
-		G4ThreeVector translate_sen = G4ThreeVector(x_sen,0.,z_sen);
-		G4ThreeVector translate_sm = G4ThreeVector(x_sm,0.,z_sm);
-		G4ThreeVector translate_sex = G4ThreeVector(x_sex,0.,z_sex);
-/*
-		//TROUBLESHOOTING
-		G4ThreeVector senhc = G4ThreeVector(x_sen,-2.,z_sen);
-		G4ThreeVector semhc = G4ThreeVector(x_sm,0.,z_sm);
-		G4ThreeVector sexhc = G4ThreeVector(x_sex,0.,z_sex);
-		G4ThreeVector senct = G4ThreeVector(sin(fSeptumAngle),0.,cos(fSeptumAngle));
-		G4ThreeVector semct = G4ThreeVector(sin((fSeptumAngle+fHRSAngle)/2.),0.,cos((fSeptumAngle+fHRSAngle)/2.));
-		G4ThreeVector sexct = G4ThreeVector(sin(fHRSAngle),0.,cos(fHRSAngle));
-		G4ThreeVector sentr = position_transform_sen.TransformPoint(senhc);
-		G4ThreeVector sencttr = momentum_transform_sen.TransformPoint(senct);
-		G4ThreeVector semtr = position_transform_sm.TransformPoint(semhc);
-		G4ThreeVector semcttr = momentum_transform_sm.TransformPoint(semct);
-		G4ThreeVector sextr = position_transform_sex.TransformPoint(sexhc);
-		G4ThreeVector sexcttr = momentum_transform_sex.TransformPoint(sexct);
-*/
-		for(int i = 0; i < numVB; i++) {
-
-			G4AffineTransform position_transform;
-			G4AffineTransform momentum_transform;
-
-			if(volName.find(VBnames[i]) != G4String::npos ) {
-				if(volName.find("virtualBoundaryPhys_sen") != G4String::npos ) {
-					position_transform.SetNetTranslation(translate_sen);
-					position_transform.SetNetRotation(rotate_sen);
-					momentum_transform.SetNetRotation(rotate_sen);
-					position_transform.Invert();
-					momentum_transform.Invert();
-				} else if(volName.find("virtualBoundaryPhys_sm") != G4String::npos )  {		
-					position_transform.SetNetTranslation(translate_sm);
-					position_transform.SetNetRotation(rotate_sm);
-					momentum_transform.SetNetRotation(rotate_sm);
-					position_transform.Invert();
-					momentum_transform.Invert();
-				} else if(volName.find("virtualBoundaryPhys_sex") != G4String::npos )  {		
-					position_transform.SetNetTranslation(translate_sex);
-					position_transform.SetNetRotation(rotate_sex);
-					momentum_transform.SetNetRotation(rotate_sex);
-					position_transform.Invert();
-					momentum_transform.Invert();
-				} else {
-					//This gets the full transform (rotation + translation) that is required for transforming POSITION		
-					position_transform = fParallelNavigator->GetGlobalToLocalTransform();
-					//However, the MOMENTUM transform requires rotation ONLY!! 
-					G4RotationMatrix momentum_rotation = position_transform.NetRotation();
-					momentum_transform = G4AffineTransform(momentum_rotation);
-				}
-
-				// Hall coordinates
-				VBdata[i][0] = x;
-				VBdata[i][1] = y;
-				VBdata[i][2] = z;
-				VBdata[i][3] = momentum.theta()/rad;
-				VBdata[i][4] = momentum.phi()/rad;
-				VBdata[i][5] = momentum.mag();	
-				// Transport coordinates
-				G4ThreeVector pos_tr = position_transform.TransformPoint(position)/1000.;
-				G4ThreeVector mom_tr = momentum_transform.TransformPoint(momentum);
-				VBdata[i][6] = pos_tr.x();
-				VBdata[i][7] = pos_tr.y();
-				VBdata[i][8] = pos_tr.z();
-				VBdata[i][9] = mom_tr.x()/mom_tr.z();
-				VBdata[i][10] = mom_tr.y()/mom_tr.z();
-				VBdata[i][11] = mom_tr.mag();		
+	/*
+			// Test transform with special position/angle	
+			fX0 = 0.*mm;
+			fY0 = 0.*mm;
+			fZ0 = 0.;
+			fP0 = 1.063*GeV;
+			fTh0 = 5.*deg;
+			fPh0 = 0.*deg;
+			G4ThreeVector position0 = G4ThreeVector(fX0, fY0, fZ0);
+			G4ThreeVector momentum0 = G4ThreeVector(fP0*sin(fTh0)*cos(fPh0),fP0*sin(fTh0)*sin(fPh0),fP0*cos(fTh0));
+	*/
 
 
+			if(momentum0.x() > 0.){
+				fLHRS = 1;
+				septum_angle = -fSeptumAngle; 
+				hrs_angle = -fHRSAngle;
+				sign = -1.;
 			}
+			if(momentum0.x() < 0.){
+				fRHRS = 1;
+				septum_angle = fSeptumAngle;
+				hrs_angle = fHRSAngle;
+				sign = +1.;
+			}
+
+			G4RotationMatrix rotate_targ;
+			rotate_targ.rotateY(septum_angle);	
+			rotate_targ.rotateZ(90.*deg);
+							
+			G4AffineTransform transportAxis_targ = G4AffineTransform(rotate_targ);
+			G4AffineTransform transport_targ = transportAxis_targ.Inverse();
+
+			//Transform
+			G4ThreeVector position0_tr = transport_targ.TransformPoint(position0);
+			G4ThreeVector momentum0_tr = transport_targ.TransformPoint(momentum0);
+
+			fX0_tr = position0_tr.x();
+			fY0_tr = position0_tr.y();
+			fZ0_tr = position0_tr.z();
+			fTh0_tr = momentum0_tr.x()/momentum0_tr.z();
+			fPh0_tr = momentum0_tr.y()/momentum0_tr.z();
+
+			r0[0] = (float)fX0_tr;
+			r0[1] = (float)(fTh0_tr);
+			r0[2] = (float)(fY0_tr*sign);			
+			r0[3] = (float)(fPh0_tr*sign);
+			r0[4] = (float)((fP0-fHRSMomentum)/fHRSMomentum);	
+
+			// Only need to call transport functions once for event
+			goodParticle = fTransportFunction->CallTransportFunction(r0, TFdata[0], TFdata[1], TFdata[2], TFdata[3]); 	
+		
 		}
 
-	} //end if volName contains virtualBoundaryPhys
+	/* TROUBLESHOOTING 
+		// Center of LHRS focal plane in HCS for coordinate transform test
+		G4ThreeVector fphc = G4ThreeVector(21770.815*sin(fHRSAngle),8330.421,1053.79+21770.815*cos(fHRSAngle));
+		// Unit momentum or central trajectory exiting dipole in HCS for coordinate transform test
+		G4ThreeVector cthc = G4ThreeVector(cos(45.*deg)*sin(fHRSAngle),sin(45.*deg),cos(45.*deg)*cos(fHRSAngle));
+	*/
+		
+		
+		// Navigator of parallel world to get volume name (to identify virtual boundaries) and hall to transport coordinate transformation
+		G4Navigator* fParallelNavigator = G4TransportationManager::GetTransportationManager()->GetNavigator("g4hrsparallel");
+		G4String volName = fParallelNavigator->LocateGlobalPointAndSetup(position)->GetName();
 
+		if(volName.find("virtualBoundaryPhys") != G4String::npos) { 
+
+			// Must explicitly define transform for septum, as these virtual boundaries are in hall coordinate system
+			//Rotations
+			G4RotationMatrix rotate_sen, rotate_sm, rotate_sex;
+			rotate_sen.rotateY(septum_angle);
+			rotate_sen.rotateZ(90.*deg);
+			rotate_sm.rotateY((septum_angle + hrs_angle)/2.);
+			rotate_sm.rotateZ(90.*deg);
+			rotate_sex.rotateY(hrs_angle);
+			rotate_sex.rotateZ(90.*deg);
+			//Translations
+			double pivotZOffset = 105.379*cm;
+			double septumZPosition = 69.99937*cm; //from snake, matches values in world and parallel world construction
+			septumZPosition+=pivotZOffset; //put origin at target center, not Hall A pivot
+			double septumLength = 74.*cm;
+			double z_sen = septumZPosition - septumLength/2.;
+			double x_sen = z_sen*tan(fSeptumAngle);
+			//Length of chord connecting central trajectory at septum entrance and septum exit
+			double chord = septumLength/cos((fHRSAngle+fSeptumAngle)/2.);
+			//Radius of circle for central trajectory in ideal septum
+			double R = sqrt((chord*chord)/(2.*(1-cos(fHRSAngle-fSeptumAngle))));
+			//Center of aforementioned circle
+			double xc = R*cos(fSeptumAngle) + x_sen;
+			double zc = z_sen - R*sin(fSeptumAngle);
+			//x,z position of central trajectory at septum middle
+			double z_sm = septumZPosition;
+			double x_sm = xc - sqrt(R*R - (z_sm - zc)*(z_sm - zc));
+			//x,z position of central trajectory at septum exit
+			double z_sex = septumZPosition + septumLength/2.;
+			double x_sex = xc - sqrt(R*R - (z_sex - zc)*(z_sex - zc));
+		
+			if(fRHRS) {
+				x_sen*=-1.;
+				x_sm*=-1.;
+				x_sex*=-1.;
+			}
+
+			G4ThreeVector translate_sen = G4ThreeVector(x_sen,0.,z_sen);
+			G4ThreeVector translate_sm = G4ThreeVector(x_sm,0.,z_sm);
+			G4ThreeVector translate_sex = G4ThreeVector(x_sex,0.,z_sex);
+	/*
+			//TROUBLESHOOTING
+			G4ThreeVector senhc = G4ThreeVector(x_sen,-2.,z_sen);
+			G4ThreeVector semhc = G4ThreeVector(x_sm,0.,z_sm);
+			G4ThreeVector sexhc = G4ThreeVector(x_sex,0.,z_sex);
+			G4ThreeVector senct = G4ThreeVector(sin(fSeptumAngle),0.,cos(fSeptumAngle));
+			G4ThreeVector semct = G4ThreeVector(sin((fSeptumAngle+fHRSAngle)/2.),0.,cos((fSeptumAngle+fHRSAngle)/2.));
+			G4ThreeVector sexct = G4ThreeVector(sin(fHRSAngle),0.,cos(fHRSAngle));
+			G4ThreeVector sentr = position_transform_sen.TransformPoint(senhc);
+			G4ThreeVector sencttr = momentum_transform_sen.TransformPoint(senct);
+			G4ThreeVector semtr = position_transform_sm.TransformPoint(semhc);
+			G4ThreeVector semcttr = momentum_transform_sm.TransformPoint(semct);
+			G4ThreeVector sextr = position_transform_sex.TransformPoint(sexhc);
+			G4ThreeVector sexcttr = momentum_transform_sex.TransformPoint(sexct);
+	*/
+			for(int i = 0; i < numVB; i++) {
+
+				G4AffineTransform position_transform;
+				G4AffineTransform momentum_transform;
+
+				if(volName.find(VBnames[i]) != G4String::npos ) {
+					if(volName.find("virtualBoundaryPhys_sen") != G4String::npos ) {
+						position_transform.SetNetTranslation(translate_sen);
+						position_transform.SetNetRotation(rotate_sen);
+						momentum_transform.SetNetRotation(rotate_sen);
+						position_transform.Invert();
+						momentum_transform.Invert();
+					} else if(volName.find("virtualBoundaryPhys_sm") != G4String::npos )  {		
+						position_transform.SetNetTranslation(translate_sm);
+						position_transform.SetNetRotation(rotate_sm);
+						momentum_transform.SetNetRotation(rotate_sm);
+						position_transform.Invert();
+						momentum_transform.Invert();
+					} else if(volName.find("virtualBoundaryPhys_sex") != G4String::npos )  {		
+						position_transform.SetNetTranslation(translate_sex);
+						position_transform.SetNetRotation(rotate_sex);
+						momentum_transform.SetNetRotation(rotate_sex);
+						position_transform.Invert();
+						momentum_transform.Invert();
+					} else {
+						//This gets the full transform (rotation + translation) that is required for transforming POSITION		
+						position_transform = fParallelNavigator->GetGlobalToLocalTransform();
+						//However, the MOMENTUM transform requires rotation ONLY!! 
+						G4RotationMatrix momentum_rotation = position_transform.NetRotation();
+						momentum_transform = G4AffineTransform(momentum_rotation);
+					}
+
+					// Hall coordinates
+					VBdata[i][0] = x;
+					VBdata[i][1] = y;
+					VBdata[i][2] = z;
+					VBdata[i][3] = momentum.theta()/rad;
+					VBdata[i][4] = momentum.phi()/rad;
+					VBdata[i][5] = momentum.mag();	
+					// Transport coordinates
+					G4ThreeVector pos_tr = position_transform.TransformPoint(position)/1000.;
+					G4ThreeVector mom_tr = momentum_transform.TransformPoint(momentum);
+					VBdata[i][6] = pos_tr.x();
+					VBdata[i][7] = pos_tr.y();
+					VBdata[i][8] = pos_tr.z();
+					VBdata[i][9] = mom_tr.x()/mom_tr.z();
+					VBdata[i][10] = mom_tr.y()/mom_tr.z();
+					VBdata[i][11] = mom_tr.mag();		
+
+
+				}
+			}
+
+		} //end if volName contains virtualBoundaryPhys
+	} //end if ParentID == 0
 }

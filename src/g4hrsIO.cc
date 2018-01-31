@@ -26,6 +26,28 @@
 
 g4hrsIO::g4hrsIO(){
 
+	numTF = 12;
+	numTFvar = 4;
+	
+	sprintf(TFName[0],"sen");
+	sprintf(TFName[1],"sm");
+	sprintf(TFName[2],"sex");
+	sprintf(TFName[3],"col");
+	sprintf(TFName[4],"q1ex");
+	sprintf(TFName[5],"q2ex");
+	sprintf(TFName[6],"den");
+	sprintf(TFName[7],"dex");
+	sprintf(TFName[8],"q3en");
+	sprintf(TFName[9],"q3m");
+	sprintf(TFName[10],"q3ex");
+	sprintf(TFName[11],"fp");
+
+	sprintf(TFVarName[0],"x");
+	sprintf(TFVarName[1],"th");
+	sprintf(TFVarName[2],"y");
+	sprintf(TFVarName[3],"ph");
+
+
 	numVB = 14;
 	numVar = 6;
 
@@ -155,6 +177,32 @@ void g4hrsIO::InitializeTree(){
     fTree->Branch("sum.det",  &fGenDetSum_det,  "sum.det[sum.n]/I");
     fTree->Branch("sum.vid",  &fGenDetSum_id,   "sum.vid[sum.n]/I");
     fTree->Branch("sum.edep", &fGenDetSum_edep, "sum.edep[sum.n]/D");
+
+	// Target data (used as input to transport functions)
+	
+	fTree->Branch("x_tg",	&fX0,	"fX0/D");
+	fTree->Branch("y_tg",	&fY0,	"fY0/D");
+	fTree->Branch("z_tg",	&fZ0,	"fZ0/D");
+	fTree->Branch("th_tg",	&fTh0,	"fTh0/D");
+	fTree->Branch("ph_tg",	&fPh0,	"fPh0/D");
+	fTree->Branch("p_tg",	&fP0,	"fP0/D");
+	fTree->Branch("x_tg_tr",	&fX0_tr,	"fX0_tr/D");
+	fTree->Branch("y_tg_tr",	&fY0_tr,	"fY0_tr/D");
+	fTree->Branch("z_tg_tr",	&fZ0_tr,	"fZ0_tr/D");
+	fTree->Branch("th_tg_tr",	&fTh0_tr,	"fTh0_tr/D");
+	fTree->Branch("ph_tg_tr",	&fPh0_tr,	"fPh0_tr/D");
+	fTree->Branch("p_tg_tr",	&fP0_tr,	"fP0_tr/D");
+
+	//Transport function data
+	
+	for(int i = 0; i < numTF; i++) {
+		for(int j = 0; j < numTFvar; j++) {
+			char thisVar[15];
+			sprintf(thisVar,"%s_%s_tf",TFVarName[j],TFName[i]);
+			fTree->Branch(thisVar, &TFdata[j][i], Form("%s/D",thisVar));
+		}
+	}
+
 
 	//Virtual boundary data
 
@@ -349,10 +397,29 @@ void g4hrsIO::ClearVirtualBoundaryData() {
 
 	fSteppingAction->fLHRS = 0;
 	fSteppingAction->fRHRS = 0;
+	
+	fSteppingAction->fX0 = -333.;
+	fSteppingAction->fY0 = -333.;
+	fSteppingAction->fZ0 = -333.;
+	fSteppingAction->fTh0 = -333.;
+	fSteppingAction->fPh0 = -333.;
+	fSteppingAction->fP0 = -333.;
+	fSteppingAction->fX0_tr = -333.;
+	fSteppingAction->fY0_tr = -333.;
+	fSteppingAction->fZ0_tr = -333.;
+	fSteppingAction->fTh0_tr = -333.;
+	fSteppingAction->fPh0_tr = -333.;
+	fSteppingAction->fP0_tr = -333.;
+
+	for(int i = 0; i < numTF; i++) {
+		for(int j = 0; j < numTFvar; j++) {
+			fSteppingAction->TFdata[j][i] = -333.;
+		}
+	}	
 
 	for(int i = 0; i<numVB; i++) {
 		for(int j = 0; j<2*numVar; j++) {
-			VBdata[i][j] = -333.;
+			fSteppingAction->VBdata[i][j] = -333.;
 		}
 	}
 
@@ -363,6 +430,25 @@ void g4hrsIO::SetVirtualBoundaryData() {
 
 	fLHRS = fSteppingAction->fLHRS;
 	fRHRS = fSteppingAction->fRHRS;
+
+	fX0 = fSteppingAction->fX0;
+	fY0 = fSteppingAction->fY0;
+	fZ0 = fSteppingAction->fZ0;
+	fTh0 = fSteppingAction->fTh0;
+	fPh0 = fSteppingAction->fPh0;
+	fP0 = fSteppingAction->fP0;
+	fX0_tr = fSteppingAction->fX0_tr;
+	fY0_tr = fSteppingAction->fY0_tr;
+	fZ0_tr = fSteppingAction->fZ0_tr;
+	fTh0_tr = fSteppingAction->fTh0_tr;
+	fPh0_tr = fSteppingAction->fPh0_tr;
+	fP0_tr = fSteppingAction->fP0_tr;
+
+	for(int i = 0; i < numTF; i++) {
+		for(int j = 0; j < numTFvar; j++) {
+			TFdata[j][i] = fSteppingAction->TFdata[j][i];
+		}
+	}	
 
 	for(int i = 0; i < numVB; i++) {
 		for(int j = 0; j < 2*numVar; j++) {
