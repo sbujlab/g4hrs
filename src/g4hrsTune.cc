@@ -57,4 +57,16 @@ void g4hrsTune::SetTune(G4String mTune) {
 		exit(1);
 	}
 
+}
+
+void g4hrsTune::SetQ1(double k1) {
+	kappaQuad1 = k1/snakeMagnet;
+}
+ 
+void g4hrsTune::SetQ2(double k2) {
+	kappaQuad2 = k2/snakeMagnet;
+}
+ 
+void g4hrsTune::SetQ3(double k3) {
+	kappaQuad3 = k3/snakeMagnet;
 } 

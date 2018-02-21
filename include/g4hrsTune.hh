@@ -13,6 +13,10 @@ public:
 	virtual ~g4hrsTune();
 	static g4hrsTune* GetTune();
 	void SetTune(G4String);
+	void SetQ1(double);
+	void SetQ2(double);
+	void SetQ3(double);
+	
 
 private:
 	static g4hrsTune* fTune;
