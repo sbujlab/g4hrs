@@ -61,8 +61,11 @@ inline void g4hrsEMField::GetFieldValue(const G4double Point[4],G4double *Bfield
 		if(mBField_Septum)
 		{
 			for(int i=0;i<3;i++) pB[i]=0.0;  //reset
-			if (! mBField_Septum->IsUniformField() )  mBField_Septum->GetBField(pPos,pB); 
-			else  mBField_Septum->GetUniformField(pB); 
+			if (! mBField_Septum->IsUniformField() ) {
+				mBField_Septum->GetBField(pPos,pB);
+			} else { 
+				mBField_Septum->GetUniformField(pB); 
+			}
 			for(int i=0;i<3;i++) Bfield[i] =pB[i];
 		}
 

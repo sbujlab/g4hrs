@@ -470,12 +470,12 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 
 	if( cmd == q1kappaCmd) {
 		G4double k = q1kappaCmd->GetNewDoubleValue(newValue);
-		ftune->kappaQuad1 = k;
+		ftune->SetQ1(k);
 	}
 
 	if( cmd == q2kappaCmd) {
 		G4double k = q2kappaCmd->GetNewDoubleValue(newValue);
-		ftune->kappaQuad2 = k;
+		ftune->SetQ2(k);
 	}
 
 	if( cmd == dBendCmd) {
@@ -485,7 +485,7 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 
 	if( cmd == q3kappaCmd) {
 		G4double k = q3kappaCmd->GetNewDoubleValue(newValue);
-		ftune->kappaQuad3 = k;
+		ftune->SetQ3(k);
 	}
 
     if( cmd == tgtLenCmd ){

@@ -126,7 +126,6 @@ void g4hrsMaterial::ConstructMaterials()
 	temperature = 2.7 *kelvin;  //cosmic background temperature
 	a = 1.3e-7 *g/mole;
 	galaxy = new G4Material(name="Galaxy",z=1,a,density,kStateGas,temperature,pressure);
-	
 
 	//A pressure that causes the Hg column to rise 1 millimeter is called ONE torr (1mm Hg)
 	// Vaccum of 1.e-6 torr at room temperature,  1 atmosphere = 101325*pascal = 760 *torr

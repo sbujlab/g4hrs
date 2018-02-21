@@ -97,8 +97,7 @@ class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
       double fFieldY;
       double fFieldZ;
  
-      g4hrsMaterial *mMaterialManager;
-
+      g4hrsMaterial* mMaterialManager;
 };
 
 #endif//__MOLLERDETECTORCONSTRUCTION_HH

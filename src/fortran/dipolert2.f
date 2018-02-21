@@ -67,6 +67,11 @@ c      if ( in == 3 ) then
 c         print*,sbx,sby,sbz
 c      endif
       call snaketog4mc(bx,by,bz,sbx,sby,sbz)
+c     TYLER TROUBLESHOOTING
+c       if( in == 3)then
+c          print *, "sx = ", sx, " sy = ", sy, " sz = ", sz
+c          print *, " bx = ", bx, " by = ", by, " bz = ", bz
+c       endif 
 c      by = 0.
 c      bz = 0.
       end
@@ -1068,6 +1073,8 @@ c****
       nbx=bx
       nby=by
       nbz=bz
+c     TYLER TROUBLESHOOTING
+c      print *, "nbx = ", bx, " nby = ", by, " nbz = ", bz
       return                                                            
       end                                                               
       subroutine bpls ( igp, d, s, re, g1, g2, g3, g4, g5, g6 )

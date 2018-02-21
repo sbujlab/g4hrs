@@ -70,15 +70,14 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 
 		} 
 		
+//	G4cout << "Step " << fTrack->GetCurrentStepNumber() << " in " << material->GetName() << G4endl;
 
 	////////////////////////////////////////////////
 	// Virtual boundaries and transport functions //
 	////////////////////////////////////////////////
 	
 	if(fTrack->GetParentID() == 0) { 
-	
 		G4StepPoint* prePoint = aStep->GetPreStepPoint(); 
-		
 		// Get hall coordinates in meters to output to ROOT	
 		G4double x = fTrack->GetPosition().x()/1000.;
 		G4double y = fTrack->GetPosition().y()/1000.;
@@ -87,6 +86,10 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 		G4ThreeVector position = fTrack->GetPosition();
 		// Get momentum 3-vector
 		G4ThreeVector momentum = fTrack->GetMomentum();
+
+		G4String realVolName = fTrack->GetVolume()->GetName();
+
+//		G4cout << std::setw(20) << realVolName << "\t" << material->GetName() << G4endl;		
 
 		if(fTrack->GetCurrentStepNumber()<=1) {
 		

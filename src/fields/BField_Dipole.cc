@@ -82,6 +82,7 @@ void BField_Dipole::GetFieldValue( const G4double y[],
   //y[1],
   //y[2]);
   
+
   //G4ThreeVector r_local = G4ThreeVector
   //(fpMatrix->colX() * r_global - fOrigin.x(),
   //fpMatrix->colY() * r_global - fOrigin.y(),
@@ -133,14 +134,15 @@ void BField_Dipole::GetFieldValue( const G4double y[],
   float sny = r_local.y();
   float snz = r_local.z();
   float snbx,snby,snbz;
-  //G4cout << "input " << snx << " " << sny << " " << snz << G4endl;
+//  G4cout << "SnPx SnPy SnPz = " << snx << " " << sny << " " << snz << G4endl;
   snakedipole_(&snx,  &sny,  &snz,
 	       &snbx, &snby, &snbz,
 	       &B_0);
-  //  G4cout << snbx << " " << snby << " " << snbz << G4endl;
+//    G4cout << snbx << " " << snby << " " << snbz << G4endl;
   snbx *= -tesla;
   snby *= -tesla;
   snbz *= -tesla;
+//	G4cout << "SnBx SnBy SnBz = " << snbx << "\t" << snby << "\t" << snbz << G4endl;
   //These lines are original without the fringe field, overwrite them later, if you desire fringe field.
   //straight from SNAKE
   //if( mtyp .eq. 3) by=
@@ -294,7 +296,10 @@ void BField_Dipole::GetFieldValue( const G4double y[],
   B[0] = B_global.x() ;
   B[1] = B_global.y() ;
   B[2] = B_global.z() ;
-  /*
+
+//	G4cout << "Yx Yy Yz = " << y[0] << " " << y[1] << " " << y[2] << G4endl;
+//	G4cout << "Bx By Bz = " << B[0] << "\t" << B[1] << "\t" << B[2] << G4endl;
+ /*
     B[0] = 0.;
     B[1] = 0.;
     B[2] = 0.;

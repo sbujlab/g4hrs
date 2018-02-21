@@ -114,14 +114,15 @@ G4VPhysicalVolume* g4hrsDetectorConstruction::Construct() {
     G4VPhysicalVolume *worldVolume;
 
     fEMFieldSetup = new g4hrsEMFieldSetup();
+ 
+	//    g4hrsMaterial::g4hrsMaterial();
+    mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
+
     
     int z, nelements;
     double a, density;
 
-//    g4hrsMaterial::g4hrsMaterial();
-    mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
-
-     // Air
+    // Air
     G4Element* N = new G4Element("Nitrogen", "N", z=7 , a=14.01*g/mole);
     G4Element* O = new G4Element("Oxygen"  , "O", z=8 , a=16.00*g/mole);
 
@@ -144,14 +145,6 @@ G4VPhysicalVolume* g4hrsDetectorConstruction::Construct() {
 }
 
 void g4hrsDetectorConstruction::CreateTarget(G4LogicalVolume *pMotherLogVol){
-    int z, nelements;
-    double a, density;
-
-
-    G4Element* Pb = new G4Element("Lead", "Pb", z=82 , a=208.0*g/mole);
-//    G4Material* Pb_Mat = new G4Material("lead208", 11.34*g/cm3, nelements=1);
-	G4Material* Pb_Mat = new G4Material("lead208",z=82.,a=207.9766521*g/mole, 11.38*g/cm3);
-//    Pb_Mat->AddElement(Pb, 1);
 
     g4hrsBeamTarget *beamtarg = g4hrsBeamTarget::GetBeamTarget();
     beamtarg->Reset();
@@ -160,51 +153,14 @@ void g4hrsDetectorConstruction::CreateTarget(G4LogicalVolume *pMotherLogVol){
 	// Can be changed in macro
 	G4Material* targ_material = mMaterialManager->lead208;
 
-
-//    G4VSolid* targetSolid  = new G4Box("targetBox", fTargetW / 2.0, fTargetH / 2.0, fTargetL / 2.0 );
     G4VSolid* targetSolid  = new G4Tubs("targetBox", 0.0, fTargetW, fTargetL / 2.0, 0, 360*deg );
-//    G4LogicalVolume* targetLogical = new G4LogicalVolume(targetSolid,Pb_Mat,"targetLogical",0,0,0);
     G4LogicalVolume* targetLogical = new G4LogicalVolume(targetSolid,targ_material,"targetLogical",0,0,0);
-//    G4LogicalVolume* targetLogical = new G4LogicalVolume(targetSolid,mMaterialManager->vacuum,"targetLogical",0,0,0); // Tyler test
 
     G4VPhysicalVolume *phystarg = new G4PVPlacement(0,G4ThreeVector(fTargetX, fTargetY, fTargetZ),
         targetLogical,"targetPhys",pMotherLogVol,0,0);
     
     beamtarg->SetTargetVolume(phystarg);
 
-	//Attempt at tracking detector just past target
-/*	
-	G4SDManager* SDMan = G4SDManager::GetSDMpointer();
-
-	G4VSensitiveDetector* airDetSD1 = new g4hrsGenericDetector("airDet1",37);
-	SDMan->AddNewDetector(airDetSD1);
-	
-	G4VSolid* airDetSolid1 = new G4Box("airDetBox1", 500., 500., 0.05);
-	G4LogicalVolume* airDetLogical1 = new G4LogicalVolume(airDetSolid1,mMaterialManager->vacuum,"airDetLogical1",0,0,0);
-	airDetLogical1->SetSensitiveDetector(airDetSD1);
-	G4VPhysicalVolume* airDetPhys1 = new G4PVPlacement(0,G4ThreeVector(fTargetX,fTargetY,fTargetZ + 4.0*cm),
-		airDetLogical1,"physAirDet1",pMotherLogVol,0,0);
-
-
-	G4VSensitiveDetector* airDetSD2 = new g4hrsGenericDetector("airDet2",38);
-	SDMan->AddNewDetector(airDetSD2);
-	
-	G4VSolid* airDetSolid2 = new G4Box("airDetBox2", 5000., 5000., 0.05);
-	G4LogicalVolume* airDetLogical2 = new G4LogicalVolume(airDetSolid2,mMaterialManager->vacuum,"airDetLogical2",0,0,0);
-	airDetLogical2->SetSensitiveDetector(airDetSD2);
-	G4VPhysicalVolume* airDetPhys2 = new G4PVPlacement(0,G4ThreeVector(fTargetX,fTargetY,fTargetZ + 175.38*cm),
-		airDetLogical2,"physAirDet2",pMotherLogVol,0,0);
-
-	G4VSensitiveDetector* airDetSD3 = new g4hrsGenericDetector("airDet3",39);
-	SDMan->AddNewDetector(airDetSD3);
-	
-	G4VSolid* airDetSolid3 = new G4Box("airDetBox1", 5000., 5000., 0.05);
-	G4LogicalVolume* airDetLogical3 = new G4LogicalVolume(airDetSolid3,mMaterialManager->vacuum,"airDetLogical3",0,0,0);
-	airDetLogical3->SetSensitiveDetector(airDetSD3);
-	G4VPhysicalVolume* airDetPhys3 = new G4PVPlacement(0,G4ThreeVector(fTargetX,fTargetY,fTargetZ + 1.46*m + fPivotZOffset ),
-		airDetLogical3,"physAirDet3",pMotherLogVol,0,0);
-
-*/
     return;
 
 }
@@ -1667,10 +1623,11 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 	G4FieldManager* LdipoleFieldManager = fEMFieldSetup->GetFieldManagerFZBL3();
 	G4FieldManager* RdipoleFieldManager = fEMFieldSetup->GetFieldManagerFZBR3();
 	//G4double minEps= 1.0e-9;  //   Minimum & value for smallest steps
-	//G4double maxEps= 1.0e-8;  //   Maximum & value for largest steps
-
+	//G4double maxEps= 0.25*mm;  //   Maximum & value for largest steps
+	
 	//dipoleFieldManager->SetMinimumEpsilonStep( minEps );
-	//dipoleFieldManager->SetMaximumEpsilonStep( maxEps );
+	//LdipoleFieldManager->SetMaximumEpsilonStep( maxEps );
+	//RdipoleFieldManager->SetMaximumEpsilonStep( maxEps );
 	//dipoleFieldManager->SetDeltaOneStep( 0.5e-9 * mm );
 	//dipoleFieldManager->GetChordFinder()->SetDeltaChord( 0.001 * mm );
 	LDipoleTunnelLogical->SetFieldManager(LdipoleFieldManager,allLocal);

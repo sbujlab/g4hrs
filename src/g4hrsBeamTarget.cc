@@ -242,17 +242,18 @@ void g4hrsBeamTarget::SetTargetMaterial(G4String targMat) {
     	mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
 	if(targMat == "Pb208") {
 		targ_material = mMaterialManager->lead208;	
-	}
-	else if(targMat == "Ca40") {
+	} else if(targMat == "Ca40") {
 		targ_material = mMaterialManager->calcium40;	
-	}
-	else if(targMat == "Ca48") {
+	} else if(targMat == "Ca48") {
 		targ_material = mMaterialManager->calcium48;	
+	} else if (targMat = "Vacuum") {
+		targ_material = mMaterialManager->vacuum;
 	} else {
 		G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
 		":  Invalid target material selected" << G4endl; 
 		exit(1);
 	}
+
 	G4GeometryManager::GetInstance()->OpenGeometry(fTargVol);
 	((G4LogicalVolume *) fTargVol->GetLogicalVolume())->SetMaterial(targ_material);
 	G4GeometryManager::GetInstance()->CloseGeometry(true, false, fTargVol);
@@ -385,7 +386,6 @@ g4hrsVertex g4hrsBeamTarget::SampleVertex(SampType_t samp){
                     zinvol + (*it)->GetFrameTranslation().z()  
                     - ((G4Tubs *) (*it)->GetLogicalVolume()->GetSolid())->GetZHalfLength() );
 
-//		fVer = G4ThreeVector(0.,0.,0.);
             G4double masssum = 0.0;
             const G4int *atomvec = mat->GetAtomsVector();
             const G4ElementVector *elvec = mat->GetElementVector();
