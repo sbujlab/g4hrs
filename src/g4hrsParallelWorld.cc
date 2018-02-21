@@ -135,12 +135,14 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	G4VSolid* FPSolid = new G4Tubs("FPTub",0,75.*cm * 2,vb_thickness,0.0*deg,360.0*deg);
 	G4VSolid* PlaneSolid1 = new G4Tubs("PlaneTub",0,35.*cm,vb_thickness,0.0*deg,360.0*deg); //circles
 	G4VSolid* PlaneSolid2 = new G4Tubs("PlaneTub",0,75.*cm,vb_thickness,0.0*deg,360.0*deg); //circles
+	G4VSolid* CollimatorSolid = new G4Tubs("ColTub",0,30.*cm,vb_thickness,0.0*deg,360.0*deg); //circles
 	G4VSolid* LocalAxis = new G4Cons("LocalAxis",20.*cm, 30.*cm, 0.0*cm, 0.1*cm, 40.*cm, 5.0*deg, 350*deg);
 
 	G4LogicalVolume* LPlaneLogical1 = new G4LogicalVolume(PlaneSolid1,0,"LPlaneLogical1",0,0,0);
 	G4LogicalVolume* RPlaneLogical1 = new G4LogicalVolume(PlaneSolid1,0,"RPlaneLogical1",0,0,0);
 	G4LogicalVolume* LPlaneLogical2 = new G4LogicalVolume(PlaneSolid2,0,"LPlaneLogical1",0,0,0);
 	G4LogicalVolume* RPlaneLogical2 = new G4LogicalVolume(PlaneSolid2,0,"RPlaneLogical1",0,0,0);
+	G4LogicalVolume* CollimatorLogical = new G4LogicalVolume(CollimatorSolid,0,"CollimatorLogical",0,0,0);
 	G4LogicalVolume* LocalAxisLog = new G4LogicalVolume(LocalAxis, 0, "LocalAxisLog",0,0,0);
 
         G4LogicalVolume* LFPLogical = new G4LogicalVolume(FPSolid,0,"LFPLogical",0,0,0);
@@ -154,6 +156,7 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	RPlaneLogical2->SetVisAttributes(virtualBoundaryVisAtt);
 	LFPLogical->SetVisAttributes(virtualBoundaryVisAtt);
 	RFPLogical->SetVisAttributes(virtualBoundaryVisAtt);
+	CollimatorLogical->SetVisAttributes(virtualBoundaryVisAtt);
 	LocalAxisLog->SetVisAttributes(virtualBoundaryVisAtt);
 
 	///////////////////////////////
@@ -192,7 +195,7 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	// HRS containers //
 	////////////////////
 
-	double pHRSContainerRin=1.46*m,pHRSContainerRout=25*m;//NickieMode it just has to be big enough to fit my VB at FP
+	double pHRSContainerRin=1.40*m,pHRSContainerRout=25*m;//NickieMode it just has to be big enough to fit my VB at FP
 	const int kNPlane_HRSContainer=7;
 	double rInner_HRSContainer[] = {	pHRSContainerRin,
 						pHRSContainerRin,
@@ -268,6 +271,7 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 
 	// Positions from SNAKE
 	double pivotOffset = 104.978*cm;
+	double col = 1.38*m;
 	double q1en = 160.*cm;
 	double q1ex = q1en + 94.13*cm;
 	double q2en = q1ex + 115.58*cm;
@@ -287,6 +291,16 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	double fp_z = vdc_z + (fp_drift / sqrt(2.));
 	double fp_x = vdc_x + (fp_drift / sqrt(2.));
 
+	///////////////////////////////////
+	// Collimator virtual boundaries //	
+	///////////////////////////////////
+	//LHRS
+	new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-col,0),
+		CollimatorLogical,"virtualBoundaryPhys_col_LHRS",LHRSContainerLogical,0,0,0);//col
+	//RHRS
+	new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-col,0),
+		CollimatorLogical,"virtualBoundaryPhys_col_RHRS",RHRSContainerLogical,0,0,0);//col
+	
 	///////////////////////////
 	// Q1 virtual boundaries //
 	///////////////////////////
@@ -297,9 +311,9 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 		LPlaneLogical1,"virtualBoundaryPhys_q1ex_LHRS",LHRSContainerLogical,0,0,0);//q1ex
 	//RHRS
 	new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-q1en,0),
-		LPlaneLogical1,"virtualBoundaryPhys_q1en_RHRS",RHRSContainerLogical,0,0,0);//q1en	
+		RPlaneLogical1,"virtualBoundaryPhys_q1en_RHRS",RHRSContainerLogical,0,0,0);//q1en	
 	new G4PVPlacement(pRotX90deg,G4ThreeVector(0,-q1ex,0),
-		LPlaneLogical1,"virtualBoundaryPhys_q1ex_RHRS",RHRSContainerLogical,0,0,0);//q1ex
+		RPlaneLogical1,"virtualBoundaryPhys_q1ex_RHRS",RHRSContainerLogical,0,0,0);//q1ex
 
 	///////////////////////////
 	// Q2 virtual boundaries //
