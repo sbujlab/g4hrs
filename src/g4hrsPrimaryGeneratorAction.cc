@@ -54,6 +54,7 @@ void g4hrsPrimaryGeneratorAction::SetGenerator(G4String genname) {
     }else if( genname == "beam" ) {
         fEventGen = new g4hrsGenBeam();
     }else if( genname == "flat" ) {
+	fEventGen = new g4hrsGenFlat();
     }
 
     if( !fEventGen ) {

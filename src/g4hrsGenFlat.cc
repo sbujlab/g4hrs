@@ -10,10 +10,14 @@
 #include "g4hrstypes.hh"
 
 g4hrsGenFlat::g4hrsGenFlat(){
-    fTh_min =     0.0*deg;
-    fTh_max =     5.0*deg;
+	fTh_min = 0.0*deg;
+    	fTh_max = 5.0*deg;
+	fPh_min = -90.0*deg;
+	fPh_max = 90.0*deg;
+	fE_min = 1.063*GeV;
+	fE_max = 1.063*GeV;
 
-    fApplyMultScatt = true;
+    fApplyMultScatt = false;
 }
 
 g4hrsGenFlat::~g4hrsGenFlat(){
@@ -27,9 +31,9 @@ void g4hrsGenFlat::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
     double mp = 0.938*GeV;
 
     double th = acos(CLHEP::RandFlat::shoot(cos(fTh_max), cos(fTh_min)));
-    double ph = CLHEP::RandFlat::shoot(0.0, 2.0*pi);
+    double ph = CLHEP::RandFlat::shoot(fPh_min, fPh_max);
     double ef = CLHEP::RandFlat::shoot(fE_min, fE_max);
-
+	
     evt->SetEffCrossSection(1);
 
     if( vert->GetMaterial()->GetNumberOfElements() != 1 ){
