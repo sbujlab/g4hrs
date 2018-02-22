@@ -26,6 +26,8 @@ class G4UIcmdWithADoubleAndUnit;
 class G4UIcmdWithAString;
 class G4UIcmdWithABool;
 class G4UIcmdWithADouble;
+class G4UIcmdWith3Vector;
+class G4UIcmdWith3VectorAndUnit;
 
 class g4hrsMessenger : public G4UImessenger {
     public:
@@ -69,12 +71,12 @@ class g4hrsMessenger : public G4UImessenger {
 	G4UIcmdWithADoubleAndUnit	*hrsMomCmd;
 	G4UIcmdWithAnInteger		*hrsSetupCmd;
 	G4UIcmdWithADoubleAndUnit	*sepMomCmd;
-	G4UIcmdWithAString		*sepMapCmd;
 	G4UIcmdWithADoubleAndUnit	*sepCurCmd;
 	G4UIcmdWithADoubleAndUnit	*q1kappaCmd;
 	G4UIcmdWithADoubleAndUnit	*q2kappaCmd;
 	G4UIcmdWithADoubleAndUnit	*dBendCmd;
 	G4UIcmdWithADoubleAndUnit	*q3kappaCmd;
+	G4UIcmdWithAString		*fTuneCmd;
 
 	G4UIcmdWithADoubleAndUnit *tgtLenCmd;
 	G4UIcmdWithADoubleAndUnit *tgtPosCmd;
@@ -114,6 +116,8 @@ class g4hrsMessenger : public G4UImessenger {
 	G4UIcmdWithADoubleAndUnit *thCoMmaxCmd;
 	G4UIcmdWithADoubleAndUnit *EminCmd;
 	G4UIcmdWithADoubleAndUnit *EmaxCmd;
+	G4UIcmdWith3VectorAndUnit* vPosCmd;
+	G4UIcmdWith3Vector* vMomCmd;
 
 };
 

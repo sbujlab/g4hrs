@@ -5,6 +5,8 @@
 #include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWithABool.hh"
 #include "G4UIcmdWithADouble.hh"
+#include "G4UIcmdWith3Vector.hh"
+#include "G4UIcmdWith3VectorAndUnit.hh"
 
 #include "g4hrsDetectorConstruction.hh"
 #include "g4hrsIO.hh"
@@ -106,10 +108,6 @@ g4hrsMessenger::g4hrsMessenger(){
 	sepMomCmd->SetGuidance("Set septum momentum");
 	sepMomCmd->SetParameterName("sepmom",false);
 
-	sepMapCmd = new G4UIcmdWithAString("/g4hrs/septummap",this);
-	sepMapCmd->SetGuidance("Set septum map file");
-	sepMapCmd->SetParameterName("sepmap",false);
-
 	sepCurCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/septumcur",this);
 	sepCurCmd->SetGuidance("Set septum current density");
 	sepCurCmd->SetParameterName("sepcur",false);
@@ -129,6 +127,10 @@ g4hrsMessenger::g4hrsMessenger(){
 	q3kappaCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/quad3",this);
 	q3kappaCmd->SetGuidance("Set magnet setting for Q3");
 	q3kappaCmd->SetParameterName("kappa3",false);
+
+	fTuneCmd = new G4UIcmdWithAString("/g4hrs/tune",this);
+	fTuneCmd->SetGuidance("Choose an overall field tune");
+	fTuneCmd->SetParameterName("tune",false);
 
     tgtLenCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/targlen",this);
     tgtLenCmd->SetGuidance("Target length");
@@ -193,6 +195,15 @@ g4hrsMessenger::g4hrsMessenger(){
     EmaxCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/emax",this);
     EmaxCmd->SetGuidance("Maximum generation energy");
     EmaxCmd->SetParameterName("emax", false);
+
+	vPosCmd = new G4UIcmdWith3VectorAndUnit("/g4hrs/vpos",this);
+	vPosCmd->SetGuidance("Event vertex position (x, y, z)");
+	vPosCmd->SetParameterName("vx","vy","vz",false);
+	
+	vMomCmd = new G4UIcmdWith3Vector("/g4hrs/vmom",this);
+	vMomCmd->SetGuidance("Event vertex position (th, ph, dp/p)");
+	vMomCmd->SetParameterName("th","ph","dp/p",false);
+	
 
 
     //////////////////////////////////////////////////
@@ -459,10 +470,6 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 		ftune->septumMomentum = p;
 	}
 
-	if( cmd == sepMapCmd ) {
-//		femfield->fSeptumMapFile = newValue;
-	}
-
 	if( cmd == sepCurCmd) {
 		G4double current = sepCurCmd->GetNewDoubleValue(newValue);
 		ftune->septumCurrent = current;
@@ -486,6 +493,10 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 	if( cmd == q3kappaCmd) {
 		G4double k = q3kappaCmd->GetNewDoubleValue(newValue);
 		ftune->SetQ3(k);
+	}
+
+	if( cmd == fTuneCmd) {
+		ftune->SetTune(newValue);
 	}
 
     if( cmd == tgtLenCmd ){
@@ -639,4 +650,23 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 	G4double y = beamdphCmd->GetNewDoubleValue(newValue);
 	fBeamTarg->fdPh = y;
     }
+
+	if(cmd == vPosCmd) {
+		G4ThreeVector vertexPos = vPosCmd->GetNew3VectorValue(newValue);
+		g4hrsVEventGen *agen = fprigen->GetGenerator();
+		if(agen) {
+			agen->fSetVPos = vertexPos;
+			agen->fIsVPosSet = true;	
+		}		
+	}
+
+	if(cmd == vMomCmd) {
+		G4ThreeVector vertexMom = vMomCmd->GetNew3VectorValue(newValue);
+		g4hrsVEventGen *agen = fprigen->GetGenerator();
+		if(agen) {
+			agen->fSetVMom = vertexMom;
+			agen->fIsVMomSet = true;	
+		}		
+	}
+
 }
