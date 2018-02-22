@@ -12,8 +12,10 @@ g4hrsVEventGen::g4hrsVEventGen() {
     fBeamTarg = g4hrsBeamTarget::GetBeamTarget();
     fRunData  = g4hrsRun::GetRun()->GetData();
 
+	fIsVPosSet = false;
+	fIsVMomSet = false;
     fSampType       = kMainTarget;
-    fApplyMultScatt = false;
+    fApplyMultScatt = true;
 }
 
 g4hrsVEventGen::~g4hrsVEventGen() {
@@ -92,6 +94,25 @@ void g4hrsVEventGen::PolishEvent(g4hrsEvent *ev) {
     }
 
     ev->fmAsym = ev->fAsym*fBeamTarg->fBeamPol;
+
+	if(fIsVPosSet) {
+		for( iter = ev->fPartPos.begin(); iter != ev->fPartPos.end(); iter++ ) {
+       	 		(*iter) = fSetVPos;
+    		}		
+	}
+	if(fIsVMomSet) {
+		G4double theta = fSetVMom[0]*deg;
+		G4double phi = fSetVMom[1]*deg;
+		G4double mom = (fBeamTarg->fBeamE)*(1.+fSetVMom[2]);
+		G4ThreeVector setMom = G4ThreeVector(mom*sin(theta)*cos(phi),mom*sin(theta)*sin(phi),mom*cos(theta));
+		for( iter = ev->fPartMom.begin(); iter != ev->fPartMom.end(); iter++ ) {
+            		(*iter) = setMom;
+        	}
+		for( iter = ev->fPartRealMom.begin(); iter != ev->fPartRealMom.end(); iter++ ) {
+            		(*iter) = setMom;
+        	}
+	}
+
 
     return;
 }

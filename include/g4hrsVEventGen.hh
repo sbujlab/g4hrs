@@ -51,12 +51,16 @@ class g4hrsVEventGen {
 	G4double fPh_min, fPh_max;
 	G4double fE_min, fE_max;
 
+	G4ThreeVector fSetVPos;
+	G4bool fIsVPosSet;
+	G4ThreeVector fSetVMom;
+	G4bool fIsVMomSet;
+
     private:
 	const G4String fName;
 
 	g4hrsBeamTarget *fBeamTarg;
 	g4hrsRunData    *fRunData;
-
 	void PolishEvent(g4hrsEvent *);
 	
 	// Pure virtual function that needs to be filled out
