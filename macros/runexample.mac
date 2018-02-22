@@ -1,61 +1,79 @@
-#  Example file
+#*** Example macro file
 
-# store tracks
+#*** store tracks 
 #/tracking/storeTrajectory 1
 
-# Should usually be commented out
+#*** Set seed should usually be commented out
+#*** (seed is randomly set in main)  
 #/g4hrs/setseed 50
 
 /g4hrs/kryptonite TRUE
 
-#/g4hrs/scalefield 70.0 A
-
+#*** This should be made obsolete
+#*** (but some classes still use it)
 /g4hrs/snake 49
 
+#*** This should typically be 4
+#*** (build all magnets in HRS)
 /g4hrs/hrssetup 4
+
+#*** Septum and HRS angles
 /g4hrs/sepangle 5.0 deg
 /g4hrs/hrsangle 12.5 deg
+
+#*** Septum and HRS momentum settings
 /g4hrs/sepmom 1.063 GeV
 /g4hrs/hrsmom 1.063 GeV
-/g4hrs/septummap ../g4hrs/src/fields/PREX_septumFieldMap.dat
 
-# This must be explicitly called
+#*** Set individual field tunes
+#/g4hrs/septumcur 515.5 A
+#/g4hrs/quad1 -0.86853 T
+#/g4hrs/quad2 0.88943 T
+#/g4hrs/dipole -0.42961 T
+#/g4hrs/quad3 1.20381 T
+
+#*** Or, specify an overall tune
+#*** (additional tunes can be defined in g4hrsTune.cc)
+#/g4hrs/tune PREX
+
+#*** This must be explicitly called
 /run/initialize
 
-# Target parameters must be set AFTER /run/initialize
-# (target physical volume must already exist)
+#*** Target parameters must be set AFTER /run/initialize
+#*** (target physical volume must already exist)
 /g4hrs/targlen 0.5 mm
 /g4hrs/targpos 0.0 mm
 /g4hrs/targmat Pb208
 
+#*** Beam parameters
 /g4hrs/beamcurr 70e-6 A
 /g4hrs/beamene 1.063 GeV
-
-/g4hrs/gen elastic
-
-/g4hrs/filename g4hrs_out.root
-
-/g4hrs/thmin 2.0 deg
-/g4hrs/thmax 10.0 deg
-/g4hrs/phmin 90.0 deg
-/g4hrs/phmax 270.0 deg
-#/g4hrs/thcommin 0.0 deg
-#/g4hrs/thcommax 10.0 deg
-
-#/g4hrs/emin 80 MeV
-#/g4hrs/emax 1.063 GeV
-
 /g4hrs/oldras FALSE
 /g4hrs/rasx 2.0 mm
 /g4hrs/rasy 2.0 mm
 
-#/g4hrs/beam_x0 0.0 mm
-#/g4hrs/beam_y0 0.0 mm
-#/g4hrs/beam_th0 5.0 deg
-#/g4hrs/beam_ph0 180.0 deg
-#/g4hrs/beam_corrth 0.0 deg
-#/g4hrs/beam_corrph 0.0 deg
-#/g4hrs/beam_dth 0.0 deg
-#/g4hrs/beam_dph 0.0 deg
+#*** Generator parameters
+/g4hrs/gen elastic
+/g4hrs/thmin 2.0 deg
+/g4hrs/thmax 8.0 deg
+/g4hrs/phmin -90.0 deg
+/g4hrs/phmax  90.0 deg
+
+#*** Deactivate eBrem and eIoni 
+#*** (for central trajectory and matrix elements)
+#/process/inactivate eIoni
+#/process/inactivate eBrem
+#/run/physicsModified
+
+#*** Set exact vertex position
+#*** (overrides EventGen and BeamTarget)
+#/g4hrs/vpos 0. 0. 0. mm
+
+#*** Set exact vertex momentum 
+#*** (overrides EventGen and BeamTarget)
+#*** arguments = {theta (deg), phi (deg), dp/p}
+#/g4hrs/vmom 4. 0. 0.
+
+/g4hrs/filename g4hrs_out.root
 
 /run/beamOn 1000

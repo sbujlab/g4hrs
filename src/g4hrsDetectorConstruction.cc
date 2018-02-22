@@ -131,8 +131,8 @@ G4VPhysicalVolume* g4hrsDetectorConstruction::Construct() {
     Air->AddElement(O, 30.*perCent);
 
     G4VSolid *worldSolid = new G4Box("worldbox", 50.0*m, 50.0*m, 50.0*m ); 
-    G4LogicalVolume *worldLog = new G4LogicalVolume(worldSolid, Air, "worldLog", 0, 0, 0);
-//    G4LogicalVolume *worldLog = new G4LogicalVolume(worldSolid, mMaterialManager->vacuum, "worldLog", 0, 0, 0);
+//    G4LogicalVolume *worldLog = new G4LogicalVolume(worldSolid, Air, "worldLog", 0, 0, 0);
+    G4LogicalVolume *worldLog = new G4LogicalVolume(worldSolid, mMaterialManager->vacuum, "worldLog", 0, 0, 0);
 
     fWorldVolume = new G4PVPlacement(0, G4ThreeVector(), worldLog, "world", 0, false, 0);
     
