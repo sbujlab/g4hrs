@@ -147,7 +147,6 @@ set(G4HRS_SCRIPTS
     horpb1.dat
     ca48_fsu.dat
     ca48_fsu_stretched.dat
-    src/fields/PREX_septumFieldMap_1320A-m2.dat
   )
 
 foreach(_script ${G4HRS_SCRIPTS})

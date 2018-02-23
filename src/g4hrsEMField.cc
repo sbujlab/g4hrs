@@ -21,7 +21,7 @@ g4hrsEMField::g4hrsEMField(): mBField_Septum(0)
 	fTune = g4hrsTune::GetTune();
 
 	fSeptumMomentum = fTune->septumMomentum;
-	fSeptumMapFile = "./src/fields/PREX_septumFieldMap_1320A-m2.dat";	
+	fSeptumMapFile = "PREX_septumFieldMap_1320A-m2.dat";	
 
 	mBField_Septum = new BField_Septum(fSeptumMomentum,fSeptumMapFile);
 
