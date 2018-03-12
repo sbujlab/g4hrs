@@ -135,7 +135,7 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	G4VSolid* FPSolid = new G4Tubs("FPTub",0,75.*cm * 2,vb_thickness,0.0*deg,360.0*deg);
 	G4VSolid* PlaneSolid1 = new G4Tubs("PlaneTub",0,35.*cm,vb_thickness,0.0*deg,360.0*deg); //circles
 	G4VSolid* PlaneSolid2 = new G4Tubs("PlaneTub",0,75.*cm,vb_thickness,0.0*deg,360.0*deg); //circles
-	G4VSolid* CollimatorSolid = new G4Tubs("ColTub",0,30.*cm,vb_thickness,0.0*deg,360.0*deg); //circles
+	G4VSolid* CollimatorSolid = new G4Tubs("ColTub",0,20.*cm,vb_thickness,0.0*deg,360.0*deg); //circles
 	G4VSolid* LocalAxis = new G4Cons("LocalAxis",20.*cm, 30.*cm, 0.0*cm, 0.1*cm, 40.*cm, 5.0*deg, 350*deg);
 
 	G4LogicalVolume* LPlaneLogical1 = new G4LogicalVolume(PlaneSolid1,0,"LPlaneLogical1",0,0,0);
