@@ -145,7 +145,7 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			fZ0_tr = position0_tr.z();
 			fTh0_tr = momentum0_tr.x()/momentum0_tr.z();
 			fPh0_tr = momentum0_tr.y()/momentum0_tr.z();
-
+			fP0_tr = momentum0_tr.mag();
 			r0[0] = (float)fX0_tr;
 			r0[1] = (float)(fTh0_tr);
 			r0[2] = (float)(fY0_tr*sign);			
