@@ -195,7 +195,7 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	// HRS containers //
 	////////////////////
 
-	double pHRSContainerRin=1.40*m,pHRSContainerRout=25*m;//NickieMode it just has to be big enough to fit my VB at FP
+	double pHRSContainerRin=1.35*m,pHRSContainerRout=25*m;//NickieMode it just has to be big enough to fit my VB at FP
 	const int kNPlane_HRSContainer=7;
 	double rInner_HRSContainer[] = {	pHRSContainerRin,
 						pHRSContainerRin,
@@ -222,7 +222,7 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 						11.0*m};
 	
 	
-	G4Polycone* HRSContainerSolid = new G4Polycone("HRSContainer",258.0*deg,24.0*deg,
+	G4Polycone* HRSContainerSolid = new G4Polycone("HRSContainer",257.625*deg,24.75*deg,
 		kNPlane_HRSContainer,zPlane_HRSContainer,rInner_HRSContainer,rOuter_HRSContainer);
 
 	G4LogicalVolume* LHRSContainerLogical = new G4LogicalVolume(HRSContainerSolid,
