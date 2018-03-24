@@ -67,8 +67,12 @@ G4String g4hrsBeamTarget::GetTargetMaterial() {
 }
 
 G4double g4hrsBeamTarget::GetEffLumin(){
-    G4double lumin = fEffMatLen*fBeamCurr/(e_SI*coulomb);
-    return lumin;
+	// Beam current in e-/sec
+	G4double electronCurrent = (fBeamCurr/ampere)/(e_SI);
+	// Effective material length in 1/mm^2 (see calculation below)
+	// Yields luminosity in e-/(s mm^2)
+	G4double lumin = fEffMatLen*electronCurrent;
+    	return lumin;
 }
 
 void g4hrsBeamTarget::UpdateInfo(){
@@ -407,8 +411,16 @@ g4hrsVertex g4hrsBeamTarget::SampleVertex(SampType_t samp){
                 nmsmat++;
             }
 
-            fEffMatLen = (fSampLen/len)* // Sample weighting
-                mat->GetDensity()*((G4Tubs *) (*it)->GetLogicalVolume()->GetSolid())->GetZHalfLength()*2.0*Avogadro/masssum; // material thickness
+		// target density in grams per cubic millimeter
+		G4double rho = mat->GetDensity()/(g/mm3);
+		// target length in millimeters
+		G4double t = ((G4Tubs *) (*it)->GetLogicalVolume()->GetSolid())->GetZHalfLength()*2.0/mm;
+		// target atomic mass number in grams per mole
+		G4double Amass = mat->GetA()/(g/mole);
+
+		// Effective material length in 1/mm^2
+            	fEffMatLen = rho*t*(Avogadro/Amass);
+
         } else {
             const G4ElementVector *elvec = mat->GetElementVector();
             const G4double *fracvec = mat->GetFractionVector();

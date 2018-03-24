@@ -84,7 +84,6 @@ void g4hrsVEventGen::PolishEvent(g4hrsEvent *ev) {
         (*iter) += ev->fVertexPos;
     }
     
-
     if ( ev->fRate == 0 ){// If the rate is set to 0 then calculate it using the cross section
     	ev->fRate  = ev->fEffXs*fBeamTarg->GetEffLumin()/((G4double) fRunData->GetNthrown());
     }

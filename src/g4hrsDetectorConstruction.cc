@@ -370,6 +370,7 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 
         G4VisAttributes *IronVisAtt = new G4VisAttributes(G4Colour(100./255.,149./255.,237./255.));
 
+//        G4LogicalVolume* septumLogical = new G4LogicalVolume(septumBlockSubLRSolid,
         G4LogicalVolume* septumLogical = new G4LogicalVolume(septumBlockSubLRCSolid,
                 mMaterialManager->siliconsteel,"septumLogical",0,0,0);
         septumLogical->SetVisAttributes(IronVisAtt);

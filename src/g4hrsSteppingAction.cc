@@ -61,7 +61,7 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 	// Don't track low energy (<0.9 GeV) particles
 
 	if(	((  material->GetName()=="Tungsten"
-		||  material->GetName()=="Copper" )
+		||  material->GetName()=="Copper" ) 
 		&&  fEnableKryptonite )
 		|| fTrack->GetParentID() != 0
 		|| fTrack->GetTotalEnergy() < 0.9*GeV ) {

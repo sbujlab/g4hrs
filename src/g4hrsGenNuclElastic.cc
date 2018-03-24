@@ -32,9 +32,6 @@ g4hrsGenNuclElastic::g4hrsGenNuclElastic(){
     fApplyMultScatt = true;
     fBeamTarg = g4hrsBeamTarget::GetBeamTarget();
 
-    // Tyler: creating g4hrsDatabase to look up cross section, asymmetry
-    // FIXME:  This should not have magic numbers and should
-    // either pull target type from BeamTarget or load all targets
     fDatabase = new g4hrsDatabase(fBeamTarg->GetTargetMaterial());
 
 
@@ -112,42 +109,35 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
 
     // sample with 1.0/(1-cos)^2
 
-    double cthmin = cos(fTh_min);
-    double cthmax = cos(fTh_max);
-//	G4cout << "cos(thmin), cos(thmax): " << cthmin << " , " << cthmax << G4endl;
-    double icth_b = 1.0/(1.0-cthmax);
-    double icth_a = 1.0/(1.0-cthmin);
+	double inv_cthmax = 1./(1.-cos(fTh_max));
+	double inv_cthmin = 1./(1.-cos(fTh_min));
+	
+	double sampv = 1./CLHEP::RandFlat::shoot(inv_cthmax, inv_cthmin);
+	assert( -1.0 < sampv && sampv < 1.0 );
 
-    double sampv = 1.0/CLHEP::RandFlat::shoot(icth_b, icth_a);
-//	G4cout << "sampv: " << sampv << G4endl;
-    assert( -1.0 < sampv && sampv < 1.0 );
+    	double th = acos(1.0-sampv);
+    	double ph = CLHEP::RandFlat::shoot(fPh_min, fPh_max);
 
-    double th = acos(1.0-sampv);
-    // Value to reweight cross section by to account for non-uniform
-    // sampling
-    double samp_fact = sampv*sampv*(icth_a-icth_b)/(cthmin-cthmax);
-  	
-    double ph = CLHEP::RandFlat::shoot(fPh_min, fPh_max);
-    double ef    = proton_mass_c2*beamE/(proton_mass_c2 + beamE*(1.0-cos(th)));;
+	// Weight for cross section to account for non-uniform sampling
+	double dcosth = cos(fTh_min) - cos(fTh_max);
+	double dphi = fPh_max - fPh_min;
+	double norm = (inv_cthmin - inv_cthmax)/(cos(fTh_min) - cos(fTh_max));	
+	double V = sampv*sampv*norm*dcosth*dphi;		
 
-    double q2  = 2.0*beamE*ef*(1.0-cos(th));
-    double tau = q2/(4.0*proton_mass_c2*proton_mass_c2);
+	double thisZ = vert->GetMaterial()->GetZ();
+	double thisA = vert->GetMaterial()->GetA()/(g/mole);
+	double M_nucl = thisA*(amu_c2/GeV)*GeV;			// GeV/GeV is redundant but the units should be explicit
 
-    double gd = pow( 1.0 + q2/(0.71*GeV*GeV), -2.0 );
-    double gep = gd;
-    double gmp = 2.79*gd;
+	//final energy	
+	double ef = (M_nucl*beamE)/(M_nucl + beamE*(1. - cos(th)));	
 
-    double gen =  1.91*gd*tau/(1.0+5.6*tau); // galster
-    double gmn = -1.91*gd;
+    double Q2  = 2.0*beamE*ef*(1.0-cos(th));
+    evt->SetQ2( Q2 );
 
-    double sigma_mott = hbarc*hbarc*pow(alpha*cos(th/2.0), 2.0)/pow(2.0*beamE*sin(th/2.0)*sin(th/2.0), 2.0);
-    double ffpart1 = (gep*gep + tau*gmp*gmp)/(1.0+tau);
-    double ffpart2 = 2.0*tau*gmp*gmp*tan(th/2.0)*tan(th/2.0);
-
-    double sigma = sigma_mott*(ef/beamE)*(ffpart1 + ffpart2);
-
-    double V = 2.0*pi*(cthmin - cthmax)*samp_fact;
-
+	// Get cross section from database (units of millibarns)
+	// Multiply by millibarn, now it's in mm^2 (Geant's favorite length unit)
+	double sigma = fDatabase->Interpolate(beamE,th,0,0)*millibarn;  	
+	
     // Suppress too low angles from being generated
     // If we're in the multiple-scattering regime
     // the cross sections are senseless.  We'll define this 
@@ -158,16 +148,8 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
 	sigma = 0.0;
     }
 
-    //  Multiply by Z because we have Z protons 
-    //  value for uneven weighting
-
-    double thisZ = vert->GetMaterial()->GetZ();
-
-	// Tyler: use th, ef to interpolate cross section
-	sigma = fDatabase->Interpolate(ef,th,0,0)/(thisZ*thisZ);  	
-
-    //evt->SetEffCrossSection(sigma*V*thisZ*thisZ*value);
-	evt->SetEffCrossSection(sigma*V*thisZ*thisZ);
+	evt->SetEffCrossSection(sigma*V);
+	evt->SetWeight(V);
 
     if( vert->GetMaterial()->GetNumberOfElements() != 1 ){
 	G4cerr << __FILE__ << " line " << __LINE__ << 
@@ -175,27 +157,24 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
 	exit(1);
     }
 	
-    G4double APV_base = -GF*q2/(4.0*sqrt(2.0)*pi*alpha);
-
-    G4double eps = pow(1.0 + 2.0*(1.0+tau)*tan(th/2.0)*tan(th/2.0), -1.0);
-
-    G4double apvffnum = eps*gep*gen + tau*gmp*gmn;
-    G4double apvffden = eps*gep*gep  + tau*gmp*gmp;
-
-    G4double APV = APV_base*(QWp - apvffnum/apvffden);
-
-	// Tyler: use th, ef to interpolate asymmetry
-	APV = fDatabase->Interpolate(ef,th,0,1);
-		
-    evt->SetAsymmetry(APV);
-
-    evt->SetQ2( q2 );
-    evt->SetW2( proton_mass_c2*proton_mass_c2 );
+	G4double APV = fDatabase->Interpolate(beamE,th,0,1);
+	G4double APV1 = fDatabase->Interpolate(beamE,th,1,1);
+	
+	G4double sens;
+	if(APV > 0.) {
+		sens = (APV - APV1)/APV;
+	} else {
+		sens = 0.;
+	}
+    
+	evt->SetAsymmetry(APV);
+	evt->SetSensitivity(sens);
+    	evt->SetW2( M_nucl*M_nucl + 2.*M_nucl*(beamE - ef) - Q2 );
 
     // REradiate////////////////////////////////////////////////////////////////////////////
     // We're going to use the new kinematics for this guy
 
-    int_bt = (alpha/pi)*( log( q2/(electron_mass_c2*electron_mass_c2) ) - 1.0 );
+    int_bt = (alpha/pi)*( log( Q2/(electron_mass_c2*electron_mass_c2) ) - 1.0 );
     Ekin = ef - electron_mass_c2;;
 
     prob = 1.- pow(bremcut/Ekin, int_bt) - int_bt/(int_bt+1.)*(1.- pow(bremcut/Ekin,int_bt+1.))
