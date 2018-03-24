@@ -54,7 +54,7 @@ void g4hrsDatabase::LoadTable(string filename, int stretch) {
             exit(1);
         }
 	
-	double thisEnergy, thisAngle, thisXs, thisAsym, ignore;
+	double thisEnergy, thisAngle, thisXS, thisAsym, ignore;
 	string dummy;
 
 	for(int i=0; i<n_E; i++) {
@@ -63,32 +63,32 @@ void g4hrsDatabase::LoadTable(string filename, int stretch) {
 		thisEnergy = E_min + double(i)*E_step;
 		energy.push_back(thisEnergy);
 
-		vector<double> row_xs;
+		vector<double> row_XS;
 		vector<double> row_asym;
 
 		if(filename.find("pb") != string::npos) {	
 			for(int j=0; j<n_Th; j++) {
-				datafile >> thisAngle >> thisXs >> ignore >> thisAsym >> ignore >> ignore;
+				datafile >> thisAngle >> thisXS >> ignore >> thisAsym >> ignore >> ignore;
 				angle.push_back(thisAngle*deg);			
-				row_xs.push_back(thisXs*millibarn);
+				row_XS.push_back(thisXS);
 				row_asym.push_back(thisAsym);
 			} // end j (angle) for loop
 		} else if(filename.find("ca") != string::npos) {
 			for(int j=0; j<n_Th; j++) {
-				datafile >> thisAngle >> thisXs >> thisAsym;
+				datafile >> thisAngle >> thisXS >> thisAsym;
 				angle.push_back(thisAngle*deg);			
-				row_xs.push_back(thisXs*millibarn);
+				row_XS.push_back(thisXS);
 				row_asym.push_back(thisAsym);
 			} // end j (angle) for loop
 		}
 	
 		if(stretch == 0) {
-			xs.push_back(row_xs);
+			XS.push_back(row_XS);
 			asym.push_back(row_asym);
 		} 
 		
 		if(stretch == 1) {
-			xs_str.push_back(row_xs);
+			XS_str.push_back(row_XS);
 			asym_str.push_back(row_asym);
 		}
 
@@ -101,7 +101,7 @@ void g4hrsDatabase::LoadTable(string filename, int stretch) {
 
 double g4hrsDatabase::Interpolate(double thisE, double thisTh, int stretch, int value) { 
 	// stretch = {0, 1} = {R_n not stretched, R_n stretched 1%)
-	// value = {0, 1} = {cross section, asymmetry}	
+	// value = {0, 1} = {form factor squared, asymmetry}	
 	double th0, th1, e0, e1;
 	int i0, i1, j0, j1;
 
@@ -129,29 +129,54 @@ double g4hrsDatabase::Interpolate(double thisE, double thisTh, int stretch, int 
 		if(angle[j-1] < thisTh && angle[j] >= thisTh) {
 			break;
 		}
-	}	
-	double xs_e0_th0 = xs[i0][j0];
-	double xs_e0_th1 = xs[i0][j1];
-	double xs_e1_th0 = xs[i1][j0];
-	double xs_e1_th1 = xs[i1][j1];
-	double asym_e0_th0 = asym[i0][j0];
-	double asym_e0_th1 = asym[i0][j1];
-	double asym_e1_th0 = asym[i1][j0];
-	double asym_e1_th1 = asym[i1][j1];
+	}
+
+	double XS_e0_th0; 
+	double XS_e0_th1; 
+	double XS_e1_th0;
+	double XS_e1_th1;
+	double asym_e0_th0;
+	double asym_e0_th1;
+	double asym_e1_th0;
+	double asym_e1_th1;
+
+	if(stretch == 0) {
+		XS_e0_th0 = XS[i0][j0];
+		XS_e0_th1 = XS[i0][j1];
+		XS_e1_th0 = XS[i1][j0];
+		XS_e1_th1 = XS[i1][j1];
+		asym_e0_th0 = asym[i0][j0];
+		asym_e0_th1 = asym[i0][j1];
+		asym_e1_th0 = asym[i1][j0];
+		asym_e1_th1 = asym[i1][j1];
+	}
+	
+	if(stretch == 1) {
+		XS_e0_th0 = XS_str[i0][j0];
+		XS_e0_th1 = XS_str[i0][j1];
+		XS_e1_th0 = XS_str[i1][j0];
+		XS_e1_th1 = XS_str[i1][j1];
+		asym_e0_th0 = asym_str[i0][j0];
+		asym_e0_th1 = asym_str[i0][j1];
+		asym_e1_th0 = asym_str[i1][j0];
+		asym_e1_th1 = asym_str[i1][j1];
+	}
+	
 	double answer;
+
 	if(value == 0) {
-		double m_e0 = (xs_e0_th1 - xs_e0_th0)/(th1 - th0);
-		double m_e1 = (xs_e1_th1 - xs_e1_th0)/(th1 - th0);
-		double xs0 = xs_e0_th1 + m_e0*(thisTh - th0); 
-		double xs1 = xs_e1_th1 + m_e1*(thisTh - th0);
-		double m_th = (xs1 - xs0)/(e1 - e0);
-		answer = xs0 + m_th*(thisE - e0); 
+		double m_e0 = (XS_e0_th1 - XS_e0_th0)/(th1 - th0);
+		double m_e1 = (XS_e1_th1 - XS_e1_th0)/(th1 - th0);
+		double XS0 = XS_e0_th0 + m_e0*(thisTh - th0); 
+		double XS1 = XS_e1_th0 + m_e1*(thisTh - th0);
+		double m_th = (XS1 - XS0)/(e1 - e0);
+		answer = XS0 + m_th*(thisE - e0); 
 	}	
 	if(value == 1) {
 		double m_e0 = (asym_e0_th1 - asym_e0_th0)/(th1 - th0);
 		double m_e1 = (asym_e1_th1 - asym_e1_th0)/(th1 - th0);
-		double asym0 = asym_e0_th1 + m_e0*(thisTh - th0); 
-		double asym1 = asym_e1_th1 + m_e1*(thisTh - th0);
+		double asym0 = asym_e0_th0 + m_e0*(thisTh - th0); 
+		double asym1 = asym_e1_th0 + m_e1*(thisTh - th0);
 		double m_th = (asym1 - asym0)/(e1 - e0);
 		answer = asym0 + m_th*(thisE - e0); 
 	}	

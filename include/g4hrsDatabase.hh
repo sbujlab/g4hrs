@@ -21,9 +21,9 @@ private:
 
 	int experiment;
 	void LoadTable(string, int);
-	vector< vector<double> > xs;
+	vector< vector<double> > XS;
 	vector< vector<double> > asym;
-	vector< vector<double> > xs_str;
+	vector< vector<double> > XS_str;
 	vector< vector<double> > asym_str;
 	vector<double> energy;
 	vector<double> angle;
