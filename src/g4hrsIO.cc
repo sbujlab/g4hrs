@@ -111,8 +111,10 @@ void g4hrsIO::InitializeTree(){
     // Event information
     fTree->Branch("rate",     &fEvRate,   "rate/D");
     fTree->Branch("ev.A",     &fEvAsym,   "ev.A/D");
+    fTree->Branch("ev.S",     &fEvSens,   "ev.S/D");
     fTree->Branch("ev.Am",    &fEvmAsym,  "ev.Am/D");
     fTree->Branch("ev.xs",    &fEvEffXS,  "ev.xs/D");
+    fTree->Branch("ev.V",     &fEvWeight, "ev.V/D");
     fTree->Branch("ev.Q2",    &fEvQ2,     "ev.Q2/D");
     fTree->Branch("ev.W2",    &fEvW2,     "ev.W2/D");
     fTree->Branch("ev.thcom", &fEvThCoM,  "ev.thcom/D");
@@ -280,9 +282,11 @@ void g4hrsIO::SetEventData(g4hrsEvent *ev){
 
     fNEvPart = n;
 
-    fEvRate   = ev->fRate*s;
-    fEvEffXS  = ev->fEffXs/microbarn;
+    fEvRate   = ev->fRate; //already in Hz 
+    fEvEffXS  = ev->fEffXs/barn; 		
     fEvAsym   = ev->fAsym/__ASYMM_SCALE;
+    fEvSens   = ev->fSens;
+    fEvWeight = ev->fWeight;
     fEvmAsym  = ev->fmAsym/__ASYMM_SCALE;
     fEvBeamP  = ev->fBeamMomentum.mag()/__E_UNIT;
 
