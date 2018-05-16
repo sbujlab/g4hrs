@@ -1,6 +1,7 @@
 #include "g4hrsVEventGen.hh"
 
 #include "G4RotationMatrix.hh"
+#include "G4AffineTransform.hh"
 
 #include "g4hrsBeamTarget.hh"
 #include "g4hrsVertex.hh"
@@ -16,6 +17,7 @@ g4hrsVEventGen::g4hrsVEventGen() {
 	fIsVMomSet = false;
     fSampType       = kMainTarget;
     fApplyMultScatt = true;
+	fSeptumAngle = 5.*deg;
 }
 
 g4hrsVEventGen::~g4hrsVEventGen() {
@@ -94,24 +96,45 @@ void g4hrsVEventGen::PolishEvent(g4hrsEvent *ev) {
 
     ev->fmAsym = ev->fAsym*fBeamTarg->fBeamPol;
 
-	if(fIsVPosSet) {
-		for( iter = ev->fPartPos.begin(); iter != ev->fPartPos.end(); iter++ ) {
-       	 		(*iter) = fSetVPos;
-    		}		
-	}
-	if(fIsVMomSet) {
-		G4double theta = fSetVMom[0]*deg;
-		G4double phi = fSetVMom[1]*deg;
-		G4double mom = (fBeamTarg->fBeamE)*(1.+fSetVMom[2]);
-		G4ThreeVector setMom = G4ThreeVector(mom*sin(theta)*cos(phi),mom*sin(theta)*sin(phi),mom*cos(theta));
-		for( iter = ev->fPartMom.begin(); iter != ev->fPartMom.end(); iter++ ) {
-            		(*iter) = setMom;
-        	}
-		for( iter = ev->fPartRealMom.begin(); iter != ev->fPartRealMom.end(); iter++ ) {
-            		(*iter) = setMom;
-        	}
-	}
+		
+	if(fIsVPosSet || fIsVMomSet) {
 
+		
+		G4RotationMatrix rotate_hall;
+		rotate_hall.rotateZ(-90.*deg);
+		rotate_hall.rotateY(fSeptumAngle);
+		
+		G4AffineTransform hallAxis_targ = G4AffineTransform(rotate_hall);
+		G4AffineTransform hall_targ = hallAxis_targ.Inverse();
+
+		if(fIsVPosSet) {
+			G4double xhall = fSetVPos.y()*cos(fSeptumAngle);
+			G4double yhall = -fSetVPos.x();
+			G4double zhall = -fSetVPos.y()*sin(fSeptumAngle);
+//			G4ThreeVector fSetVPosHCS = G4ThreeVector(xhall, yhall, zhall);
+			G4ThreeVector fSetVPosHCS = hall_targ.TransformPoint(fSetVPos);
+			for( iter = ev->fPartPos.begin(); iter != ev->fPartPos.end(); iter++ ) {
+				(*iter) = fSetVPosHCS;
+			}		
+		}
+		if(fIsVMomSet) {
+			G4double theta = fSetVMom[0];
+			G4double phi = fSetVMom[1];
+			G4double mom = (fBeamTarg->fBeamE)*(1.+fSetVMom[2]);
+//			G4ThreeVector fSetVMomHCS = G4ThreeVector(mom*sin(theta)*cos(phi),mom*sin(theta)*sin(phi),mom*cos(theta));		
+			G4double pztr = mom/sqrt(theta*theta + phi*phi + 1.*1.);  
+			G4double pxtr = pztr*theta;
+			G4double pytr = pztr*phi;
+			G4ThreeVector ptr = G4ThreeVector(pxtr, pytr, pztr);
+			G4ThreeVector fSetVMomHCS = hall_targ.TransformPoint(ptr);
+			for( iter = ev->fPartMom.begin(); iter != ev->fPartMom.end(); iter++ ) {
+				(*iter) = fSetVMomHCS;
+			}
+			for( iter = ev->fPartRealMom.begin(); iter != ev->fPartRealMom.end(); iter++ ) {
+				(*iter) = fSetVMomHCS;
+			}
+		}
+	}
 
     return;
 }

@@ -50,6 +50,7 @@ class g4hrsVEventGen {
 	G4double fTh_min, fTh_max;
 	G4double fPh_min, fPh_max;
 	G4double fE_min, fE_max;
+	G4double fSeptumAngle;
 
 	G4ThreeVector fSetVPos;
 	G4bool fIsVPosSet;
