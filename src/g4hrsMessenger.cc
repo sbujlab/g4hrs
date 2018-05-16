@@ -442,6 +442,10 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 		fdetcon->fSeptumAngle = angle;
 		fStepAct->fSeptumAngle = angle;
 		ftune->septumAngle = angle;
+		g4hrsVEventGen *agen = fprigen->GetGenerator();
+		if( agen ){
+		    agen->fSeptumAngle = angle;
+		}
 	}
 
 	if( cmd == hrsAngCmd ) {
@@ -477,12 +481,12 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 
 	if( cmd == q1kappaCmd) {
 		G4double k = q1kappaCmd->GetNewDoubleValue(newValue);
-		ftune->SetQ1(k);
+		ftune->kappaQuad1 = k;
 	}
 
 	if( cmd == q2kappaCmd) {
 		G4double k = q2kappaCmd->GetNewDoubleValue(newValue);
-		ftune->SetQ2(k);
+		ftune->kappaQuad2 = k;
 	}
 
 	if( cmd == dBendCmd) {
@@ -492,7 +496,7 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 
 	if( cmd == q3kappaCmd) {
 		G4double k = q3kappaCmd->GetNewDoubleValue(newValue);
-		ftune->SetQ3(k);
+		ftune->kappaQuad3 = k;
 	}
 
 	if( cmd == fTuneCmd) {

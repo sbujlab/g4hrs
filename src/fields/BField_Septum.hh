@@ -20,8 +20,7 @@ private:
 	static BField_Septum* fInstance;
 
 public:
-	BField_Septum(double pMomentum,
-		const char *mapfile);
+	BField_Septum(const char *mapfile);
 	virtual ~BField_Septum();
 	bool GetBField(double Pos[],double B[]);
 	bool GetBField(float fPos[],float fB[]);
@@ -80,8 +79,8 @@ private:
 	int	   mRotAxis[3];
 	double mRotAngle[3];
 
-	double fDefaultMomentum;
-	double fDefaultCurrentDensity;
+	double fMomentumScale;
+	double fMapCurrentDensity;
 	double fMomentum;
 	double fCurrentDensity;
 	double fFieldScale;

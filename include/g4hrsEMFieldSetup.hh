@@ -94,7 +94,7 @@ public:
 	G4double		KAPPA2;	    
 	G4double		KAPPA3;
 	G4double		DPBEND;
-	G4double		fDefaultMomentum;
+	G4double		fMomentumScale;
 	G4double		snakemagnumber;
 	G4int			sos;
 	G4int			quads_on;

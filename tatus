@@ -1,0 +1,442 @@
+diff --git a/include/g4hrsEMFieldSetup.hh b/include/g4hrsEMFieldSetup.hh
+index 65c4fd3..c0e6f4b 100644
+--- a/include/g4hrsEMFieldSetup.hh
++++ b/include/g4hrsEMFieldSetup.hh
+@@ -94,7 +94,7 @@ public:
+ 	G4double		KAPPA2;	    
+ 	G4double		KAPPA3;
+ 	G4double		DPBEND;
+-	G4double		fDefaultMomentum;
++	G4double		fMomentumScale;
+ 	G4double		snakemagnumber;
+ 	G4int			sos;
+ 	G4int			quads_on;
+diff --git a/include/g4hrsTune.hh b/include/g4hrsTune.hh
+index 3b60d0b..ef63dd8 100644
+--- a/include/g4hrsTune.hh
++++ b/include/g4hrsTune.hh
+@@ -13,16 +13,13 @@ public:
+ 	virtual ~g4hrsTune();
+ 	static g4hrsTune* GetTune();
+ 	void SetTune(G4String);
+-	void SetQ1(double);
+-	void SetQ2(double);
+-	void SetQ3(double);
+-	
++	double GetMomentumScale();
+ 
+ private:
+ 	static g4hrsTune* fTune;
++	double momentum_scale;
+ 
+ public:
+-	double snakeMagnet;
+ 	double kappaQuad1;
+ 	double kappaQuad2;
+ 	double kappaQuad3;
+diff --git a/include/g4hrsVEventGen.hh b/include/g4hrsVEventGen.hh
+index d08257c..f9e2c00 100644
+--- a/include/g4hrsVEventGen.hh
++++ b/include/g4hrsVEventGen.hh
+@@ -50,6 +50,7 @@ class g4hrsVEventGen {
+ 	G4double fTh_min, fTh_max;
+ 	G4double fPh_min, fPh_max;
+ 	G4double fE_min, fE_max;
++	G4double fSeptumAngle;
+ 
+ 	G4ThreeVector fSetVPos;
+ 	G4bool fIsVPosSet;
+diff --git a/include/g4hrsglobs.hh b/include/g4hrsglobs.hh
+index 84ac7e3..4fd0195 100644
+--- a/include/g4hrsglobs.hh
++++ b/include/g4hrsglobs.hh
+@@ -20,9 +20,9 @@ const double QWe_rad = -0.002787;  //  arxiv 1302.6263 - KK's low Q2 EW review w
+ 	                     //  See HAPLOG 284
+ const double QWp = 0.0707;
+ 
+-const double gDefaultBeamE   = 11.0*GeV;
++const double gDefaultBeamE   = 1.063*GeV;
+ const double gDefaultBeamPol = 0.85;
+-const double gDefaultBeamCur = 75e-6*ampere;
++const double gDefaultBeamCur = 70e-6*ampere;
+ 
+ 
+ #endif//__REMOLLGLOBS_HH
+diff --git a/src/fields/BField_Septum.cc b/src/fields/BField_Septum.cc
+index ba5cefe..8cd0506 100644
+--- a/src/fields/BField_Septum.cc
++++ b/src/fields/BField_Septum.cc
+@@ -48,7 +48,7 @@ BField_Septum* BField_Septum::GetInstance()
+ // Construction/Destruction
+ //////////////////////////////////////////////////////////////////////
+ 
+-BField_Septum::BField_Septum(double pMomentum, const char *mapfile)
++BField_Septum::BField_Septum(const char *mapfile)
+ {
+ #ifdef BFIELD_SEPTUM_DEBUG
+ 	if(BFIELD_SEPTUM_DEBUG > Global_Debug_Level)
+@@ -57,17 +57,13 @@ BField_Septum::BField_Septum(double pMomentum, const char *mapfile)
+ 
+ 	fTune = g4hrsTune::GetTune();	
+ 
+-	fDefaultMomentum = 1.063*GeV;			// assume PREX default
+-	fDefaultCurrentDensity = 1320*ampere;		// septum field map generated with I/m2 = 1320 A/m2
++	fMomentumScale = fTune->GetMomentumScale();			// assume PREX default
++	fMapCurrentDensity = 1320.*ampere;				// septum field map generated with I/m2 = 1320 A/m2
+ 	fMomentum = fTune->septumMomentum;
+ 	fCurrentDensity = fTune->septumCurrent;
+ 	fFieldUnit = 1.e-4*tesla;			//septum field map is in Gauss 
+ 	
+-	if( (fMomentum/fDefaultMomentum - 1.) > 1.e-3 && (fCurrentDensity/fDefaultCurrentDensity - 1.) > 1.e-3) {
+-		G4cout << " *** WARNING *** \n *** Septum field is being scaled by both MOMENTUM and CURRENT DENSITY *** \n *** You have been warned! *** \n";		
+-	}
+-	
+-	fFieldScale = (fMomentum/fDefaultMomentum)*(fCurrentDensity/fDefaultCurrentDensity);
++	fFieldScale = (fMomentum/fMomentumScale)*(fCurrentDensity/fMapCurrentDensity);
+ 
+ 	mUseUniformB = 0;
+ 	mUniformB[0] = 0.; mUniformB[1] = 0.; mUniformB[2] = 0.; 
+diff --git a/src/fields/BField_Septum.hh b/src/fields/BField_Septum.hh
+index e3a5d4d..baaddaa 100644
+--- a/src/fields/BField_Septum.hh
++++ b/src/fields/BField_Septum.hh
+@@ -20,8 +20,7 @@ private:
+ 	static BField_Septum* fInstance;
+ 
+ public:
+-	BField_Septum(double pMomentum,
+-		const char *mapfile);
++	BField_Septum(const char *mapfile);
+ 	virtual ~BField_Septum();
+ 	bool GetBField(double Pos[],double B[]);
+ 	bool GetBField(float fPos[],float fB[]);
+@@ -80,8 +79,8 @@ private:
+ 	int	   mRotAxis[3];
+ 	double mRotAngle[3];
+ 
+-	double fDefaultMomentum;
+-	double fDefaultCurrentDensity;
++	double fMomentumScale;
++	double fMapCurrentDensity;
+ 	double fMomentum;
+ 	double fCurrentDensity;
+ 	double fFieldScale;
+diff --git a/src/g4hrsDetectorConstruction.cc b/src/g4hrsDetectorConstruction.cc
+index 12353e9..928a6e5 100644
+--- a/src/g4hrsDetectorConstruction.cc
++++ b/src/g4hrsDetectorConstruction.cc
+@@ -494,17 +494,6 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
+                 septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,15,0);
+         }
+     
+-	/////////////////////////
+-	// HRS Virtual Boundary, 
+-	/////////////////////////
+-	//For 6 degrees, if septum field is valid and argument UseSeptumPlusStdHRS==1, will 
+-	//place the virtual boundary 1 cm before HRSContainer (pHRSContainerRin-6*cm = 1.40m)
+-	//otherwise will place the VB at the position given by the Detector.ini
+-	//For 12.5 degrees, always place VB 1.40m away from the hall center
+-
+-
+-        //
+-        
+ 
+         if( fSnakeModel == 49 || fSnakeModel == 48 || fSnakeModel == 51 || fSnakeModel == 53){
+ 
+@@ -1018,15 +1007,11 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
+ 	//Radius to Pole Tip = 12.827  cm
+ 	
+ 	int    sos   = 1;
+-	if( fSnakeModel >= 52){
+-	  sos = 1;
+-	}
++
+ 	double q1shift = sos ? 0.0 * m : 0.0 * m;
+ 	double pQ1Rin  = sos ? 12.827 * cm : 15.0*cm;
+ 	double pQ1Rout = sos ? 35.0   * cm : 35.0*cm;//for now, keep the outer same for either
+-	double pQ1Length;//=80*cm;
+-	//pQ1Length = ( IS_NIM == 1 ) ? 80.0 * cm : pQ1ex - pQ1en;
+-	pQ1Length = sos ?  70. * cm : pQ1ex - pQ1en;
++	double pQ1Length = sos ?  70. * cm : pQ1ex - pQ1en;
+ 	double pQ1PosAct = pQ1ex - pQ1en;
+ 	double pQ1LengthMag=pQ1Length * fringe_extension;
+ 	//double pQ1LengthMag=94.1*cm;
+diff --git a/src/g4hrsEMField.cc b/src/g4hrsEMField.cc
+index 16f95a0..62d0a8d 100644
+--- a/src/g4hrsEMField.cc
++++ b/src/g4hrsEMField.cc
+@@ -18,12 +18,9 @@ g4hrsEMField::g4hrsEMField(): mBField_Septum(0)
+ 	bool pSetupHRS= true;
+ 	if(pSetupHRS)
+ 
+-	fTune = g4hrsTune::GetTune();
+-
+-	fSeptumMomentum = fTune->septumMomentum;
+ 	fSeptumMapFile = "PREX_septumFieldMap_1320A-m2.dat";	
+ 
+-	mBField_Septum = new BField_Septum(fSeptumMomentum,fSeptumMapFile);
++	mBField_Septum = new BField_Septum(fSeptumMapFile);
+ 
+ 	bUseUniformBField=false;
+ 	BField3V.set(0,0,0);
+diff --git a/src/g4hrsEMFieldSetup.cc b/src/g4hrsEMFieldSetup.cc
+index a8bb049..f998083 100644
+--- a/src/g4hrsEMFieldSetup.cc
++++ b/src/g4hrsEMFieldSetup.cc
+@@ -60,21 +60,21 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
+ 
+ 	fTune = g4hrsTune::GetTune(); 
+ 
+-	fDefaultMomentum = 1.063*GeV; 		// assume PREX default
++	fMomentumScale = fTune->GetMomentumScale(); 		// assume PREX default
+   	fHRSMomentum = fTune->HRSMomentum;
+   	fSnakeModel = 49;
+   	fHRSAngle = fTune->HRSAngle;
+   	fSeptumAngle = fTune->septumAngle;
+ 
+-	KAPPA1 = fTune->kappaQuad1;
+-	KAPPA2 = fTune->kappaQuad2;
+-	DPBEND = fTune->bendDipole;
+-	KAPPA3 = fTune->kappaQuad3;
++	KAPPA1 = (fTune->kappaQuad1)*(fHRSMomentum/fMomentumScale);
++	KAPPA2 = (fTune->kappaQuad2)*(fHRSMomentum/fMomentumScale);
++	DPBEND = (fTune->bendDipole)*(fHRSMomentum/fMomentumScale);
++	KAPPA3 = (fTune->kappaQuad3)*(fHRSMomentum/fMomentumScale);
+ 	quads_on = fTune->quadsOn;
+ 	sos = fTune->sosQuad;
+ 		
+ 
+-  G4cout << "HRS angles: " << fHRSAngle <<  G4endl;
++//  G4cout << "HRS angles: " << fHRSAngle <<  G4endl;
+ 
+   //G4cout << "Quad fringe?" << G4endl;
+   //QuadFringe* fringe = new QuadFringe();
+diff --git a/src/g4hrsGenNuclElastic.cc b/src/g4hrsGenNuclElastic.cc
+index 5fbaa0c..86b74c7 100644
+--- a/src/g4hrsGenNuclElastic.cc
++++ b/src/g4hrsGenNuclElastic.cc
+@@ -58,12 +58,14 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
+     // Approximation for Q2, just needs to be order of magnitude
+     double effQ2 = 2.0*beamE*beamE*(1.0-cos(5.0*deg));
+ 
+-    // Let's just do internal radiation
++    // Internal radiation
+     double int_bt = 0.75*(alpha/pi)*( log( effQ2/(electron_mass_c2*electron_mass_c2) ) - 1.0 );
++    // External radiation
++    double radlen = fBeamTarg->fRadLen;
+ 
+     double bt;
+     if( !bypass_target ){
+-	bt = (4.0/3.0)*(int_bt);
++	bt = (4.0/3.0)*(int_bt + radlen);
+     } else {
+ 	bt = 0.0;
+     }
+@@ -72,8 +74,8 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
+     value = 1.0;
+     prob = 1.- pow(bremcut/Ekin,bt) - bt/(bt+1.)*(1.- pow(bremcut/Ekin,bt+1.))
+ 	+ 0.75*bt/(2.+bt)*(1.- pow(bremcut/Ekin,bt+2.));
+-    prob = prob/(1.- bt*Euler + bt*bt/2.*(Euler*Euler+pi*pi/6.)); /* Gamma function */
+-    prob_sample = G4UniformRand();        /* Random sampling */
++    prob = prob/(1.- bt*Euler + bt*bt/2.*(Euler*Euler+pi*pi/6.)); // Gamma function 
++    prob_sample = G4UniformRand();        // Random sampling 
+ 
+     double env, ref;
+ 
+diff --git a/src/g4hrsMessenger.cc b/src/g4hrsMessenger.cc
+index 8f647f5..04b3120 100644
+--- a/src/g4hrsMessenger.cc
++++ b/src/g4hrsMessenger.cc
+@@ -442,6 +442,10 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
+ 		fdetcon->fSeptumAngle = angle;
+ 		fStepAct->fSeptumAngle = angle;
+ 		ftune->septumAngle = angle;
++		g4hrsVEventGen *agen = fprigen->GetGenerator();
++		if( agen ){
++		    agen->fSeptumAngle = angle;
++		}
+ 	}
+ 
+ 	if( cmd == hrsAngCmd ) {
+@@ -477,12 +481,12 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
+ 
+ 	if( cmd == q1kappaCmd) {
+ 		G4double k = q1kappaCmd->GetNewDoubleValue(newValue);
+-		ftune->SetQ1(k);
++		ftune->kappaQuad1 = k;
+ 	}
+ 
+ 	if( cmd == q2kappaCmd) {
+ 		G4double k = q2kappaCmd->GetNewDoubleValue(newValue);
+-		ftune->SetQ2(k);
++		ftune->kappaQuad2 = k;
+ 	}
+ 
+ 	if( cmd == dBendCmd) {
+@@ -492,7 +496,7 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
+ 
+ 	if( cmd == q3kappaCmd) {
+ 		G4double k = q3kappaCmd->GetNewDoubleValue(newValue);
+-		ftune->SetQ3(k);
++		ftune->kappaQuad3 = k;
+ 	}
+ 
+ 	if( cmd == fTuneCmd) {
+diff --git a/src/g4hrsSteppingAction.cc b/src/g4hrsSteppingAction.cc
+index cb7d683..27d2cbf 100644
+--- a/src/g4hrsSteppingAction.cc
++++ b/src/g4hrsSteppingAction.cc
+@@ -274,7 +274,6 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
+ 					VBdata[i][10] = mom_tr.y()/mom_tr.z();
+ 					VBdata[i][11] = mom_tr.mag();		
+ 
+-
+ 				}
+ 			}
+ 
+diff --git a/src/g4hrsTune.cc b/src/g4hrsTune.cc
+index 8021713..f00de6c 100644
+--- a/src/g4hrsTune.cc
++++ b/src/g4hrsTune.cc
+@@ -11,32 +11,21 @@ g4hrsTune* g4hrsTune::GetTune() {
+ g4hrsTune::g4hrsTune() {
+ 
+ 	fTune = this;
++
+ 	
++	momentum_scale = 1.*GeV;
+ 	// Default values
+-	snakeMagnet = -3.76320471828;
+-	kappaQuad1 = -0.8476 * tesla / snakeMagnet;
+-	kappaQuad2 = 0.8680 * tesla / snakeMagnet;
++	kappaQuad1 = -0.8476 * tesla;
++	kappaQuad2 = 0.8680 * tesla;
+ 	bendDipole = -0.4192 * tesla;
+-	kappaQuad3 = 1.1748 * tesla / snakeMagnet;
++	kappaQuad3 = 1.1748 * tesla;
+ 	septumAngle = 5.*deg;
+ 	septumMomentum = 1.063*GeV;
+ 	septumCurrent = 528*ampere;
+ 	HRSAngle = 12.5*deg;
+ 	HRSMomentum = 1.063*GeV;
+-
+-	//Copy+pasted from EMFieldSetup, in case these values are needed down the road	
+-/*
+-	//snakeMagnet = 1. / -4.77577734;//unitless, STD - correct, I believe
+-	//snakeMagnet = 1. / -4.77577734 * ( 4.00 / 1.063 ) ;//unitless, PREX tune B - correct, I believe
+-	G4double snakeMagnet = -4.77577734 / 1.063;//Nickie's calculation//this is just 4.77577734 / 1.063 //THIS CURRENTLY BEING USED, TTK 01/16/2018
+-	//snakeMagnet *= 0.83756;
+-	snakeMagnet *= 0.83762;  //THIS CURRENTLY BEING USED, TTK 01/16/2018
+-	//snakeMagnet *= 0.7;//This is tuned with hrstrans #1
+-	//snakeMagnet *= 1.33;//This is tuned with hrstrans when hrstrans is tuned to JLR
+-	//snakeMagnet *= 1.24;//This is my new tune, with snake d.dat problems fixed #2
+-	//snakeMagnet *= 0.965; #3
+-*/
+-
++	quadsOn = 1;
++	sosQuad = 0;
+ }
+ 
+ g4hrsTune::~g4hrsTune() {
+@@ -59,14 +48,8 @@ void g4hrsTune::SetTune(G4String mTune) {
+ 
+ }
+ 
+-void g4hrsTune::SetQ1(double k1) {
+-	kappaQuad1 = k1/snakeMagnet;
+-}
+- 
+-void g4hrsTune::SetQ2(double k2) {
+-	kappaQuad2 = k2/snakeMagnet;
++double g4hrsTune::GetMomentumScale() {
++
++	return momentum_scale;
++
+ }
+- 
+-void g4hrsTune::SetQ3(double k3) {
+-	kappaQuad3 = k3/snakeMagnet;
+-} 
+diff --git a/src/g4hrsVEventGen.cc b/src/g4hrsVEventGen.cc
+index 21b53a5..fe6d2bd 100644
+--- a/src/g4hrsVEventGen.cc
++++ b/src/g4hrsVEventGen.cc
+@@ -1,6 +1,7 @@
+ #include "g4hrsVEventGen.hh"
+ 
+ #include "G4RotationMatrix.hh"
++#include "G4AffineTransform.hh"
+ 
+ #include "g4hrsBeamTarget.hh"
+ #include "g4hrsVertex.hh"
+@@ -16,6 +17,7 @@ g4hrsVEventGen::g4hrsVEventGen() {
+ 	fIsVMomSet = false;
+     fSampType       = kMainTarget;
+     fApplyMultScatt = true;
++	fSeptumAngle = 5.*deg;
+ }
+ 
+ g4hrsVEventGen::~g4hrsVEventGen() {
+@@ -94,24 +96,45 @@ void g4hrsVEventGen::PolishEvent(g4hrsEvent *ev) {
+ 
+     ev->fmAsym = ev->fAsym*fBeamTarg->fBeamPol;
+ 
+-	if(fIsVPosSet) {
+-		for( iter = ev->fPartPos.begin(); iter != ev->fPartPos.end(); iter++ ) {
+-       	 		(*iter) = fSetVPos;
+-    		}		
++		
++	if(fIsVPosSet || fIsVMomSet) {
++
++		
++		G4RotationMatrix rotate_hall;
++		rotate_hall.rotateZ(-90.*deg);
++		rotate_hall.rotateY(fSeptumAngle);
++		
++		G4AffineTransform hallAxis_targ = G4AffineTransform(rotate_hall);
++		G4AffineTransform hall_targ = hallAxis_targ.Inverse();
++
++		if(fIsVPosSet) {
++			G4double xhall = fSetVPos.y()*cos(fSeptumAngle);
++			G4double yhall = -fSetVPos.x();
++			G4double zhall = -fSetVPos.y()*sin(fSeptumAngle);
++//			G4ThreeVector fSetVPosHCS = G4ThreeVector(xhall, yhall, zhall);
++			G4ThreeVector fSetVPosHCS = hall_targ.TransformPoint(fSetVPos);
++			for( iter = ev->fPartPos.begin(); iter != ev->fPartPos.end(); iter++ ) {
++				(*iter) = fSetVPosHCS;
++			}		
++		}
++		if(fIsVMomSet) {
++			G4double theta = fSetVMom[0];
++			G4double phi = fSetVMom[1];
++			G4double mom = (fBeamTarg->fBeamE)*(1.+fSetVMom[2]);
++//			G4ThreeVector fSetVMomHCS = G4ThreeVector(mom*sin(theta)*cos(phi),mom*sin(theta)*sin(phi),mom*cos(theta));		
++			G4double pztr = mom/sqrt(theta*theta + phi*phi + 1.*1.);  
++			G4double pxtr = pztr*theta;
++			G4double pytr = pztr*phi;
++			G4ThreeVector ptr = G4ThreeVector(pxtr, pytr, pztr);
++			G4ThreeVector fSetVMomHCS = hall_targ.TransformPoint(ptr);
++			for( iter = ev->fPartMom.begin(); iter != ev->fPartMom.end(); iter++ ) {
++				(*iter) = fSetVMomHCS;
++			}
++			for( iter = ev->fPartRealMom.begin(); iter != ev->fPartRealMom.end(); iter++ ) {
++				(*iter) = fSetVMomHCS;
++			}
++		}
+ 	}
+-	if(fIsVMomSet) {
+-		G4double theta = fSetVMom[0]*deg;
+-		G4double phi = fSetVMom[1]*deg;
+-		G4double mom = (fBeamTarg->fBeamE)*(1.+fSetVMom[2]);
+-		G4ThreeVector setMom = G4ThreeVector(mom*sin(theta)*cos(phi),mom*sin(theta)*sin(phi),mom*cos(theta));
+-		for( iter = ev->fPartMom.begin(); iter != ev->fPartMom.end(); iter++ ) {
+-            		(*iter) = setMom;
+-        	}
+-		for( iter = ev->fPartRealMom.begin(); iter != ev->fPartRealMom.end(); iter++ ) {
+-            		(*iter) = setMom;
+-        	}
+-	}
+-
+ 
+     return;
+ }

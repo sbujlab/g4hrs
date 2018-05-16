@@ -60,21 +60,21 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
 
 	fTune = g4hrsTune::GetTune(); 
 
-	fDefaultMomentum = 1.063*GeV; 		// assume PREX default
+	fMomentumScale = fTune->GetMomentumScale(); 		// assume PREX default
   	fHRSMomentum = fTune->HRSMomentum;
   	fSnakeModel = 49;
   	fHRSAngle = fTune->HRSAngle;
   	fSeptumAngle = fTune->septumAngle;
 
-	KAPPA1 = fTune->kappaQuad1;
-	KAPPA2 = fTune->kappaQuad2;
-	DPBEND = fTune->bendDipole;
-	KAPPA3 = fTune->kappaQuad3;
+	KAPPA1 = (fTune->kappaQuad1)*(fHRSMomentum/fMomentumScale);
+	KAPPA2 = (fTune->kappaQuad2)*(fHRSMomentum/fMomentumScale);
+	DPBEND = (fTune->bendDipole)*(fHRSMomentum/fMomentumScale);
+	KAPPA3 = (fTune->kappaQuad3)*(fHRSMomentum/fMomentumScale);
 	quads_on = fTune->quadsOn;
 	sos = fTune->sosQuad;
 		
 
-  G4cout << "HRS angles: " << fHRSAngle <<  G4endl;
+//  G4cout << "HRS angles: " << fHRSAngle <<  G4endl;
 
   //G4cout << "Quad fringe?" << G4endl;
   //QuadFringe* fringe = new QuadFringe();

@@ -13,16 +13,13 @@ public:
 	virtual ~g4hrsTune();
 	static g4hrsTune* GetTune();
 	void SetTune(G4String);
-	void SetQ1(double);
-	void SetQ2(double);
-	void SetQ3(double);
-	
+	double GetMomentumScale();
 
 private:
 	static g4hrsTune* fTune;
+	double momentum_scale;
 
 public:
-	double snakeMagnet;
 	double kappaQuad1;
 	double kappaQuad2;
 	double kappaQuad3;

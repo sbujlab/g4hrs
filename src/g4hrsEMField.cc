@@ -18,12 +18,9 @@ g4hrsEMField::g4hrsEMField(): mBField_Septum(0)
 	bool pSetupHRS= true;
 	if(pSetupHRS)
 
-	fTune = g4hrsTune::GetTune();
-
-	fSeptumMomentum = fTune->septumMomentum;
 	fSeptumMapFile = "PREX_septumFieldMap_1320A-m2.dat";	
 
-	mBField_Septum = new BField_Septum(fSeptumMomentum,fSeptumMapFile);
+	mBField_Septum = new BField_Septum(fSeptumMapFile);
 
 	bUseUniformBField=false;
 	BField3V.set(0,0,0);
