@@ -1006,7 +1006,7 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 	//Magnetic Length = 70 cm
 	//Radius to Pole Tip = 12.827  cm
 	
-	sos = fTune->sosQuad;
+	int sos = fTune->sosQuad;
 
 	double q1shift = sos ? 0.0 * m : 0.0 * m;
 	double pQ1Rin  = sos ? 12.827 * cm : 15.0*cm;
