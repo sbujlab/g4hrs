@@ -20,9 +20,9 @@ const double QWe_rad = -0.002787;  //  arxiv 1302.6263 - KK's low Q2 EW review w
 	                     //  See HAPLOG 284
 const double QWp = 0.0707;
 
-const double gDefaultBeamE   = 11.0*GeV;
+const double gDefaultBeamE   = 1.063*GeV;
 const double gDefaultBeamPol = 0.85;
-const double gDefaultBeamCur = 75e-6*ampere;
+const double gDefaultBeamCur = 70e-6*ampere;
 
 
 #endif//__REMOLLGLOBS_HH
