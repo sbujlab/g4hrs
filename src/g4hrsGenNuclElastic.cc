@@ -58,12 +58,14 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
     // Approximation for Q2, just needs to be order of magnitude
     double effQ2 = 2.0*beamE*beamE*(1.0-cos(5.0*deg));
 
-    // Let's just do internal radiation
+    // Internal radiation
     double int_bt = 0.75*(alpha/pi)*( log( effQ2/(electron_mass_c2*electron_mass_c2) ) - 1.0 );
+    // External radiation
+    double radlen = fBeamTarg->fRadLen;
 
     double bt;
     if( !bypass_target ){
-	bt = (4.0/3.0)*(int_bt);
+	bt = (4.0/3.0)*(int_bt + radlen);
     } else {
 	bt = 0.0;
     }
@@ -72,8 +74,8 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
     value = 1.0;
     prob = 1.- pow(bremcut/Ekin,bt) - bt/(bt+1.)*(1.- pow(bremcut/Ekin,bt+1.))
 	+ 0.75*bt/(2.+bt)*(1.- pow(bremcut/Ekin,bt+2.));
-    prob = prob/(1.- bt*Euler + bt*bt/2.*(Euler*Euler+pi*pi/6.)); /* Gamma function */
-    prob_sample = G4UniformRand();        /* Random sampling */
+    prob = prob/(1.- bt*Euler + bt*bt/2.*(Euler*Euler+pi*pi/6.)); // Gamma function 
+    prob_sample = G4UniformRand();        // Random sampling 
 
     double env, ref;
 
