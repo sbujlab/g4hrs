@@ -14,6 +14,7 @@ class g4hrsIO;
 class g4hrsEMFieldSetup;
 class g4hrsEMField;
 class g4hrsMaterial;
+class g4hrsTune;
 
 class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
 {
@@ -97,6 +98,7 @@ class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
       double fFieldY;
       double fFieldZ;
  
+      g4hrsTune* fTune;
       g4hrsMaterial* mMaterialManager;
 };
 

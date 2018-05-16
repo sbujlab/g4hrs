@@ -6,7 +6,7 @@
 #include "g4hrsIO.hh"
 #include "g4hrsMaterial.hh"
 #include "g4hrsEMFieldSetup.hh"
-
+#include "g4hrsTune.hh"
 
 #include "G4FieldManager.hh"
 #include "G4TransportationManager.hh"
@@ -72,7 +72,7 @@ g4hrsDetectorConstruction::g4hrsDetectorConstruction() {
 
     fUseSeptumPlusStdHRS=0;
     fSnakeModel = 49;
-
+	fTune = g4hrsTune::GetTune();
     fSetupStdScatChamber = 0;
 
 	// create septum and HRS fields
@@ -494,17 +494,6 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
                 septumCoilLogical,"septumCoilPhys",pMotherLogVol,true,15,0);
         }
     
-	/////////////////////////
-	// HRS Virtual Boundary, 
-	/////////////////////////
-	//For 6 degrees, if septum field is valid and argument UseSeptumPlusStdHRS==1, will 
-	//place the virtual boundary 1 cm before HRSContainer (pHRSContainerRin-6*cm = 1.40m)
-	//otherwise will place the VB at the position given by the Detector.ini
-	//For 12.5 degrees, always place VB 1.40m away from the hall center
-
-
-        //
-        
 
         if( fSnakeModel == 49 || fSnakeModel == 48 || fSnakeModel == 51 || fSnakeModel == 53){
 
@@ -1017,16 +1006,12 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 	//Magnetic Length = 70 cm
 	//Radius to Pole Tip = 12.827  cm
 	
-	int    sos   = 1;
-	if( fSnakeModel >= 52){
-	  sos = 1;
-	}
+	sos = fTune->sosQuad;
+
 	double q1shift = sos ? 0.0 * m : 0.0 * m;
 	double pQ1Rin  = sos ? 12.827 * cm : 15.0*cm;
 	double pQ1Rout = sos ? 35.0   * cm : 35.0*cm;//for now, keep the outer same for either
-	double pQ1Length;//=80*cm;
-	//pQ1Length = ( IS_NIM == 1 ) ? 80.0 * cm : pQ1ex - pQ1en;
-	pQ1Length = sos ?  70. * cm : pQ1ex - pQ1en;
+	double pQ1Length = sos ?  70. * cm : pQ1ex - pQ1en;
 	double pQ1PosAct = pQ1ex - pQ1en;
 	double pQ1LengthMag=pQ1Length * fringe_extension;
 	//double pQ1LengthMag=94.1*cm;
