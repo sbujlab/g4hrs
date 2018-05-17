@@ -15,6 +15,7 @@ g4hrsVEventGen::g4hrsVEventGen() {
 
 	fIsVPosSet = false;
 	fIsVMomSet = false;
+	fIsVThetaSet = false;
     fSampType       = kMainTarget;
     fApplyMultScatt = true;
 	fSeptumAngle = 5.*deg;
@@ -96,8 +97,13 @@ void g4hrsVEventGen::PolishEvent(g4hrsEvent *ev) {
 
     ev->fmAsym = ev->fAsym*fBeamTarg->fBeamPol;
 
+	if(fIsVMomSet && fIsVThetaSet) {
+        	G4cerr << __FILE__ << " line " << __LINE__ << ": Cannot specify both scattering angle (HCS) and vertex momentum (TCS)" << fName << ".  Aborting" << G4endl;
+		exit(1);				
+	}	
+
 		
-	if(fIsVPosSet || fIsVMomSet) {
+	if(fIsVPosSet || fIsVMomSet || fIsVThetaSet) {
 
 		
 		G4RotationMatrix rotate_hall;
@@ -134,6 +140,18 @@ void g4hrsVEventGen::PolishEvent(g4hrsEvent *ev) {
 				(*iter) = fSetVMomHCS;
 			}
 		}
+
+		if(fIsVThetaSet) {
+			G4double p = fBeamTarg->fBeamE;
+			G4ThreeVector phall = G4ThreeVector(p*sin(fSetVTheta),0.,p*cos(fSetVTheta));
+			for( iter = ev->fPartMom.begin(); iter != ev->fPartMom.end(); iter++ ) {
+				(*iter) = phall;
+			}
+			for( iter = ev->fPartRealMom.begin(); iter != ev->fPartRealMom.end(); iter++ ) {
+				(*iter) = phall;
+			}
+		}
+
 	}
 
     return;

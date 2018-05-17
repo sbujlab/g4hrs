@@ -117,8 +117,8 @@ class g4hrsMessenger : public G4UImessenger {
 	G4UIcmdWithADoubleAndUnit *EminCmd;
 	G4UIcmdWithADoubleAndUnit *EmaxCmd;
 	G4UIcmdWith3VectorAndUnit* vPosCmd;
-	G4UIcmdWith3Vector* vMomCmd;
-
+	G4UIcmdWith3Vector* vMomCmd;	
+	G4UIcmdWithADoubleAndUnit* vThetaCmd;
 };
 
 #endif//g4hrsMessenger_HH

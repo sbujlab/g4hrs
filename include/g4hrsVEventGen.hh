@@ -56,6 +56,8 @@ class g4hrsVEventGen {
 	G4bool fIsVPosSet;
 	G4ThreeVector fSetVMom;
 	G4bool fIsVMomSet;
+	G4double fSetVTheta;
+	G4bool fIsVThetaSet;
 
     private:
 	const G4String fName;

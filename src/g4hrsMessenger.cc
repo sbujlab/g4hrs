@@ -204,6 +204,10 @@ g4hrsMessenger::g4hrsMessenger(){
 	vMomCmd->SetGuidance("Event vertex position (th, ph, dp/p)");
 	vMomCmd->SetParameterName("th","ph","dp/p",false);
 	
+	vThetaCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/vtheta",this);
+	vThetaCmd->SetGuidance("Scattering angle (hall coordinates)");
+	vThetaCmd->SetParameterName("theta",false);
+	
 
 
     //////////////////////////////////////////////////
@@ -671,6 +675,15 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 			agen->fSetVMom = vertexMom;
 			agen->fIsVMomSet = true;	
 		}		
+	}
+
+	if(cmd == vThetaCmd) {
+		G4double theta = vThetaCmd->GetNewDoubleValue(newValue);		
+		g4hrsVEventGen *agen = fprigen->GetGenerator();
+                if(agen) {
+                        agen->fSetVTheta = theta;
+                        agen->fIsVThetaSet = true;
+                }
 	}
 
 }
