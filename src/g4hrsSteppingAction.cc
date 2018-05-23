@@ -64,7 +64,7 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 		||  material->GetName()=="Copper" ) 
 		&&  fEnableKryptonite )
 		|| fTrack->GetParentID() != 0
-		|| fTrack->GetTotalEnergy() < 0.9*GeV ) {
+		|| fTrack->GetTotalEnergy() < 0.85*GeV ) {
 
 			fTrack->SetTrackStatus(fStopAndKill);
 
@@ -95,7 +95,7 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 		
 			G4ThreeVector position0 = prePoint->GetPosition()/1000.;	
 			G4ThreeVector momentum0 = prePoint->GetMomentum();
-		
+
 			fX0 = position0.x();
 			fY0 = position0.y();
 			fZ0 = position0.z();
