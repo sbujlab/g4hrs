@@ -6,7 +6,7 @@
 #include "g4hrsIO.hh"
 #include "g4hrsMaterial.hh"
 #include "g4hrsEMFieldSetup.hh"
-
+#include "g4hrsTune.hh"
 
 #include "G4FieldManager.hh"
 #include "G4TransportationManager.hh"
@@ -52,9 +52,9 @@ g4hrsParallelWorld::g4hrsParallelWorld(G4String parallelWorldName) :G4VUserParal
 
     // Default geometry file
 
-
-    fHRSAngle=12.5*deg;
-    fSeptumAngle=5.0*deg;
+	fTune = g4hrsTune::GetTune();
+    fHRSAngle=fTune->HRSAngle;
+    fSeptumAngle=fTune->septumAngle;
 
     fTargetW = 2.0*2.54*cm;
     fTargetH = 2.0*2.54*cm;
@@ -181,7 +181,20 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	new G4PVPlacement(0,G4ThreeVector(0,0,-50. * cm + fPivotZOffset),
 	    	LPlaneLogical2,"virtualBoundaryPhys_mid",motherLogical,0,0);//mid
 
+	///////////////////////////////
+	// Septum tracking detectors //
+	///////////////////////////////
 	
+	// Septum tracking detectors will be placed directly in the (parallel) world volume
+	// at engineering-critical z locations ("pinch points")
+	
+	double zcrit1 = 213.*mm;
+	double zcrit2 = 1095.*mm;	
+	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit1 + fPivotZOffset),
+		LPlaneLogical2,"virtualBoundaryPhys_zCriticalPlane1",motherLogical,0,0);
+	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit2 + fPivotZOffset),
+		LPlaneLogical2,"virtualBoundaryPhys_zCriticalPlane2",motherLogical,0,0);
+
 	////////////////////////////
 	// HRS virtual boundaries //
 	////////////////////////////

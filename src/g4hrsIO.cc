@@ -73,6 +73,16 @@ g4hrsIO::g4hrsIO(){
 	sprintf(VarName[4],"ph");
 	sprintf(VarName[5],"p");
 
+	numZCrit = 2;
+	numZCritVar = 3;
+	
+	sprintf(ZCritName[0],"zcrit1");
+	sprintf(ZCritName[1],"zcrit2");
+
+	sprintf(ZCritVarName[0],"x");
+	sprintf(ZCritVarName[1],"y");
+	sprintf(ZCritVarName[2],"z");
+
 
     fTree = NULL;
     InitializeTree();
@@ -217,6 +227,17 @@ void g4hrsIO::InitializeTree(){
 			fTree->Branch(thisVar, &VBdata[i][j+numVar], Form("%s/D",thisVar));
 		}
 	}
+
+	//Critical z-position data
+	
+	for(int i = 0; i < numZCrit; i++) {
+		for(int j = 0; j < numZCritVar; j++) {
+			char thisVar[15];
+			sprintf(thisVar,"%s_%s",ZCritVarName[j],ZCritName[i]);
+			fTree->Branch(thisVar, &ZCritData[i][j], Form("%s/D",thisVar));
+		}
+	}
+
 
     return;
 }
@@ -427,6 +448,11 @@ void g4hrsIO::ClearVirtualBoundaryData() {
 		}
 	}
 
+	for(int i = 0; i<numZCrit; i++) {
+		for(int j = 0; j< numZCritVar; j++) {
+			fSteppingAction->ZCritData[i][j] = -333.;
+		}
+	}
 
 }
 
@@ -459,6 +485,12 @@ void g4hrsIO::SetVirtualBoundaryData() {
 			VBdata[i][j] = fSteppingAction->VBdata[i][j];
 		}
 	}	
+	
+	for(int i = 0; i < numZCrit; i++) {
+		for(int j = 0; j < numZCritVar; j++) {
+			ZCritData[i][j] = fSteppingAction->ZCritData[i][j];
+		}
+	}
 	
 }
 
