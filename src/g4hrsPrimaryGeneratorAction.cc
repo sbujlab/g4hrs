@@ -27,13 +27,13 @@ g4hrsPrimaryGeneratorAction::g4hrsPrimaryGeneratorAction() {
         G4ThreeVector(0.0,0.0, gDefaultBeamE),
         "e-" );
 
-    double kinE = sqrt(fDefaultEvent->fPartMom[0].mag()*fDefaultEvent->fPartMom[0].mag()
+    double kinE = sqrt(fDefaultEvent->fPartRealMom[0].mag()*fDefaultEvent->fPartRealMom[0].mag()
                        + fDefaultEvent->fPartType[0]->GetPDGMass()*fDefaultEvent->fPartType[0]->GetPDGMass() )
                   -  fDefaultEvent->fPartType[0]->GetPDGMass();
 
     // Default generator data
     fParticleGun->SetParticleDefinition(fDefaultEvent->fPartType[0]);
-    fParticleGun->SetParticleMomentumDirection(fDefaultEvent->fPartMom[0].unit());
+    fParticleGun->SetParticleMomentumDirection(fDefaultEvent->fPartRealMom[0].unit());
     fParticleGun->SetParticleEnergy( kinE  );
     fParticleGun->SetParticlePosition( fDefaultEvent->fPartPos[0] );
 
@@ -78,12 +78,12 @@ void g4hrsPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
         thisev = fEventGen->GenerateEvent();
         for( unsigned int pidx = 0; pidx < thisev->fPartType.size(); pidx++ ) {
 
-            double kinE = sqrt(thisev->fPartMom[pidx].mag()*thisev->fPartMom[pidx].mag() +
+            double kinE = sqrt(thisev->fPartRealMom[pidx].mag()*thisev->fPartRealMom[pidx].mag() +
                                thisev->fPartType[pidx]->GetPDGMass()*thisev->fPartType[pidx]->GetPDGMass())
                           -  thisev->fPartType[pidx]->GetPDGMass();
 
             fParticleGun->SetParticleDefinition(thisev->fPartType[pidx]);
-            fParticleGun->SetParticleMomentumDirection(thisev->fPartMom[pidx].unit());
+            fParticleGun->SetParticleMomentumDirection(thisev->fPartRealMom[pidx].unit());
             fParticleGun->SetParticleEnergy( kinE  );
             fParticleGun->SetParticlePosition( thisev->fPartPos[pidx] );
 
