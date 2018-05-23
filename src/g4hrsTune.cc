@@ -11,9 +11,11 @@ g4hrsTune* g4hrsTune::GetTune() {
 g4hrsTune::g4hrsTune() {
 
 	fTune = this;
-
 	
+	// This value should not be changed
 	momentum_scale = 1.*GeV;
+
+
 	// Default values
 	kappaQuad1 = -0.8476 * tesla;
 	kappaQuad2 = 0.8680 * tesla;
@@ -38,7 +40,11 @@ void g4hrsTune::SetTune(G4String mTune) {
 		//Do nothing, this is the default tune
 	} else if(mTune == "B") {
 
-		// Put Tune B here
+		kappaQuad1 = 0.140065 * tesla;
+		kappaQuad2 = -0.212361 * tesla;
+		bendDipole = -0.4042 * tesla;
+		kappaQuad3 = -0.330965 * tesla;
+		septumCurrent = 488.5*ampere;
 
 	} else {
 		G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
