@@ -1,5 +1,6 @@
 #include "g4hrsSteppingAction.hh"
 #include "g4hrsTransportFunction.hh"
+#include "g4hrsTune.hh"
 //#include "g4hrsSteppingActionMessenger.hh"
 
 #include "G4VVisManager.hh"
@@ -37,17 +38,23 @@ g4hrsSteppingAction::g4hrsSteppingAction()
 	VBnames[11] = "virtualBoundaryPhys_q3ex";
 	VBnames[12] = "virtualBoundaryPhys_vdc";
 	VBnames[13] = "virtualBoundaryPhys_fp";	
-
+	
+	numZCrit = 2;
+	numZCritVar = 3;
+	ZCritNames[0] = "virtualBoundaryPhys_zCriticalPlane1";
+	ZCritNames[1] = "virtualBoundaryPhys_zCriticalPlane2";
 
 
 ///  new g4hrsSteppingActionMessenger(this);
 	rad = 1.;
     fEnableKryptonite = true;
 	fTransportFunction = new g4hrsTransportFunction();
+
+	fTune = g4hrsTune::GetTune();	
 	
-	fSeptumAngle = 5.*deg;
-	fHRSAngle = 12.5*deg;
-	fHRSMomentum = 1.063*GeV;
+	fSeptumAngle = fTune->septumAngle;
+	fHRSAngle = fTune->HRSAngle;
+	fHRSMomentum = fTune->HRSMomentum;
 	nelements = 5;
 
 }
@@ -225,6 +232,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			G4ThreeVector sextr = position_transform_sex.TransformPoint(sexhc);
 			G4ThreeVector sexcttr = momentum_transform_sex.TransformPoint(sexct);
 	*/
+
+			// Transform and record virtual detector data			
 			for(int i = 0; i < numVB; i++) {
 
 				G4AffineTransform position_transform;
@@ -275,6 +284,15 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 					VBdata[i][11] = mom_tr.mag();		
 
 
+				}
+			}
+
+			// Record septum tracker data
+			for(int i = 0; i < numZCrit; i++) {
+				if(volName.find(ZCritNames[i]) != G4String::npos) {
+					ZCritData[i][0] = x;
+					ZCritData[i][1] = y;
+					ZCritData[i][2] = z;
 				}
 			}
 

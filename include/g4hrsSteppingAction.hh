@@ -6,6 +6,7 @@
 #include "globals.hh"
 
 class g4hrsTransportFunction; 
+class g4hrsTune;
 
 class g4hrsSteppingAction : public G4UserSteppingAction
 {
@@ -37,6 +38,8 @@ class g4hrsSteppingAction : public G4UserSteppingAction
 	bool goodParticle;
 	double sign; 	// y/phi sign flip for using transport function on left arm
 
+	g4hrsTune* fTune;
+	
 	G4int fLHRS;
 	G4int fRHRS;
 	
@@ -61,10 +64,13 @@ class g4hrsSteppingAction : public G4UserSteppingAction
 
 	int numVB;
 	int numVar;
-
 	G4double VBdata[14][12];
 	G4String VBnames[14];
-
+	
+	int numZCrit;
+        int numZCritVar;
+        G4double ZCritData[2][3];
+        G4String ZCritNames[2];
 
 };
 

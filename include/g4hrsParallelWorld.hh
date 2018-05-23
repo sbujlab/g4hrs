@@ -13,6 +13,7 @@ class g4hrsIO;
 class g4hrsEMFieldSetup;
 class g4hrsEMField;
 class g4hrsMaterial;
+class g4hrsTune;
 
 class g4hrsParallelWorld : public G4VUserParallelWorld
 {
@@ -28,6 +29,7 @@ class g4hrsParallelWorld : public G4VUserParallelWorld
 
   private:
       g4hrsIO *fIO;
+	g4hrsTune* fTune;
 
   public:
     void SetIO(g4hrsIO *io){ fIO = io; }

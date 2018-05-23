@@ -171,21 +171,21 @@ class g4hrsIO {
 
 	int numTF;
 	int numTFvar;
-
 	G4double TFdata[4][12];
-
 	char TFName[12][6];
 	char TFVarName[4][5];
 
 	int numVB;
 	int numVar;
-
 	G4double VBdata[14][12];
-
 	char VBName[14][6];
 	char VarName[12][5];
 
-
+	int numZCrit;
+	int numZCritVar;
+	G4double ZCritData[2][3];
+	char ZCritName[2][10];
+	char ZCritVarName[3][5];
 
 };
 
