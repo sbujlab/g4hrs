@@ -334,14 +334,14 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
         double pSeptumX=140.0*cm;
         double pSeptumY=84.4*cm;
         double pSeptumZ=74.0*cm;
-        double pSeptumTunnelX=30.4*cm;
+        double pSeptumTunnelX=30.55*cm;
         double pSeptumTunnelY=24.4*cm;//-2.0*inch;  //By Jixie @20120205: Add 2 inches of iron
         double pSeptumBeamHoleX=7.8*cm;
         double pSeptumBeamHoleY=8.0*cm;
 
 
 
-        double pSeptumTunnelPos_X=8.4*cm+pSeptumTunnelX/2.0;
+        double pSeptumTunnelPos_X=8.425*cm+pSeptumTunnelX/2.0;
         double pSeptumPos_Z=69.99937*cm;		
 
 

@@ -127,12 +127,18 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	parallelDetLogical->SetSensitiveDetector(virtual45);
 	G4VPhysicalVolume* parallelDetPhys = new G4PVPlacement(0,G4ThreeVector(fTargetX,fTargetY,fTargetZ + 69.99937 - 74./2. + fPivotZOffset - 10.*cm),
 		parallelDetLogical,"parallelDetPhys",motherLogical,0,0);
-*/	
+*/
+
+	double pSeptumBoxX      = 130.0  * cm;
+	double pSeptumBoxY      = 80.   * cm;
+	double pSeptumZ      = 74.0   * cm;
+	
 	///////////////////////////////////
 	// Solids for virtual boundaries //
 	///////////////////////////////////
 	G4double vb_thickness = 0.5 * mm;
 	G4VSolid* FPSolid = new G4Tubs("FPTub",0,175.*cm,vb_thickness,0.0*deg,360.0*deg);
+	G4VSolid* SeptumSolid = new G4Box("SeptumPlane",pSeptumBoxX/2.,pSeptumBoxY/2.,vb_thickness/2.);
 	G4VSolid* PlaneSolid1 = new G4Tubs("PlaneTub",0,35.*cm,vb_thickness,0.0*deg,360.0*deg); //circles
 	G4VSolid* PlaneSolid2 = new G4Tubs("PlaneTub",0,75.*cm,vb_thickness,0.0*deg,360.0*deg); //circles
 	G4VSolid* CollimatorSolid = new G4Tubs("ColTub",0,20.*cm,vb_thickness,0.0*deg,360.0*deg); //circles
@@ -141,6 +147,7 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	G4LogicalVolume* LPlaneLogical1 = new G4LogicalVolume(PlaneSolid1,0,"LPlaneLogical1",0,0,0);
 	G4LogicalVolume* RPlaneLogical1 = new G4LogicalVolume(PlaneSolid1,0,"RPlaneLogical1",0,0,0);
 	G4LogicalVolume* LPlaneLogical2 = new G4LogicalVolume(PlaneSolid2,0,"LPlaneLogical1",0,0,0);
+	G4LogicalVolume* SepPlaneLogical = new G4LogicalVolume(SeptumSolid,0,"SepPlaneLogical",0,0,0);
 	G4LogicalVolume* RPlaneLogical2 = new G4LogicalVolume(PlaneSolid2,0,"RPlaneLogical1",0,0,0);
 	G4LogicalVolume* CollimatorLogical = new G4LogicalVolume(CollimatorSolid,0,"CollimatorLogical",0,0,0);
 	G4LogicalVolume* LocalAxisLog = new G4LogicalVolume(LocalAxis, 0, "LocalAxisLog",0,0,0);
@@ -154,6 +161,7 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	LPlaneLogical2->SetVisAttributes(virtualBoundaryVisAtt);
 	RPlaneLogical1->SetVisAttributes(virtualBoundaryVisAtt);	
 	RPlaneLogical2->SetVisAttributes(virtualBoundaryVisAtt);
+	SepPlaneLogical->SetVisAttributes(virtualBoundaryVisAtt);
 	LFPLogical->SetVisAttributes(virtualBoundaryVisAtt);
 	RFPLogical->SetVisAttributes(virtualBoundaryVisAtt);
 	CollimatorLogical->SetVisAttributes(virtualBoundaryVisAtt);
@@ -162,24 +170,21 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	///////////////////////////////
 	// Septum virtual boundaries //
 	///////////////////////////////
-
+	
 	// Septum virtual boundaries will be placed directly in the (parallel) world volume
 	
-	double pSeptumX      = 140.0  * cm;
-	double pSeptumY      = 84.4   * cm;
-	double pSeptumZ      = 74.0   * cm;
 	//double pSeptumPlaceZ = 70.414 * cm;
 	double pSeptumPlaceZ = 69.99937 * cm;
 	new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPlaceZ - 0.5 * pSeptumZ + fPivotZOffset),
-		LPlaneLogical2,"virtualBoundaryPhys_sen",motherLogical,0,0);//sen
+		SepPlaneLogical,"virtualBoundaryPhys_sen",motherLogical,0,0);//sen
 	new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPlaceZ + fPivotZOffset),
-		LPlaneLogical2,"virtualBoundaryPhys_sm",motherLogical,0,0);//sm
+		SepPlaneLogical,"virtualBoundaryPhys_sm",motherLogical,0,0);//sm
 	new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPlaceZ + 0.5 * pSeptumZ + fPivotZOffset),
-	    	LPlaneLogical2,"virtualBoundaryPhys_sex",motherLogical,0,0);//sex
+	    	SepPlaneLogical,"virtualBoundaryPhys_sex",motherLogical,0,0);//sex
 	new G4PVPlacement(0,G4ThreeVector(0,0,36. * cm + fPivotZOffset),
-	    	LPlaneLogical2,"virtualBoundaryPhys_coil",motherLogical,0,0);//coil
+	    	SepPlaneLogical,"virtualBoundaryPhys_coil",motherLogical,0,0);//coil
 	new G4PVPlacement(0,G4ThreeVector(0,0,-50. * cm + fPivotZOffset),
-	    	LPlaneLogical2,"virtualBoundaryPhys_mid",motherLogical,0,0);//mid
+	    	SepPlaneLogical,"virtualBoundaryPhys_mid",motherLogical,0,0);//mid
 
 	///////////////////////////////
 	// Septum tracking detectors //
@@ -191,9 +196,9 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	double zcrit1 = 213.*mm;
 	double zcrit2 = 1095.*mm;	
 	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit1 + fPivotZOffset),
-		LPlaneLogical2,"virtualBoundaryPhys_zCriticalPlane1",motherLogical,0,0);
+		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane1",motherLogical,0,0);
 	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit2 + fPivotZOffset),
-		LPlaneLogical2,"virtualBoundaryPhys_zCriticalPlane2",motherLogical,0,0);
+		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane2",motherLogical,0,0);
 
 	////////////////////////////
 	// HRS virtual boundaries //
