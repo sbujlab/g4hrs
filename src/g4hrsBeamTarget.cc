@@ -387,7 +387,7 @@ g4hrsVertex g4hrsBeamTarget::SampleVertex(SampType_t samp){
             fRadLen = radsum;
 
             fVer    = G4ThreeVector( rasx, rasy, 
-                    zinvol + (*it)->GetFrameTranslation().z()  
+                    zinvol - (*it)->GetFrameTranslation().z()  
                     - ((G4Tubs *) (*it)->GetLogicalVolume()->GetSolid())->GetZHalfLength() );
 
             G4double masssum = 0.0;
