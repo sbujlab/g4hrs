@@ -74,24 +74,26 @@ g4hrsIO::g4hrsIO(){
 	sprintf(VarName[5],"p");
 
 	numZCrit = 12;
-	numZCritVar = 3;
+	numZCritVar = 5;
 	
-	sprintf(ZCritName[0],"zcrit1");
-	sprintf(ZCritName[1],"zcrit2");
-	sprintf(ZCritName[2],"zcrit3");
-	sprintf(ZCritName[3],"zcrit4");
-	sprintf(ZCritName[4],"zcrit5");
-	sprintf(ZCritName[5],"zcrit6");
-	sprintf(ZCritName[6],"zcrit7");
-	sprintf(ZCritName[7],"zcrit8");
-	sprintf(ZCritName[8],"zcrit9");
-	sprintf(ZCritName[9],"zcrit10");
-	sprintf(ZCritName[10],"zcrit11");
-	sprintf(ZCritName[11],"zcrit12");
+	sprintf(ZCritName[0], "zpinch1");
+	sprintf(ZCritName[1], "zpinch2");
+	sprintf(ZCritName[2], "zpinch3");
+	sprintf(ZCritName[3], "ztarg");
+	sprintf(ZCritName[4], "zfield0");
+	sprintf(ZCritName[5], "zfield1");
+	sprintf(ZCritName[6], "zfield2");
+	sprintf(ZCritName[7], "zmidtosep");
+	sprintf(ZCritName[8], "zsep1");
+	sprintf(ZCritName[9], "zsep2");
+	sprintf(ZCritName[10],"zsep3");
+	sprintf(ZCritName[11],"zsep4");
 
 	sprintf(ZCritVarName[0],"x");
 	sprintf(ZCritVarName[1],"y");
 	sprintf(ZCritVarName[2],"z");
+	sprintf(ZCritVarName[3],"th");
+	sprintf(ZCritVarName[4],"ph");
 
 
     fTree = NULL;

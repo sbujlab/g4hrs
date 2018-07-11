@@ -136,7 +136,7 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	///////////////////////////////////
 	// Solids for virtual boundaries //
 	///////////////////////////////////
-	G4double vb_thickness = 0.5 * mm;
+	G4double vb_thickness = 1. * mm;
 	G4VSolid* FPSolid = new G4Tubs("FPTub",0,175.*cm,vb_thickness,0.0*deg,360.0*deg);
 	G4VSolid* SeptumSolid = new G4Box("SeptumPlane",pSeptumBoxX/2.,pSeptumBoxY/2.,vb_thickness/2.);
 	G4VSolid* PlaneSolid1 = new G4Tubs("PlaneTub",0,35.*cm,vb_thickness,0.0*deg,360.0*deg); //circles
@@ -192,44 +192,51 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	
 	// Septum tracking detectors will be placed directly in the (parallel) world volume
 	// at engineering-critical z locations ("pinch points")
-	
-	double zcrit1 = 213.*mm;
-	double zcrit2 = 1095.*mm;
-	double zcrit3 = 5.*cm;	
-	double zcrit4 = 30.*cm;	
-	double zcrit5 = 55.*cm;	
-	double zcrit6 = 80.*cm;	
-	double zcrit7 = 105.*cm;	
-	double zcrit8 = 130.*cm;
-	double zcrit9 = (pSeptumPlaceZ - 0.5 * pSeptumZ + fPivotZOffset) + 0.1 * pSeptumZ; 	
-	double zcrit10 = (pSeptumPlaceZ - 0.5 * pSeptumZ + fPivotZOffset) + 0.2 * pSeptumZ; 	
-	double zcrit11 = (pSeptumPlaceZ - 0.5 * pSeptumZ + fPivotZOffset) + 0.3 * pSeptumZ; 	
-	double zcrit12 = (pSeptumPlaceZ - 0.5 * pSeptumZ + fPivotZOffset) + 0.4 * pSeptumZ; 	
-	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit1 + fPivotZOffset),
-		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane1",motherLogical,0,0);
-	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit2 + fPivotZOffset),
-		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane2",motherLogical,0,0);
 
-	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit3),
-		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane3",motherLogical,0,0);
-	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit4),
-		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane4",motherLogical,0,0);
-	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit5),
-		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane5",motherLogical,0,0);
-	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit6),
-		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane6",motherLogical,0,0);
-	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit7),
-		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane7",motherLogical,0,0);
-	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit8),
-		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane8",motherLogical,0,0);
-	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit9),
-		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane9",motherLogical,0,0);
-	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit10),
-		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane10",motherLogical,0,0);
-	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit11),
-		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane11",motherLogical,0,0);
-	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit12),
-		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane12",motherLogical,0,0);
+	// pinch points are known from CAD in HCS, so the pivot offset is required
+	double zpinch1 =  -7.8*cm + fPivotZOffset;
+	double zpinch2 =  21.3*cm + fPivotZOffset;
+	double zpinch3 = 109.5*cm + fPivotZOffset;
+
+	// other tracking detectors in G4 coordinates
+	double ztarg = 1.*cm;
+	double zfield0 = 99.378*cm;
+	double zfield1 = 100.378*cm;
+	double zfield2 = 101.378*cm;
+	double zmidtosep = 69.189*cm;
+
+	// tracking in the septum	
+	double zsep1 = (pSeptumPlaceZ - 0.5 * pSeptumZ + fPivotZOffset) + 0.1 * pSeptumZ; 	
+	double zsep2 = (pSeptumPlaceZ - 0.5 * pSeptumZ + fPivotZOffset) + 0.2 * pSeptumZ; 	
+	double zsep3 = (pSeptumPlaceZ - 0.5 * pSeptumZ + fPivotZOffset) + 0.3 * pSeptumZ; 	
+	double zsep4 = (pSeptumPlaceZ - 0.5 * pSeptumZ + fPivotZOffset) + 0.4 * pSeptumZ; 	
+
+	new G4PVPlacement(0,G4ThreeVector(0,0,zpinch1),
+		SepPlaneLogical,"virtualBoundaryPhys_zpinch1",motherLogical,0,0);
+	new G4PVPlacement(0,G4ThreeVector(0,0,zpinch2),
+		SepPlaneLogical,"virtualBoundaryPhys_zpinch2",motherLogical,0,0);
+	new G4PVPlacement(0,G4ThreeVector(0,0,zpinch3),
+		SepPlaneLogical,"virtualBoundaryPhys_zpinch3",motherLogical,0,0);
+
+	new G4PVPlacement(0,G4ThreeVector(0,0,ztarg),
+		SepPlaneLogical,"virtualBoundaryPhys_ztarg",motherLogical,0,0);
+	new G4PVPlacement(0,G4ThreeVector(0,0,zfield0),
+		SepPlaneLogical,"virtualBoundaryPhys_zfield0",motherLogical,0,0);
+	new G4PVPlacement(0,G4ThreeVector(0,0,zfield1),
+		SepPlaneLogical,"virtualBoundaryPhys_zfield1",motherLogical,0,0);
+	new G4PVPlacement(0,G4ThreeVector(0,0,zfield2),
+		SepPlaneLogical,"virtualBoundaryPhys_zfield2",motherLogical,0,0);
+	new G4PVPlacement(0,G4ThreeVector(0,0,zmidtosep),
+		SepPlaneLogical,"virtualBoundaryPhys_zmidtosep",motherLogical,0,0);
+
+	new G4PVPlacement(0,G4ThreeVector(0,0,zsep1),
+		SepPlaneLogical,"virtualBoundaryPhys_zsep1",motherLogical,0,0);
+	new G4PVPlacement(0,G4ThreeVector(0,0,zsep2),
+		SepPlaneLogical,"virtualBoundaryPhys_zsep2",motherLogical,0,0);
+	new G4PVPlacement(0,G4ThreeVector(0,0,zsep3),
+		SepPlaneLogical,"virtualBoundaryPhys_zsep3",motherLogical,0,0);
+	new G4PVPlacement(0,G4ThreeVector(0,0,zsep4),
+		SepPlaneLogical,"virtualBoundaryPhys_zsep4",motherLogical,0,0);
 
 
 	////////////////////////////

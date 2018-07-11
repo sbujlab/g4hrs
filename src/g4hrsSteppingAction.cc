@@ -40,19 +40,19 @@ g4hrsSteppingAction::g4hrsSteppingAction()
 	VBnames[13] = "virtualBoundaryPhys_fp";	
 	
 	numZCrit = 12;
-	numZCritVar = 3;
-	ZCritNames[0] = "virtualBoundaryPhys_zCriticalPlane1";
-	ZCritNames[1] = "virtualBoundaryPhys_zCriticalPlane2";
-	ZCritNames[2] = "virtualBoundaryPhys_zCriticalPlane3";
-	ZCritNames[3] = "virtualBoundaryPhys_zCriticalPlane4";
-	ZCritNames[4] = "virtualBoundaryPhys_zCriticalPlane5";
-	ZCritNames[5] = "virtualBoundaryPhys_zCriticalPlane6";
-	ZCritNames[6] = "virtualBoundaryPhys_zCriticalPlane7";
-	ZCritNames[7] = "virtualBoundaryPhys_zCriticalPlane8";
-	ZCritNames[8] = "virtualBoundaryPhys_zCriticalPlane9";
-	ZCritNames[9] = "virtualBoundaryPhys_zCriticalPlane10";
-	ZCritNames[10] = "virtualBoundaryPhys_zCriticalPlane11";
-	ZCritNames[11] = "virtualBoundaryPhys_zCriticalPlane12";
+	numZCritVar = 5;
+	ZCritNames[0] =  "virtualBoundaryPhys_zpinch1";
+	ZCritNames[1] =  "virtualBoundaryPhys_zpinch2";
+	ZCritNames[2] =  "virtualBoundaryPhys_zpinch3";
+	ZCritNames[3] =  "virtualBoundaryPhys_ztarg";
+	ZCritNames[4] =  "virtualBoundaryPhys_zfield0";
+	ZCritNames[5] =  "virtualBoundaryPhys_zfield1";
+	ZCritNames[6] =  "virtualBoundaryPhys_zfield2";
+	ZCritNames[7] =  "virtualBoundaryPhys_zmidtosep";
+	ZCritNames[8] =  "virtualBoundaryPhys_zsep1";
+	ZCritNames[9] =  "virtualBoundaryPhys_zsep2";
+	ZCritNames[10] = "virtualBoundaryPhys_zsep3";
+	ZCritNames[11] = "virtualBoundaryPhys_zsep4";
 
 ///  new g4hrsSteppingActionMessenger(this);
 	rad = 1.;
@@ -297,12 +297,14 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 				}
 			}
 
-			// Record septum tracker data
+			// Record tracking detector data
 			for(int i = 0; i < numZCrit; i++) {
 				if(volName.find(ZCritNames[i]) != G4String::npos) {
 					ZCritData[i][0] = x;
 					ZCritData[i][1] = y;
 					ZCritData[i][2] = z;
+					ZCritData[i][3] = momentum.theta()/rad;
+					ZCritData[i][4] = momentum.phi()/rad;
 				}
 			}
 
