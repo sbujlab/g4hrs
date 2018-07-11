@@ -63,7 +63,12 @@ g4hrsBeamTarget *g4hrsBeamTarget::GetBeamTarget() {
 }
 
 G4String g4hrsBeamTarget::GetTargetMaterial() {
-	return fTargetMaterial;
+
+	if(fTargetMaterial == "Vacuum") {
+		return "Pb208";
+	} else {
+		return fTargetMaterial;
+	}
 }
 
 G4double g4hrsBeamTarget::GetEffLumin(){
@@ -242,15 +247,16 @@ void g4hrsBeamTarget::SetTargetPos(G4double z){
 
 void g4hrsBeamTarget::SetTargetMaterial(G4String targMat) {
 
+	fTargetMaterial = targMat;
 	G4Material* targ_material;
     	mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
-	if(targMat == "Pb208") {
+	if(fTargetMaterial == "Pb208") {
 		targ_material = mMaterialManager->lead208;	
-	} else if(targMat == "Ca40") {
+	} else if(fTargetMaterial == "Ca40") {
 		targ_material = mMaterialManager->calcium40;	
-	} else if(targMat == "Ca48") {
+	} else if(fTargetMaterial == "Ca48") {
 		targ_material = mMaterialManager->calcium48;	
-	} else if (targMat = "Vacuum") {
+	} else if (fTargetMaterial == "Vacuum") {
 		targ_material = mMaterialManager->vacuum;
 	} else {
 		G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
