@@ -181,10 +181,6 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 		SepPlaneLogical,"virtualBoundaryPhys_sm",motherLogical,0,0);//sm
 	new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPlaceZ + 0.5 * pSeptumZ + fPivotZOffset),
 	    	SepPlaneLogical,"virtualBoundaryPhys_sex",motherLogical,0,0);//sex
-	new G4PVPlacement(0,G4ThreeVector(0,0,36. * cm + fPivotZOffset),
-	    	SepPlaneLogical,"virtualBoundaryPhys_coil",motherLogical,0,0);//coil
-	new G4PVPlacement(0,G4ThreeVector(0,0,-50. * cm + fPivotZOffset),
-	    	SepPlaneLogical,"virtualBoundaryPhys_mid",motherLogical,0,0);//mid
 
 	///////////////////////////////
 	// Septum tracking detectors //
