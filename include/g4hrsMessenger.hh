@@ -78,6 +78,8 @@ class g4hrsMessenger : public G4UImessenger {
 	G4UIcmdWithADoubleAndUnit	*q3kappaCmd;
 	G4UIcmdWithAString		*fTuneCmd;
 
+	G4UIcmdWithADoubleAndUnit *minEKillCmd;
+
 	G4UIcmdWithADoubleAndUnit *tgtLenCmd;
 	G4UIcmdWithADoubleAndUnit *tgtPosCmd;
 	G4UIcmdWithAString 	  *tgtMatCmd;

@@ -17,13 +17,13 @@ g4hrsTune::g4hrsTune() {
 
 
 	// Default values
-	kappaQuad1 = -0.8476 * tesla;
-	kappaQuad2 = 0.8680 * tesla;
-	bendDipole = -0.4192 * tesla;
-	kappaQuad3 = 1.1748 * tesla;
+	kappaQuad1 = (-0.8476 * tesla) / (-3.7632047 * 1.063);
+	kappaQuad2 = (0.93528 * tesla) / (-3.7632047 * 1.063);
+	bendDipole = -0.4205 * tesla / 1.063;
+	kappaQuad3 = (1.15762 * tesla) / (-3.7632047 * 1.063);
 	septumAngle = 5.*deg;
 	septumMomentum = 1.063*GeV;
-	septumCurrent = 528*ampere;
+	septumCurrent = 488.5*ampere;
 	HRSAngle = 12.5*deg;
 	HRSMomentum = 1.063*GeV;
 	quadsOn = 1;
@@ -44,7 +44,7 @@ void g4hrsTune::SetTune(G4String mTune) {
 		kappaQuad2 = -0.212361 * tesla;
 		bendDipole = -0.4042 * tesla;
 		kappaQuad3 = -0.330965 * tesla;
-		septumCurrent = 488.5*ampere;
+		septumCurrent = 488.5*1.05*ampere;
 
 	} else {
 		G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<

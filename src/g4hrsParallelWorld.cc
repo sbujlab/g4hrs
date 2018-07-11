@@ -194,11 +194,43 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	// at engineering-critical z locations ("pinch points")
 	
 	double zcrit1 = 213.*mm;
-	double zcrit2 = 1095.*mm;	
+	double zcrit2 = 1095.*mm;
+	double zcrit3 = 5.*cm;	
+	double zcrit4 = 30.*cm;	
+	double zcrit5 = 55.*cm;	
+	double zcrit6 = 80.*cm;	
+	double zcrit7 = 105.*cm;	
+	double zcrit8 = 130.*cm;
+	double zcrit9 = (pSeptumPlaceZ - 0.5 * pSeptumZ + fPivotZOffset) + 0.1 * pSeptumZ; 	
+	double zcrit10 = (pSeptumPlaceZ - 0.5 * pSeptumZ + fPivotZOffset) + 0.2 * pSeptumZ; 	
+	double zcrit11 = (pSeptumPlaceZ - 0.5 * pSeptumZ + fPivotZOffset) + 0.3 * pSeptumZ; 	
+	double zcrit12 = (pSeptumPlaceZ - 0.5 * pSeptumZ + fPivotZOffset) + 0.4 * pSeptumZ; 	
 	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit1 + fPivotZOffset),
 		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane1",motherLogical,0,0);
 	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit2 + fPivotZOffset),
 		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane2",motherLogical,0,0);
+
+	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit3),
+		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane3",motherLogical,0,0);
+	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit4),
+		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane4",motherLogical,0,0);
+	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit5),
+		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane5",motherLogical,0,0);
+	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit6),
+		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane6",motherLogical,0,0);
+	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit7),
+		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane7",motherLogical,0,0);
+	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit8),
+		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane8",motherLogical,0,0);
+	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit9),
+		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane9",motherLogical,0,0);
+	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit10),
+		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane10",motherLogical,0,0);
+	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit11),
+		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane11",motherLogical,0,0);
+	new G4PVPlacement(0,G4ThreeVector(0,0,zcrit12),
+		SepPlaneLogical,"virtualBoundaryPhys_zCriticalPlane12",motherLogical,0,0);
+
 
 	////////////////////////////
 	// HRS virtual boundaries //

@@ -38,6 +38,8 @@ class g4hrsSteppingAction : public G4UserSteppingAction
 	bool goodParticle;
 	double sign; 	// y/phi sign flip for using transport function on left arm
 
+	G4double fMinEKill;
+
 	g4hrsTune* fTune;
 	
 	G4int fLHRS;
@@ -69,8 +71,8 @@ class g4hrsSteppingAction : public G4UserSteppingAction
 	
 	int numZCrit;
         int numZCritVar;
-        G4double ZCritData[2][3];
-        G4String ZCritNames[2];
+        G4double ZCritData[12][3];
+        G4String ZCritNames[12];
 
 };
 

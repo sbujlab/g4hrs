@@ -73,11 +73,21 @@ g4hrsIO::g4hrsIO(){
 	sprintf(VarName[4],"ph");
 	sprintf(VarName[5],"p");
 
-	numZCrit = 2;
+	numZCrit = 12;
 	numZCritVar = 3;
 	
 	sprintf(ZCritName[0],"zcrit1");
 	sprintf(ZCritName[1],"zcrit2");
+	sprintf(ZCritName[2],"zcrit3");
+	sprintf(ZCritName[3],"zcrit4");
+	sprintf(ZCritName[4],"zcrit5");
+	sprintf(ZCritName[5],"zcrit6");
+	sprintf(ZCritName[6],"zcrit7");
+	sprintf(ZCritName[7],"zcrit8");
+	sprintf(ZCritName[8],"zcrit9");
+	sprintf(ZCritName[9],"zcrit10");
+	sprintf(ZCritName[10],"zcrit11");
+	sprintf(ZCritName[11],"zcrit12");
 
 	sprintf(ZCritVarName[0],"x");
 	sprintf(ZCritVarName[1],"y");

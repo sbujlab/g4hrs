@@ -23,6 +23,7 @@ g4hrsEMField::g4hrsEMField(): mBField_Septum(0)
 	mBField_Septum = new BField_Septum(fSeptumMapFile);
 
 	bUseUniformBField=false;
+//	BField3V.set(0,1.1*9.91e-4,0);
 	BField3V.set(0,0,0);
 }
 
@@ -42,14 +43,20 @@ inline void g4hrsEMField::GetFieldValue(const G4double Point[4],G4double *Bfield
 {  
 	//////////////////////////////////////////////////////////
 	//get BField
-	if(this->bUseUniformBField) 
-	{
-		Bfield[0]=BField3V.x();
-		Bfield[1]=BField3V.y();
-		Bfield[2]=BField3V.z();
-	}
-	else
-	{
+
+	if(this->bUseUniformBField) {
+
+                if(Point[2]/cm > 137. && Point[2]/cm < (137. + 75.) && Point[0]/cm > 0.) {
+                        Bfield[0]=BField3V.x();
+                        Bfield[1]=BField3V.y();
+                        Bfield[2]=BField3V.z();
+                } else {
+                        Bfield[0]=0.;
+                        Bfield[1]=0.;
+                        Bfield[2]=0.;
+                }
+
+        } else {
 		double pB[3],pPos[3]={Point[0]/cm,Point[1]/cm,Point[2]/cm};  //turn into cm
 		for(int i=0;i<3;i++) Bfield[i]=0.0;  //reset
 

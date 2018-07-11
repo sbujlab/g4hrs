@@ -39,11 +39,20 @@ g4hrsSteppingAction::g4hrsSteppingAction()
 	VBnames[12] = "virtualBoundaryPhys_vdc";
 	VBnames[13] = "virtualBoundaryPhys_fp";	
 	
-	numZCrit = 2;
+	numZCrit = 12;
 	numZCritVar = 3;
 	ZCritNames[0] = "virtualBoundaryPhys_zCriticalPlane1";
 	ZCritNames[1] = "virtualBoundaryPhys_zCriticalPlane2";
-
+	ZCritNames[2] = "virtualBoundaryPhys_zCriticalPlane3";
+	ZCritNames[3] = "virtualBoundaryPhys_zCriticalPlane4";
+	ZCritNames[4] = "virtualBoundaryPhys_zCriticalPlane5";
+	ZCritNames[5] = "virtualBoundaryPhys_zCriticalPlane6";
+	ZCritNames[6] = "virtualBoundaryPhys_zCriticalPlane7";
+	ZCritNames[7] = "virtualBoundaryPhys_zCriticalPlane8";
+	ZCritNames[8] = "virtualBoundaryPhys_zCriticalPlane9";
+	ZCritNames[9] = "virtualBoundaryPhys_zCriticalPlane10";
+	ZCritNames[10] = "virtualBoundaryPhys_zCriticalPlane11";
+	ZCritNames[11] = "virtualBoundaryPhys_zCriticalPlane12";
 
 ///  new g4hrsSteppingActionMessenger(this);
 	rad = 1.;
@@ -56,6 +65,7 @@ g4hrsSteppingAction::g4hrsSteppingAction()
 	fHRSAngle = fTune->HRSAngle;
 	fHRSMomentum = fTune->HRSMomentum;
 	nelements = 5;
+	fMinEKill = 0.850*GeV;
 
 }
 
@@ -68,11 +78,10 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 	// Don't track low energy (<0.9 GeV) particles
 
 	if(	((  material->GetName()=="Tungsten"
-		||  material->GetName()=="Copper" 
-		||  material->GetName()=="SiliconSteel") 
+		||  material->GetName()=="Copper" ) 
 		&&  fEnableKryptonite )
 		|| fTrack->GetParentID() != 0
-		|| fTrack->GetTotalEnergy() < 0.85*GeV ) {
+		|| fTrack->GetTotalEnergy() < fMinEKill ) {
 
 			fTrack->SetTrackStatus(fStopAndKill);
 

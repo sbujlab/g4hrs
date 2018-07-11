@@ -132,6 +132,10 @@ g4hrsMessenger::g4hrsMessenger(){
 	fTuneCmd->SetGuidance("Choose an overall field tune");
 	fTuneCmd->SetParameterName("tune",false);
 
+	minEKillCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/minEkill",this);
+	minEKillCmd->SetGuidance("Set minimum energy required to track particle");
+	minEKillCmd->SetParameterName("minE",false);
+
     tgtLenCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/targlen",this);
     tgtLenCmd->SetGuidance("Target length");
     tgtLenCmd->SetParameterName("targlen", false);
@@ -505,6 +509,11 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 
 	if( cmd == fTuneCmd) {
 		ftune->SetTune(newValue);
+	}
+
+	if( cmd == minEKillCmd) {
+		G4double minE = minEKillCmd->GetNewDoubleValue(newValue);
+		fStepAct->fMinEKill = minE;
 	}
 
     if( cmd == tgtLenCmd ){
