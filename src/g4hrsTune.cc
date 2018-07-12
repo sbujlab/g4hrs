@@ -27,7 +27,7 @@ g4hrsTune::g4hrsTune() {
 	HRSAngle = 12.5*deg;
 	HRSMomentum = 1.063*GeV;
 	quadsOn = 1;
-	sosQuad = 0;
+	sosQuad = 1;
 }
 
 g4hrsTune::~g4hrsTune() {
@@ -36,15 +36,30 @@ g4hrsTune::~g4hrsTune() {
 
 void g4hrsTune::SetTune(G4String mTune) {
 	
-	if(mTune == "PREX") {
-		//Do nothing, this is the default tune
-	} else if(mTune == "B") {
-
+	if(mTune == "B") {
+		// This is the tune with PREX-I target position
 		kappaQuad1 = 0.140065 * tesla;
 		kappaQuad2 = -0.212361 * tesla;
 		bendDipole = -0.4042 * tesla;
 		kappaQuad3 = -0.330965 * tesla;
 		septumCurrent = 488.5*1.05*ampere;
+
+	} else if(mTune == "PREXII") {
+		// This tune is for PREX-II with a -5 cm target shift
+		kappaQuad1 = 0.140065 * tesla;
+		kappaQuad2 = -0.212361 * tesla;
+		bendDipole = -0.4042 * tesla;
+		kappaQuad3 = -0.330965 * tesla;
+		septumCurrent = 497.65*ampere;
+
+	} else if(mTune == "CREX") {
+		// This tune is for CREX with a -5 cm target shift
+		// Septum current is 5% higher than for the PREX-II tune
+		kappaQuad1 = 0.140065 * tesla;
+		kappaQuad2 = -0.212361 * tesla;
+		bendDipole = -0.4042 * tesla;
+		kappaQuad3 = -0.330965 * tesla;
+		septumCurrent = 497.65*1.05*ampere;
 
 	} else {
 		G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
