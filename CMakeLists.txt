@@ -147,6 +147,11 @@ set(G4HRS_SCRIPTS
     horpb1.dat
     ca48_fsu.dat
     ca48_fsu_stretched.dat
+    ca40_fsu.dat
+    ca40_fsu_stretched.dat
+    ca48_fsu.dat
+    ca48_fsu_stretched.dat
+    c12_fsu.dat
   )
 
 foreach(_script ${G4HRS_SCRIPTS})

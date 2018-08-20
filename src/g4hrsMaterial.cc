@@ -267,11 +267,6 @@ void g4hrsMaterial::ConstructMaterials()
 	density = 0.180 *g/cm3;
 	liquidD2 = new G4Material(name="LiquidD2", z=1., a, density);
 
-	//carbon12  2.267 *g/cm3
-	a = 12.01078*g/mole;
-	density = 2.267 *g/cm3;
-	carbon = new G4Material(name="Carbon", z=6., a, density);
-
 	//Define diamond
 	a = 12.01 * g/mole;
 	density = 3.515*g/cm3;
@@ -287,6 +282,11 @@ void g4hrsMaterial::ConstructMaterials()
 	a = 26.982*g/mole;
 	density = 2.70*g/cm3;
 	aluminum = new G4Material(name="Aluminum", z=13., a, density);
+
+	//carbon12
+	a = 12.01078*g/mole;
+	density = 2.267*g/cm3;
+	carbon12 = new G4Material(name="Carbon12", z=6., a, density);
 
 	//Calcium40
 	a = 40.078*g/mole;//natural

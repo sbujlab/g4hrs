@@ -21,6 +21,16 @@ g4hrsDatabase::g4hrsDatabase(G4String targmat) {
 		LoadTable("horpb.dat",0);
 		LoadTable("horpb1.dat",1);
 	}
+	if(targmat == "C12") {
+		E_min = 0.9*GeV;
+		E_step = 0.05*GeV;
+		n_E = 3;
+		n_Th = 71;
+		LoadTable("c12_fsu.dat",0);
+		// There is no "strech" table for 12C
+		// Loading the same table twice will just cause sensitivity = 0
+		LoadTable("c12_fsu.dat",1);
+	}
 	if(targmat == "Ca48") {
 		E_min = 0.5*GeV;
 		E_step = 0.05*GeV;
@@ -66,21 +76,12 @@ void g4hrsDatabase::LoadTable(string filename, int stretch) {
 		vector<double> row_XS;
 		vector<double> row_asym;
 
-		if(filename.find("pb") != string::npos) {	
-			for(int j=0; j<n_Th; j++) {
-				datafile >> thisAngle >> thisXS >> ignore >> thisAsym >> ignore >> ignore;
-				angle.push_back(thisAngle*deg);			
-				row_XS.push_back(thisXS);
-				row_asym.push_back(thisAsym);
-			} // end j (angle) for loop
-		} else if(filename.find("ca") != string::npos) {
-			for(int j=0; j<n_Th; j++) {
-				datafile >> thisAngle >> thisXS >> thisAsym;
-				angle.push_back(thisAngle*deg);			
-				row_XS.push_back(thisXS);
-				row_asym.push_back(thisAsym);
-			} // end j (angle) for loop
-		}
+		for(int j=0; j<n_Th; j++) {
+			datafile >> thisAngle >> thisXS >> thisAsym;
+			angle.push_back(thisAngle*deg);			
+			row_XS.push_back(thisXS);
+			row_asym.push_back(thisAsym);
+		} // end j (angle) for loop
 	
 		if(stretch == 0) {
 			XS.push_back(row_XS);

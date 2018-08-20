@@ -252,6 +252,8 @@ void g4hrsBeamTarget::SetTargetMaterial(G4String targMat) {
     	mMaterialManager = g4hrsMaterial::GetHRSMaterialManager();
 	if(fTargetMaterial == "Pb208") {
 		targ_material = mMaterialManager->lead208;	
+	} else if(fTargetMaterial == "C12") {
+		targ_material = mMaterialManager->carbon12;
 	} else if(fTargetMaterial == "Ca40") {
 		targ_material = mMaterialManager->calcium40;	
 	} else if(fTargetMaterial == "Ca48") {
