@@ -114,11 +114,15 @@ void g4hrsVEventGen::PolishEvent(g4hrsEvent *ev) {
 		G4AffineTransform hall_targ = hallAxis_targ.Inverse();
 
 		if(fIsVPosSet) {
-			G4double xhall = fSetVPos.y()*cos(fSeptumAngle);
-			G4double yhall = -fSetVPos.x();
-			G4double zhall = -fSetVPos.y()*sin(fSeptumAngle);
-//			G4ThreeVector fSetVPosHCS = G4ThreeVector(xhall, yhall, zhall);
-			G4ThreeVector fSetVPosHCS = hall_targ.TransformPoint(fSetVPos);
+		
+			int isHCS = 0;
+	
+			G4ThreeVector fSetVPosHCS;
+			if (isHCS) {
+				fSetVPosHCS = fSetVPos;
+			} else {
+				fSetVPosHCS = hall_targ.TransformPoint(fSetVPos);
+			}	
 			for( iter = ev->fPartPos.begin(); iter != ev->fPartPos.end(); iter++ ) {
 				(*iter) = fSetVPosHCS;
 			}		
