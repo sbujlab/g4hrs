@@ -66,7 +66,8 @@ g4hrsDetectorConstruction::g4hrsDetectorConstruction() {
     fPivot2SieveFace = 800*mm;
     fPivotXOffset =  0.0*deg;
     fPivotYOffset =  0.0*deg;
-    fPivotZOffset =  1053.79*mm;
+    fPivotZOffset =  1103.79*mm;   // new target position (-5 cm)
+
 
     fSetupSieveSlit = false;
 
@@ -90,7 +91,7 @@ g4hrsDetectorConstruction::g4hrsDetectorConstruction() {
 
     fScatChamberXOffset = 0.0;
     fScatChamberYOffset = 0.0;
-    fScatChamberZOffset = -1053.79*mm;
+    fScatChamberZOffset = -fPivotZOffset;
     fSetupCREXGeometry = true;
 
     //fEMFieldSetup = NULL;

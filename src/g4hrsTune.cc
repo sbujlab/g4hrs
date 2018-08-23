@@ -46,10 +46,10 @@ void g4hrsTune::SetTune(G4String mTune) {
 
 	} else if(mTune == "PREXII") {
 		// This tune is for PREX-II with a -5 cm target shift
-		kappaQuad1 = 0.140065 * tesla;
-		kappaQuad2 = -0.212361 * tesla;
+		kappaQuad1 = 0.145371 * tesla;
+		kappaQuad2 = -0.209233 * tesla;
 		bendDipole = -0.4042 * tesla;
-		kappaQuad3 = -0.330965 * tesla;
+		kappaQuad3 = -0.325263 * tesla;
 		septumCurrent = 497.65*ampere;
 
 	} else if(mTune == "CREX") {

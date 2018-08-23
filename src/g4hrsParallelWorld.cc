@@ -69,7 +69,7 @@ g4hrsParallelWorld::g4hrsParallelWorld(G4String parallelWorldName) :G4VUserParal
     fPivot2SieveFace = 800*mm;
     fPivotXOffset =  0.0*deg;
     fPivotYOffset =  0.0*deg;
-    fPivotZOffset =  1053.79*mm;
+    fPivotZOffset =  1103.79*mm;  // new target position (-5 cm)
 
     fSetupSieveSlit = false;
 
@@ -88,9 +88,6 @@ g4hrsParallelWorld::g4hrsParallelWorld(G4String parallelWorldName) :G4VUserParal
     fScatChamberRout  =  509.425*mm;
     fScatChamberL     =  692.15*mm;
 
-    fScatChamberXOffset = 0.0;
-    fScatChamberYOffset = 0.0;
-    fScatChamberZOffset = -1053.79*mm;
     fSetupCREXGeometry = true;
 
     //fEMFieldSetup = NULL;
@@ -340,7 +337,7 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	double vdc_drift = 3.4538*m;
 	double vdc_z = q3ex_z + (vdc_drift / sqrt(2.));
 	double vdc_x = q3ex_x + (vdc_drift / sqrt(2.));
-	double fp_drift = 1.43*m;
+	double fp_drift = 0.9*m;
 	double fp_z = vdc_z + (fp_drift / sqrt(2.));
 	double fp_x = vdc_x + (fp_drift / sqrt(2.));
 

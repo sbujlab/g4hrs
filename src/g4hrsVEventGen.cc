@@ -115,7 +115,7 @@ void g4hrsVEventGen::PolishEvent(g4hrsEvent *ev) {
 
 		if(fIsVPosSet) {
 		
-			int isHCS = 0;
+			int isHCS = 1;
 	
 			G4ThreeVector fSetVPosHCS;
 			if (isHCS) {

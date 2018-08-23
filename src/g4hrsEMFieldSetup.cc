@@ -56,11 +56,11 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
 : fChordFinder(0), fStepper(0), fIntgrDriver(0)
 {
 
-    G4ThreeVector pivotOffset(0.0, 0.0,  1053.79*mm );
+    G4ThreeVector pivotOffset(0.0, 0.0,  1103.79*mm );    // new target position (-5 cm)
 
 	fTune = g4hrsTune::GetTune(); 
 
-	fMomentumScale = fTune->GetMomentumScale(); 		// assume PREX default
+	fMomentumScale = fTune->GetMomentumScale(); 	
   	fHRSMomentum = fTune->HRSMomentum;
   	fSnakeModel = 49;
   	fHRSAngle = fTune->HRSAngle;

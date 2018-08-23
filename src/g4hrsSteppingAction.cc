@@ -176,7 +176,7 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 
 	/* TROUBLESHOOTING 
 		// Center of LHRS focal plane in HCS for coordinate transform test
-		G4ThreeVector fphc = G4ThreeVector(21770.815*sin(fHRSAngle),8330.421,1053.79+21770.815*cos(fHRSAngle));
+		G4ThreeVector fphc = G4ThreeVector(21770.815*sin(fHRSAngle),8330.421,1103.79+21770.815*cos(fHRSAngle));
 		// Unit momentum or central trajectory exiting dipole in HCS for coordinate transform test
 		G4ThreeVector cthc = G4ThreeVector(cos(45.*deg)*sin(fHRSAngle),sin(45.*deg),cos(45.*deg)*cos(fHRSAngle));
 	*/
