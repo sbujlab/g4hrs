@@ -53,11 +53,11 @@ class g4hrsVEventGen {
 	G4double fSeptumAngle;
 
 	G4ThreeVector fSetVPos;
-	G4bool fIsVPosSet;
+	G4bool fIsVPosHCSSet;
+	G4bool fIsVPosTCSSet;
 	G4ThreeVector fSetVMom;
-	G4bool fIsVMomSet;
-	G4double fSetVTheta;
-	G4bool fIsVThetaSet;
+	G4bool fIsVMomHCSSet;
+	G4bool fIsVMomTCSSet;
 
     private:
 	const G4String fName;

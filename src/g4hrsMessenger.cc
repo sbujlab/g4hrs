@@ -200,19 +200,21 @@ g4hrsMessenger::g4hrsMessenger(){
     EmaxCmd->SetGuidance("Maximum generation energy");
     EmaxCmd->SetParameterName("emax", false);
 
-	vPosCmd = new G4UIcmdWith3VectorAndUnit("/g4hrs/vpos",this);
-	vPosCmd->SetGuidance("Event vertex position (x, y, z)");
-	vPosCmd->SetParameterName("vx","vy","vz",false);
-	
-	vMomCmd = new G4UIcmdWith3Vector("/g4hrs/vmom",this);
-	vMomCmd->SetGuidance("Event vertex position (th, ph, dp/p)");
-	vMomCmd->SetParameterName("th","ph","dp/p",false);
-	
-	vThetaCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/vtheta",this);
-	vThetaCmd->SetGuidance("Scattering angle (hall coordinates)");
-	vThetaCmd->SetParameterName("theta",false);
-	
+	vPosHCSCmd = new G4UIcmdWith3VectorAndUnit("/g4hrs/vposHCS",this);
+	vPosHCSCmd->SetGuidance("Event vertex position (x, y, z) in hall coordinates");
+	vPosHCSCmd->SetParameterName("vx","vy","vz",false);
 
+	vPosTCSCmd = new G4UIcmdWith3VectorAndUnit("/g4hrs/vposTCS",this);
+	vPosTCSCmd->SetGuidance("Event vertex position (x, y, z) in transport coordinates");
+	vPosTCSCmd->SetParameterName("vx","vy","vz",false);
+	
+	vMomHCSCmd = new G4UIcmdWith3Vector("/g4hrs/vmomHCS",this);
+	vMomHCSCmd->SetGuidance("Event vertex position (th, ph, p) in hall coordinates");
+	vMomHCSCmd->SetParameterName("th","ph","p",false);
+	
+	vMomTCSCmd = new G4UIcmdWith3Vector("/g4hrs/vmomTCS",this);
+	vMomTCSCmd->SetGuidance("Event vertex position (th, ph, dp/p) in transport coordinates");
+	vMomTCSCmd->SetParameterName("th","ph","dp/p",false);
 
     //////////////////////////////////////////////////
     // beam info
@@ -668,31 +670,40 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 	fBeamTarg->fdPh = y;
     }
 
-	if(cmd == vPosCmd) {
-		G4ThreeVector vertexPos = vPosCmd->GetNew3VectorValue(newValue);
+	if(cmd == vPosHCSCmd) {
+		G4ThreeVector vertexPos = vPosHCSCmd->GetNew3VectorValue(newValue);
 		g4hrsVEventGen *agen = fprigen->GetGenerator();
 		if(agen) {
 			agen->fSetVPos = vertexPos;
-			agen->fIsVPosSet = true;	
+			agen->fIsVPosHCSSet = true;	
 		}		
 	}
 
-	if(cmd == vMomCmd) {
-		G4ThreeVector vertexMom = vMomCmd->GetNew3VectorValue(newValue);
+	if(cmd == vPosTCSCmd) {
+		G4ThreeVector vertexPos = vPosTCSCmd->GetNew3VectorValue(newValue);
+		g4hrsVEventGen *agen = fprigen->GetGenerator();
+		if(agen) {
+			agen->fSetVPos = vertexPos;
+			agen->fIsVPosTCSSet = true;	
+		}		
+	}
+
+	if(cmd == vMomHCSCmd) {
+		G4ThreeVector vertexMom = vMomHCSCmd->GetNew3VectorValue(newValue);
 		g4hrsVEventGen *agen = fprigen->GetGenerator();
 		if(agen) {
 			agen->fSetVMom = vertexMom;
-			agen->fIsVMomSet = true;	
+			agen->fIsVMomHCSSet = true;	
 		}		
 	}
 
-	if(cmd == vThetaCmd) {
-		G4double theta = vThetaCmd->GetNewDoubleValue(newValue);		
+	if(cmd == vMomTCSCmd) {
+		G4ThreeVector vertexMom = vMomTCSCmd->GetNew3VectorValue(newValue);
 		g4hrsVEventGen *agen = fprigen->GetGenerator();
-                if(agen) {
-                        agen->fSetVTheta = theta;
-                        agen->fIsVThetaSet = true;
-                }
+		if(agen) {
+			agen->fSetVMom = vertexMom;
+			agen->fIsVMomTCSSet = true;	
+		}		
 	}
 
 }
