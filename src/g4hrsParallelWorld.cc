@@ -134,7 +134,7 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	// Solids for virtual boundaries //
 	///////////////////////////////////
 	G4double vb_thickness = 1. * mm;
-	G4VSolid* FPSolid = new G4Tubs("FPTub",0,175.*cm,vb_thickness,0.0*deg,360.0*deg);
+	G4VSolid* FPSolid = new G4Tubs("FPTub",0,75.*cm,vb_thickness,0.0*deg,360.0*deg);
 	G4VSolid* SeptumSolid = new G4Box("SeptumPlane",pSeptumBoxX/2.,pSeptumBoxY/2.,vb_thickness/2.);
 	G4VSolid* PlaneSolid1 = new G4Tubs("PlaneTub",0,35.*cm,vb_thickness,0.0*deg,360.0*deg); //circles
 	G4VSolid* PlaneSolid2 = new G4Tubs("PlaneTub",0,75.*cm,vb_thickness,0.0*deg,360.0*deg); //circles
