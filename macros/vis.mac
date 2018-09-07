@@ -1,40 +1,55 @@
 # Use this open statement to create an OpenGL view:
 /vis/open OGL 600x600-0+0  
 
+
+#/g4hrs/setseed 50
+
+/g4hrs/kryptonite TRUE
+
 /g4hrs/snake 49
 
 /g4hrs/hrssetup 4
-/g4hrs/sepangle 5.0 deg
+
+/g4hrs/sepangle 4.984 deg
 /g4hrs/hrsangle 12.5 deg
-/g4hrs/sepmom 1.063 GeV
-/g4hrs/hrsmom 1.063 GeV
-/g4hrs/septummap ../g4hrs/src/fields/PREX_septumFieldMap.dat
+
+/g4hrs/sepmom 0.950 GeV
+/g4hrs/hrsmom 0.950 GeV
+
+/g4hrs/tune PREXII
+
+/run/initialize
 
 /g4hrs/targlen 0.5 mm
 /g4hrs/targpos 0.0 mm
 /g4hrs/targmat Pb208
 
 /g4hrs/beamcurr 70e-6 A
-/g4hrs/beamene 1.063 GeV
+/g4hrs/beamene 0.95 GeV
+/g4hrs/oldras FALSE
+/g4hrs/rasx 4.0 mm
+/g4hrs/rasy 4.0 mm
 
 /g4hrs/gen elastic
+/g4hrs/thmin 2.0 deg
+/g4hrs/thmax 8.0 deg
+/g4hrs/phmin -50.0 deg
+/g4hrs/phmax  50.0 deg
+
+#/process/inactivate eIoni
+#/process/inactivate eBrem
+#/run/physicsModified
+
+#/g4hrs/vposHCS 0. 0. 0. mm
+#/g4hrs/vposTCS 0. 0. 0. mm
+
+#*** HCS arguments = {theta (deg), phi (deg), dp/p}
+#*** TCS arguments = {theta (dx/dz), phi (dy/dz), dp/p}
+#/g4hrs/sepangle 4.984 deg
+#/g4hrs/vmomHCS 5. 0. 0.
+#/g4hrs/vmomTCS 0. 0. 0.
 
 /g4hrs/filename g4hrs_out.root
 
-/g4hrs/thmin 4.95 deg
-/g4hrs/thmax 5.05 deg
-/g4hrs/phmin 179.5 deg
-/g4hrs/phmax 380.5 deg
-#/g4hrs/thcommin 0.0 deg
-#/g4hrs/thcommax 10.0 deg
-
-#/g4hrs/emin 80 MeV
-#/g4hrs/emax 1.063 GeV
-
-/g4hrs/oldras FALSE
-/g4hrs/rasx 2.0 mm
-/g4hrs/rasy 2.0 mm
-
-/run/initialize
 /control/execute vis/vis.mac
 
