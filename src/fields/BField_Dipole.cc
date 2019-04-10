@@ -100,7 +100,8 @@ void BField_Dipole::GetFieldValue( const G4double y[],
 
 
   // Test that this is within reason
-  if( fabs(y[0])>20*m || fabs(y[1])>20*m || fabs(y[2]-13*m)>20*m ){
+  if( fabs(y[0])>4*m || fabs(y[1])>4*m || fabs(y[2]-13.5*m)>3.5*m 
+    ){
       B[0] = 0.0;
       B[1] = 0.0;
       B[2] = 0.0;

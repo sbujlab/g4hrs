@@ -1158,7 +1158,8 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 	//vac2
 	double pQ2vac2Rin     = pQ2Rin;
 	double pQ2vac2Rout    = pQ2Rin + 1. * mm;
-	double pQ2vac2Length  = 561.7 * mm;
+	//double pQ2vac2Length  = 561.7 * mm;
+	double pQ2vac2Length  = 226.7 * mm; // SPR Shortening to avoid overlaps with dipole
 	double pQ2vac2CenterZ = pHallCenter2RQ2Face + pQ2Length + pQ2vac2Length / 2.;
 	double pQ2vac2CenterY = 0;
 	G4VSolid* Q2vac2Solid = new G4Tubs("Q2vac2Tub",pQ2vac2Rin,pQ2vac2Rout,pQ2vac2Length/2.0,0.0,360.0*deg);
@@ -1278,16 +1279,18 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 	if(fSetupHRS>=4)
 	{
 	  //put it in the container, which also center at the hall center
-	  new G4PVPlacement(pRotDipoleInContainer,
-			    G4ThreeVector(0,-pDipoleRCenterZ,pDipoleRCenterY),
-			    LDipoleLogical,"LDipolePhys",LHRSContainerLogical,0,0,0);
+            // SPR:  FIXME  This is problematic out of the box
+	  //new G4PVPlacement(pRotDipoleInContainer,
+	//		    G4ThreeVector(0,-pDipoleRCenterZ,pDipoleRCenterY),
+	//		    LDipoleLogical,"LDipolePhys",LHRSContainerLogical,0,0,0);
 	}
 	//if(0)
 	if(fSetupHRS>=4)
 	{
-	  new G4PVPlacement(pRotDipoleInContainer,
-			    G4ThreeVector(0,-pDipoleRCenterZ,pDipoleRCenterY),
-			    RDipoleLogical,"RDipolePhys",RHRSContainerLogical,0,0,0);
+            // SPR:  FIXME This is problematic out of the box
+	 // new G4PVPlacement(pRotDipoleInContainer,
+	//		    G4ThreeVector(0,-pDipoleRCenterZ,pDipoleRCenterY),
+	//		    RDipoleLogical,"RDipolePhys",RHRSContainerLogical,0,0,0);
 	}
 
 	
@@ -1340,7 +1343,8 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 	//vacuum pipe
 	double pQ3vacRin  = 30.0*cm;
 	double pQ3vacRout = 35.0*cm;
-	double pQ3vacLength = 575. * mm; 
+//	double pQ3vacLength = 575. * mm; 
+	double pQ3vacLength = 530. * mm; // SPR:  Shortening this so that we don't overlap with fringe volume
 	double pQ3vacCenterY = pQ3CenterY + pQ3Length / 2. / sqrt( 2 ) + pQ3vacLength / 2. / sqrt( 2 );
 	double pQ3vacCenterZ = pQ3CenterZ + pQ3Length / 2. / sqrt( 2 ) + pQ3vacLength / 2. / sqrt( 2 );
 	G4VSolid* Q3vacSolid = new G4Tubs("Q3vacTub",pQ3vacRin,pQ3vacRout,pQ3vacLength/2.0,0.0,360.0*deg);
@@ -1587,16 +1591,17 @@ void g4hrsDetectorConstruction::CreateHRS(G4LogicalVolume* motherLogical)
 	G4LogicalVolume* RDipoleFringe2Logical = new G4LogicalVolume(DipoleFringeSolid2,
 	        mMaterialManager->vacuum,"RDipoleFringe2Logical",0,0,0);
 
-        /*
 	G4LogicalVolume* LDipoleTunnelLogical = new G4LogicalVolume(DipoleTunnelCone5,
 		mMaterialManager->vacuum,"LDipoleTunnelLogical",0,0,0);
 	G4LogicalVolume* RDipoleTunnelLogical = new G4LogicalVolume(DipoleTunnelCone5,
 		mMaterialManager->vacuum,"RDipoleTunnelLogical",0,0,0);
-        */
+        /*
+           // This utilizes Nickie's which are too short 
 	G4LogicalVolume* LDipoleTunnelLogical = new G4LogicalVolume(DipoleTunnelCone3,
 		mMaterialManager->vacuum,"LDipoleTunnelLogical",0,0,0);
 	G4LogicalVolume* RDipoleTunnelLogical = new G4LogicalVolume(DipoleTunnelCone3,
 		mMaterialManager->vacuum,"RDipoleTunnelLogical",0,0,0);
+        */
 
         G4VisAttributes *YellowVisAtt = new G4VisAttributes(G4Colour(1.0,1.0,0.0));      //yellow, color for Ultem
 
