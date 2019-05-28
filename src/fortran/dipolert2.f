@@ -1038,28 +1038,28 @@ c****
      1   (g5/384.)*(x5*y +2.*x3*y3 + x*y5)  )
 c****
 c****
-      ss = z/dh  + dsh
+      ss = z/dh
       call bpls( 3, dh, ss, re, g1, g2, g3, g4, g5, g6 )
       b3x = grad2*( re*2.*x*y - (g2/48.)*(12.*x3*y + 4.*x*y3 ) )        
       b3y = grad2*( re*(x2-y2) - (g2/48.)*(3.*x4 + 6.*x2*y2 - 5.*y4 ) ) 
       b3z = grad2*( g1*(x2*y - y3/3.) - (g3/48.)*(3.*x4*y+2.*x2*y3-y5)) 
 c****
 c****
-      ss = z/do  + dso
+      ss = z/do
       call bpls( 4, do, ss, re, g1, g2, g3, g4, g5, g6 )
       b4x = grad3*( re*(3.*x2*y - y3) - (g4/80.)*(20.*x4*y - 4.*y5 ) )  
       b4y = grad3*( re*(x3 - 3.*x*y2) - (g4/80.)*(4.*x5-20.*x*y4 ) )    
       b4z = grad3*g1*(x3*y - x*y3 )                                     
 c****
 c****
-      ss = z/dd  + dsd
+      ss = z/dd
       call bpls( 5, dd, ss, re, g1, g2, g3, g4, g5, g6 )
       b5x = grad4*re*(4.*x3*y - 4.*x*y3)                                
       b5y = grad4*re*(x4 - 6.*x2*y2 + y4 )                              
       b5z = grad4*g1*(x4*y - 2.*x2*y3 + y5/5. )                         
 c****
 c****
-      ss = z/ddd + dsdd
+      ss = z/ddd
       call bpls( 6, ddd,ss, re, g1, g2, g3, g4, g5, g6 )
       b6x = grad5*re*(5.*x4*y - 10.*x2*y3 + y5 )                        
       b6y = grad5*re*(x5 - 10.*x3*y2 + 5.*x*y4 )                        
