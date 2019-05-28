@@ -201,10 +201,10 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
   UpdateFieldFZBR3();
   
   //Local field  FZB4, Q3
-  fMagFieldFZBL4 = new BField_Quad(KAPPA3, LORIGINQ3,pivotOffset, LROTATEQ3, pQ3Length, pQ3Radius, 3);
+  fMagFieldFZBL4 = new BField_Quad(KAPPA3,pivotOffset, LORIGINQ3 , LROTATEQ3, pQ3Length, pQ3Radius, 3);
   fLocalFieldManagerFZBL4 = new G4FieldManager();
   UpdateFieldFZBL4();
-  fMagFieldFZBR4 = new BField_Quad(KAPPA3, RORIGINQ3,pivotOffset, RROTATEQ3, pQ3Length, pQ3Radius, 3);
+  fMagFieldFZBR4 = new BField_Quad(KAPPA3,pivotOffset, RORIGINQ3, RROTATEQ3, pQ3Length, pQ3Radius, 3);
   fLocalFieldManagerFZBR4 = new G4FieldManager();
   UpdateFieldFZBR4();
 
