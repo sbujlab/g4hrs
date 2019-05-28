@@ -356,12 +356,12 @@ void g4hrsMaterial::ConstructMaterials()
 	siliconsteel = new G4Material(name="SiliconSteel", density, nElem=2);
 	siliconsteel->AddElement(elFe, nAtoms=11);
 	siliconsteel->AddElement(elSi, nAtoms=1);
-/*
+
 	//Tantalum
 	a = 180.95*g/mole;
 	density = 16.69*g/cm3;
 	tantalum = new G4Material(name="Tantalum", z=73., a, density);
-*/
+
 	//Tungsten
 	a = 183.84*g/mole;
 	density = 19.25*g/cm3;
@@ -377,6 +377,15 @@ void g4hrsMaterial::ConstructMaterials()
 	a = 207.9766521*g/mole;
 	density = 11.38*g/cm3;
 	lead208 = new G4Material(name="Lead208", z=82., a, density);
+
+        //RR adding water for water cell target
+        density = 1.000*g/cm3;
+        H2O = new G4Material(name="Water", density , nElem=2);
+        H2O->AddElement(elH, nAtoms=2);
+        H2O->AddElement(elO, nAtoms=1);
+
+
+
 /*
 	//solid NH3 	
 	//double mSolidNH3D = 0.817*g/cm3;
