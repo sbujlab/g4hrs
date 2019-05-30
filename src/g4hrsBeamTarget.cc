@@ -64,11 +64,8 @@ g4hrsBeamTarget *g4hrsBeamTarget::GetBeamTarget() {
 
 G4String g4hrsBeamTarget::GetTargetMaterial() {
 
-	if(fTargetMaterial == "Vacuum") {
-		return "Pb208";
-	} else {
-		return fTargetMaterial;
-	}
+ 	return fTargetMaterial;
+	
 }
 
 G4double g4hrsBeamTarget::GetEffLumin(){
