@@ -136,6 +136,10 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
     double Q2  = 2.0*beamE*ef*(1.0-cos(th));
     evt->SetQ2( Q2 );
 
+     //RR - For debugging purposes to make sure the flag worked
+    //bool table = fDatabase->Table; G4cout << table << G4endl;
+
+
 	// Get cross section from database (units of millibarns)
 	// Multiply by millibarn, now it's in mm^2 (Geant's favorite length unit)
 	double sigma = fDatabase->Interpolate(beamE,th,0,0)*millibarn;  	
