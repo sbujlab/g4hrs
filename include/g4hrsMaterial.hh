@@ -61,8 +61,7 @@ public:
 	G4Material* liquidHe3;
 	G4Material* liquidH2;
 	G4Material* liquidD2;
-        G4Material* H2O; 
-       
+               
 
 
 	G4Material* scintillator;	//EJ-204 Plastic Scintillator
