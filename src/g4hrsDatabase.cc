@@ -12,6 +12,7 @@ using std::endl;
 
 g4hrsDatabase::g4hrsDatabase(G4String targmat) {
 
+         Table = true;  
 
 	if(targmat == "Pb208") {
 		E_min = 0.55*GeV;
@@ -21,7 +22,7 @@ g4hrsDatabase::g4hrsDatabase(G4String targmat) {
 		LoadTable("horpb.dat",0);
 		LoadTable("horpb1.dat",1);
 	}
-	if(targmat == "C12") {
+	else if(targmat == "C12") {
 		E_min = 0.9*GeV;
 		E_step = 0.05*GeV;
 		n_E = 3;
@@ -31,7 +32,7 @@ g4hrsDatabase::g4hrsDatabase(G4String targmat) {
 		// Loading the same table twice will just cause sensitivity = 0
 		LoadTable("c12_fsu.dat",1);
 	}
-	if(targmat == "Ca48") {
+	else if(targmat == "Ca48") {
 		E_min = 0.5*GeV;
 		E_step = 0.05*GeV;
 		n_E = 62;
@@ -40,7 +41,7 @@ g4hrsDatabase::g4hrsDatabase(G4String targmat) {
 		LoadTable("ca48_fsu_stretched.dat",1);
 	}
 
-	if(targmat == "Ca40") {
+	else if(targmat == "Ca40") {
 		E_min = 0.5*GeV;
 		E_step = 0.05*GeV;
 		n_E = 62;
@@ -48,6 +49,11 @@ g4hrsDatabase::g4hrsDatabase(G4String targmat) {
 		LoadTable("ca40_fsu.dat",0);
 		LoadTable("ca40_fsu_stretched.dat",1);
 	}
+
+        else { Table = false; cout << "No Table for this material" << endl; }
+ 
+
+
 // end constructer 
 } 
 
@@ -105,6 +111,8 @@ double g4hrsDatabase::Interpolate(double thisE, double thisTh, int stretch, int 
 	// value = {0, 1} = {form factor squared, asymmetry}	
 	double th0, th1, e0, e1;
 	int i0, i1, j0, j1;
+
+        if(!Table) return 0;
 
         // Check ranges
         if( thisTh < angle[0] ) return 0;

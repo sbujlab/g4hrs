@@ -16,6 +16,7 @@ public:
 	g4hrsDatabase(G4String);
 	~g4hrsDatabase();
 	double Interpolate(double,double,int,int);
+        bool Table; //RR adding a flag here
 	
 private:
 
