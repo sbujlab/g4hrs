@@ -61,7 +61,15 @@ void g4hrsTune::SetTune(G4String mTune) {
 		kappaQuad3 = -0.333733 * tesla;
 		septumCurrent = 497.6*1.05*ampere;
 
-	} else {
+	} else if(mTune == "prexIItuneB"){
+                //RR PREX-II TuneB miminizing FWEM
+                kappaQuad1 = 0.215996 * tesla;
+                kappaQuad2 = -0.226872 * tesla;
+                bendDipole = -0.394409 * tesla;
+                kappaQuad3 = -0.283408 * tesla;
+                septumCurrent = 497.6*ampere;
+
+        }  else {
 		G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
 		":  Invalid tune specified" << G4endl; 
 		exit(1);
