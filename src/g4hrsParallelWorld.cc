@@ -69,7 +69,7 @@ g4hrsParallelWorld::g4hrsParallelWorld(G4String parallelWorldName) :G4VUserParal
     fPivot2SieveFace = 800*mm;
     fPivotXOffset =  0.0*deg;
     fPivotYOffset =  0.0*deg;
-    fPivotZOffset =  1103.79*mm;  // new target position (-5 cm)
+    fPivotZOffset =  1151.2*mm;  // RR new target position (-10 cm)
 
     fSetupSieveSlit = false;
 
@@ -171,7 +171,7 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	// Septum virtual boundaries will be placed directly in the (parallel) world volume
 	
 	//double pSeptumPlaceZ = 70.414 * cm;
-	double pSeptumPlaceZ = 69.99937 * cm;
+	double pSeptumPlaceZ = 70.0 * cm;
 	new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPlaceZ - 0.5 * pSeptumZ + fPivotZOffset),
 		SepPlaneLogical,"virtualBoundaryPhys_sen",motherLogical,0,0);//sen
 	new G4PVPlacement(0,G4ThreeVector(0,0,pSeptumPlaceZ + fPivotZOffset),
@@ -204,6 +204,15 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	double zsep3 = (pSeptumPlaceZ - 0.5 * pSeptumZ + fPivotZOffset) + 0.3 * pSeptumZ; 	
 	double zsep4 = (pSeptumPlaceZ - 0.5 * pSeptumZ + fPivotZOffset) + 0.4 * pSeptumZ; 	
 
+         //tracking the full path of the acceptance
+         //RR upstream pivot
+         double zup[2] = { fPivotZOffset-506*mm ,fPivotZOffset-459*mm };
+         //RR downstream pivot
+         double zdown[9] = { fPivotZOffset + 7*mm,  fPivotZOffset + 65*mm ,  fPivotZOffset + 236*mm,  fPivotZOffset + 353*mm,
+         fPivotZOffset + 471*mm,  fPivotZOffset + 510*mm,  fPivotZOffset + 590*mm,  fPivotZOffset + 1012*mm,  fPivotZOffset + 1114*mm };
+
+
+
 	new G4PVPlacement(0,G4ThreeVector(0,0,zpinch1),
 		SepPlaneLogical,"virtualBoundaryPhys_zpinch1",motherLogical,0,0);
 	new G4PVPlacement(0,G4ThreeVector(0,0,zpinch2),
@@ -230,6 +239,31 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 		SepPlaneLogical,"virtualBoundaryPhys_zsep3",motherLogical,0,0);
 	new G4PVPlacement(0,G4ThreeVector(0,0,zsep4),
 		SepPlaneLogical,"virtualBoundaryPhys_zsep4",motherLogical,0,0);
+
+        //RR adding instances of these volumes 
+        new G4PVPlacement(0,G4ThreeVector(0,0,zup[0]),
+               SepPlaneLogical,"virtualBoundaryPhys_zup1",motherLogical,0,0);
+        new G4PVPlacement(0,G4ThreeVector(0,0,zup[1]),
+            SepPlaneLogical,"virtualBoundaryPhys_zup2",motherLogical,0,0);
+        new G4PVPlacement(0,G4ThreeVector(0,0,zdown[0]),
+               SepPlaneLogical,"virtualBoundaryPhys_zdown1",motherLogical,0,0);
+        new G4PVPlacement(0,G4ThreeVector(0,0,zdown[1]),
+               SepPlaneLogical,"virtualBoundaryPhys_zdown2",motherLogical,0,0);
+        new G4PVPlacement(0,G4ThreeVector(0,0,zdown[2]),
+               SepPlaneLogical,"virtualBoundaryPhys_zdown3",motherLogical,0,0);
+        new G4PVPlacement(0,G4ThreeVector(0,0,zdown[3]),
+               SepPlaneLogical,"virtualBoundaryPhys_zdown4",motherLogical,0,0);
+        new G4PVPlacement(0,G4ThreeVector(0,0,zdown[4]),
+               SepPlaneLogical,"virtualBoundaryPhys_zdown5",motherLogical,0,0);
+        new G4PVPlacement(0,G4ThreeVector(0,0,zdown[5]),
+               SepPlaneLogical,"virtualBoundaryPhys_zdown6",motherLogical,0,0);
+        new G4PVPlacement(0,G4ThreeVector(0,0,zdown[6]),
+               SepPlaneLogical,"virtualBoundaryPhys_zdown7",motherLogical,0,0);
+        new G4PVPlacement(0,G4ThreeVector(0,0,zdown[7]),
+               SepPlaneLogical,"virtualBoundaryPhys_zdown8",motherLogical,0,0);
+        new G4PVPlacement(0,G4ThreeVector(0,0,zdown[8]),
+               SepPlaneLogical,"virtualBoundaryPhys_zdown9",motherLogical,0,0);
+
 
 
 	////////////////////////////
@@ -312,7 +346,8 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 	pRotX45deg->rotateX(-45*deg);
 	pRotX45deg->rotateZ(90*deg); 
 	G4RotationMatrix *pRotVDC = new G4RotationMatrix();
-	pRotVDC->rotateZ(90*deg);
+	pRotVDC->rotateX(-45*deg);// RR this to be in transport coordinates
+        pRotVDC->rotateZ(90*deg);
 	G4RotationMatrix *pRotFP = new G4RotationMatrix();
 	pRotFP->rotateX(-45*deg);
 	pRotFP->rotateZ(90*deg);
@@ -320,11 +355,12 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
 //	new G4PVPlacement(0,G4ThreeVector(0,0,0),LocalAxisLog,"localaxis_lhrs",motherLogical,0,0,0);
 
 	// Positions from SNAKE
-	double pivotOffset = 104.978*cm;
+	double pivotOffset = 115.21*cm;
 	double col = 1.38*m;
-	double q1en = 160.*cm;
-	double q1ex = q1en + 94.13*cm;
-	double q2en = q1ex + 115.58*cm;
+        //Updating these positions to place the parallel planes at the entrance and exit of the quads
+	double q1en = 172.*cm;
+    	double q1ex = q1en + 70.*cm;
+	double q2en = q1ex + 12.71*cm;
 	double q2ex = q2en + 182.66*cm;
 	double dpen = q2ex + 443.74*cm;
 	double dpex_z = 15.9006973*m;
