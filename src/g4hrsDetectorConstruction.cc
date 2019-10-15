@@ -66,7 +66,7 @@ g4hrsDetectorConstruction::g4hrsDetectorConstruction() {
     fPivot2SieveFace = 800*mm;
     fPivotXOffset =  0.0*deg;
     fPivotYOffset =  0.0*deg;
-    fPivotZOffset =  1103.79*mm;   // new target position (-5 cm)
+    fPivotZOffset =  1151.2*mm;   //RR new target position (-10 cm)
 
 
     fSetupSieveSlit = false;
@@ -343,7 +343,7 @@ void g4hrsDetectorConstruction::CreateSeptum(G4LogicalVolume *pMotherLogVol){
 
 
         double pSeptumTunnelPos_X=8.425*cm+pSeptumTunnelX/2.0;
-        double pSeptumPos_Z=69.99937*cm;		
+        double pSeptumPos_Z=70.0*cm;		
 
 
 
