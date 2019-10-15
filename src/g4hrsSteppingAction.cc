@@ -39,7 +39,7 @@ g4hrsSteppingAction::g4hrsSteppingAction()
 	VBnames[12] = "virtualBoundaryPhys_vdc";
 	VBnames[13] = "virtualBoundaryPhys_fp";	
 	
-	numZCrit = 12;
+	numZCrit = 23;
 	numZCritVar = 5;
 	ZCritNames[0] =  "virtualBoundaryPhys_zpinch1";
 	ZCritNames[1] =  "virtualBoundaryPhys_zpinch2";
@@ -53,6 +53,19 @@ g4hrsSteppingAction::g4hrsSteppingAction()
 	ZCritNames[9] =  "virtualBoundaryPhys_zsep2";
 	ZCritNames[10] = "virtualBoundaryPhys_zsep3";
 	ZCritNames[11] = "virtualBoundaryPhys_zsep4";
+        ZCritNames[12] = "virtualBoundaryPhys_zup1";
+        ZCritNames[13] = "virtualBoundaryPhys_zup2";
+        ZCritNames[14] = "virtualBoundaryPhys_zdown1";
+        ZCritNames[15] = "virtualBoundaryPhys_zdown2";
+        ZCritNames[16] = "virtualBoundaryPhys_zdown3";
+        ZCritNames[17] = "virtualBoundaryPhys_zdown4";
+        ZCritNames[18] = "virtualBoundaryPhys_zdown5";
+        ZCritNames[19] = "virtualBoundaryPhys_zdown6";
+        ZCritNames[20] = "virtualBoundaryPhys_zdown7";
+        ZCritNames[21] = "virtualBoundaryPhys_zdown8";
+        ZCritNames[22] = "virtualBoundaryPhys_zdown9";
+
+
 
 ///  new g4hrsSteppingActionMessenger(this);
 	rad = 1.;
@@ -198,8 +211,8 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			rotate_sex.rotateY(hrs_angle);
 			rotate_sex.rotateZ(90.*deg);
 			//Translations
-			double pivotZOffset = 105.379*cm;
-			double septumZPosition = 69.99937*cm; //from snake, matches values in world and parallel world construction
+			double pivotZOffset = 115.12*cm;// RR match survey
+			double septumZPosition = 70.0*cm; //match survey
 			septumZPosition+=pivotZOffset; //put origin at target center, not Hall A pivot
 			double septumLength = 74.*cm;
 			double z_sen = septumZPosition - septumLength/2.;
