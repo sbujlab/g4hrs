@@ -56,7 +56,7 @@ g4hrsEMFieldSetup::g4hrsEMFieldSetup()
 : fChordFinder(0), fStepper(0), fIntgrDriver(0)
 {
 
-    G4ThreeVector pivotOffset(0.0, 0.0,  1103.79*mm );    // new target position (-5 cm)
+    G4ThreeVector pivotOffset(0.0, 0.0,  1151.2*mm );    // RR (target 10 cm upstream)
 
 	fTune = g4hrsTune::GetTune(); 
 
