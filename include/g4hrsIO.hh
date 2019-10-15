@@ -183,8 +183,8 @@ class g4hrsIO {
 
 	int numZCrit;
 	int numZCritVar;
-	G4double ZCritData[12][5];
-	char ZCritName[12][10];
+	G4double ZCritData[23][5];
+	char ZCritName[23][10];
 	char ZCritVarName[5][5];
 
 };
