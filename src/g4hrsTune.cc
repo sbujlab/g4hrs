@@ -53,21 +53,21 @@ void g4hrsTune::SetTune(G4String mTune) {
 		septumCurrent = 497.6*ampere;
 
 	} else if(mTune == "CREX") {
-		// This tune is for CREX with a -5 cm target shift
+		// This tune is for CREX with a -10 cm target shift
 		// Septum current is 5% higher than for the PREX-II tune
-		kappaQuad1 = 0.167238 * tesla;
-		kappaQuad2 = -0.212596 * tesla;
-		bendDipole = -0.4042 * tesla;
-		kappaQuad3 = -0.333733 * tesla;
+		kappaQuad1 = 0.224897 * tesla;
+		kappaQuad2 = -0.233318 * tesla;
+		bendDipole = -0.394537 * tesla;
+		kappaQuad3 = -0.262854 * tesla;
 		septumCurrent = 497.6*1.05*ampere;
 
-	} else if(mTune == "prexIItuneB"){
-                //RR PREX-II TuneB miminizing FWEM
-                kappaQuad1 = 0.215996 * tesla;
-                kappaQuad2 = -0.226872 * tesla;
-                bendDipole = -0.394409 * tesla;
-                kappaQuad3 = -0.283408 * tesla;
-                septumCurrent = 497.6*ampere;
+	} else if(mTune == "TuneP"){
+                //RR Tune P
+                kappaQuad1 = 0.224897* tesla;
+                kappaQuad2 = -0.233318 * tesla;
+                bendDipole = -0.394537 * tesla;
+                kappaQuad3 = -0.262854 * tesla;
+                septumCurrent = 505.714*ampere;
 
         }  else {
 		G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
