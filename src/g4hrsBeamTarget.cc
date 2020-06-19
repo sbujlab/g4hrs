@@ -255,9 +255,13 @@ void g4hrsBeamTarget::SetTargetMaterial(G4String targMat) {
 		targ_material = mMaterialManager->calcium40;	
 	} else if(fTargetMaterial == "Ca48") {
 		targ_material = mMaterialManager->calcium48;	
-	} else if (fTargetMaterial == "Vacuum") {
+	} else if(fTargetMaterial == "Vacuum") {
 		targ_material = mMaterialManager->vacuum;
-	} else {
+	} else if(fTargetMaterial == "Galaxy") {
+                targ_material = mMaterialManager->galaxy;
+        } else if(fTargetMaterial == "Diamond") { 
+                targ_material = mMaterialManager->diamond;
+        }  else {
 		G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
 		":  Invalid target material selected" << G4endl; 
 		exit(1);
