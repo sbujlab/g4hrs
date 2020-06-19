@@ -52,24 +52,40 @@ void g4hrsTune::SetTune(G4String mTune) {
 		kappaQuad3 = -0.333733 * tesla;
 		septumCurrent = 497.6*ampere;
 
-	} else if(mTune == "CREX") {
+	} else if(mTune == "TuneP_CREX") {
 		// This tune is for CREX with a -10 cm target shift
 		// Septum current is 5% higher than for the PREX-II tune
-		kappaQuad1 = 0.224897 * tesla;
-		kappaQuad2 = -0.233318 * tesla;
-		bendDipole = -0.394537 * tesla;
-		kappaQuad3 = -0.262854 * tesla;
-		septumCurrent = 497.6*1.05*ampere;
+		kappaQuad1 = 0.22453 * tesla;
+		kappaQuad2 = -0.23284 * tesla;
+		bendDipole = -0.394539 * tesla;
+		kappaQuad3 = -0.264908 * tesla;
+		septumCurrent = 505.683*1.05*ampere;
 
-	} else if(mTune == "TuneP"){
-                //RR Tune P
-                kappaQuad1 = 0.224897* tesla;
-                kappaQuad2 = -0.233318 * tesla;
-                bendDipole = -0.394537 * tesla;
-                kappaQuad3 = -0.262854 * tesla;
-                septumCurrent = 505.714*ampere;
+	} else if(mTune == "TuneP_PREX"){
+                //RR Tune P-- needs to be worked on
+                kappaQuad1 = 0.22453* tesla;
+                kappaQuad2 = -0.23284 * tesla;
+                bendDipole = -0.394539 * tesla;
+                kappaQuad3 = -0.264908 * tesla;
+                septumCurrent = 505.683*ampere;
 
-        }  else {
+        } else if(mTune == "TuneE"){  
+          //From Weibin with CREX map 
+          //Central angle is 4.85121, Septum scaled up 5%
+               kappaQuad1 = 0.22553 * tesla;
+               kappaQuad2 = -0.233232 * tesla;
+               bendDipole = -0.394655 * tesla;
+               kappaQuad3 = -0.264745 * tesla;
+               septumCurrent = 492.489*1.05*ampere;
+
+        } else if(mTune == "QuadsOff"){ 
+              //No quad tune to test central ray
+               kappaQuad1 = 0.22553 * tesla;
+               kappaQuad2 = 0.0 * tesla;
+               bendDipole = -0.394543 * tesla;
+               kappaQuad3 = 0.0 * tesla;
+               septumCurrent = 505.683 * ampere;
+        } else {
 		G4cerr << "ERROR:  " << __PRETTY_FUNCTION__ << " line " << __LINE__ <<
 		":  Invalid tune specified" << G4endl; 
 		exit(1);
