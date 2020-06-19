@@ -266,13 +266,14 @@ void g4hrsMaterial::ConstructMaterials()
 	a = 2.01410*g/mole;
 	density = 0.180 *g/cm3;
 	liquidD2 = new G4Material(name="LiquidD2", z=1., a, density);
+*/
 
 	//Define diamond
 	a = 12.01 * g/mole;
 	density = 3.515*g/cm3;
 	diamond = new G4Material("Diamond", z=6, a, density);
-*/
-	//mylar
+
+        //mylar
 	density = 1.39*g/cm3;
 	mylar = new G4Material(name="Mylar", density, nElem=2);
 	mylar->AddElement(elH, nAtoms=8);
