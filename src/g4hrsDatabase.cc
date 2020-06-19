@@ -31,7 +31,13 @@ g4hrsDatabase::g4hrsDatabase(G4String targmat) {
 		// There is no "strech" table for 12C
 		// Loading the same table twice will just cause sensitivity = 0
 		LoadTable("c12_fsu.dat",1);
-	}
+ 	} else if(targmat == "Diamond") {
+                E_min = 0.9*GeV;
+                E_step = 0.05*GeV;
+                n_E = 3;
+                n_Th = 71;
+                LoadTable("c12_fsu.dat",0);
+        } 
 	else if(targmat == "Ca48") {
 		E_min = 0.5*GeV;
 		E_step = 0.05*GeV;
