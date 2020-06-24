@@ -360,7 +360,7 @@ void g4hrsParallelWorld::ConstructSD(G4LogicalVolume* motherLogical) {
         //Updating these positions to place the parallel planes at the entrance and exit of the quads
 	double q1en = 172.*cm;
     	double q1ex = q1en + 70.*cm;
-	double q2en = q1ex + 12.71*cm;
+	double q2en = q1ex + 127.71*cm;
 	double q2ex = q2en + 182.66*cm;
 	double dpen = q2ex + 443.74*cm;
 	double dpex_z = 15.9006973*m;
