@@ -155,6 +155,8 @@ void g4hrsIO::InitializeTree(){
     fTree->Branch("ev.thcom", &fEvThCoM,  "ev.thcom/D");
     fTree->Branch("ev.beamp",  &fEvBeamP,   "ev.beamp/D");
 
+    fTree->Branch("ev.ep",    &fEvEp,     "ev.ep/D");
+
     fTree->Branch("ev.npart", &fNEvPart   ,     "ev.npart/I");
     fTree->Branch("ev.pid",   &fEvPID,      "ev.pid[ev.npart]/I");
     fTree->Branch("ev.vx",    &fEvPart_X,   "ev.vx[ev.npart]/D");
@@ -260,6 +262,8 @@ void g4hrsIO::InitializeTree(){
 			char thisVar[15];
 			sprintf(thisVar,"%s_%s",ZCritVarName[j],ZCritName[i]);
 			fTree->Branch(thisVar, &ZCritData[i][j], Form("%s/D",thisVar));
+			sprintf(thisVar,"%s_%s_tr",ZCritVarName[j],ZCritName[i]);
+			fTree->Branch(thisVar, &ZCritData[i][j+numZCritVar], Form("%s/D",thisVar));
 		}
 	}
 
@@ -339,6 +343,8 @@ void g4hrsIO::SetEventData(g4hrsEvent *ev){
     fEvQ2     = ev->fQ2/__E_UNIT/__E_UNIT;
     fEvW2     = ev->fW2/__E_UNIT/__E_UNIT;
     fEvThCoM  = ev->fThCoM/deg; // specify this in degrees over anything else
+
+    fEvEp     = ev->fVEP/__E_UNIT;
 
     int idx;
     for( idx = 0; idx < n; idx++ ){
@@ -474,7 +480,7 @@ void g4hrsIO::ClearVirtualBoundaryData() {
 	}
 
 	for(int i = 0; i<numZCrit; i++) {
-		for(int j = 0; j< numZCritVar; j++) {
+		for(int j = 0; j< 2*numZCritVar; j++) {
 			fSteppingAction->ZCritData[i][j] = -333.;
 		}
 	}
@@ -512,7 +518,7 @@ void g4hrsIO::SetVirtualBoundaryData() {
 	}	
 	
 	for(int i = 0; i < numZCrit; i++) {
-		for(int j = 0; j < numZCritVar; j++) {
+		for(int j = 0; j < 2*numZCritVar; j++) {
 			ZCritData[i][j] = fSteppingAction->ZCritData[i][j];
 		}
 	}
