@@ -61,6 +61,7 @@ class g4hrsEvent {
 	G4double fW2;
 	G4double fXbj;
 	G4double fThCoM;
+ 	G4double fVEP;   // scattered momentum right after the vertex
 };
 
 #endif//__REMOLLEVENT_HH
