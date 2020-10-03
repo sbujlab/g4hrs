@@ -93,10 +93,7 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
 
 	beamE -= eloss;
     }
-   
-    //RR -- from Hanjie
     beamE -= fBeamTarg->fIonLoss;
-
 
     if( beamE < electron_mass_c2 ){ 
 	evt->SetEffCrossSection(0.0);
@@ -139,7 +136,7 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
 
     double Q2  = 2.0*beamE*ef*(1.0-cos(th));
     evt->SetQ2( Q2 );
-
+    evt->fVEP = ef;
      //RR - For debugging purposes to make sure the flag worked
     //bool table = fDatabase->Table; G4cout << table << G4endl;
 
@@ -206,6 +203,7 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
 	ef = Ekin-eloss+electron_mass_c2;
 	assert( ef > electron_mass_c2 );
     }
+
 
     ///////////////////////////////////////////////////////////////////////////////////////
 
