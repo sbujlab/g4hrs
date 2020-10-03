@@ -78,6 +78,8 @@ class g4hrsIO {
 	Double_t fEvW2;
 	Double_t fEvThCoM;
 
+	Double_t fEvEp;
+
 	Double_t fBmX;
 	Double_t fBmY;
 	Double_t fBmZ;
@@ -183,9 +185,9 @@ class g4hrsIO {
 
 	int numZCrit;
 	int numZCritVar;
-	G4double ZCritData[24][5];
+	G4double ZCritData[24][12];
 	char ZCritName[24][10];
-	char ZCritVarName[5][5];
+	char ZCritVarName[6][5];
 
 };
 
