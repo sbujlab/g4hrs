@@ -312,14 +312,36 @@ void g4hrsSteppingAction::UserSteppingAction(const G4Step *aStep) {
 			}
 
 			// Record tracking detector data
+			// RR adding transport coordinates to these planes
 			for(int i = 0; i < numZCrit; i++) {
-				if(volName.find(ZCritNames[i]) != G4String::npos) {
+                         G4RotationMatrix rotate_zplanes;
+                         rotate_zplanes.rotateY(septum_angle);
+                         rotate_zplanes.rotateZ(90.*deg);
+
+                        G4AffineTransform transportAxis_zplanes = G4AffineTransform(rotate_zplanes);
+                        G4AffineTransform transport_zplanes = transportAxis_zplanes.Inverse();
+
+
+		
+   		if(volName.find(ZCritNames[i]) != G4String::npos) {
 					ZCritData[i][0] = x;
 					ZCritData[i][1] = y;
 					ZCritData[i][2] = z;
 					ZCritData[i][3] = momentum.theta()/rad;
 					ZCritData[i][4] = momentum.phi()/rad;
                                         ZCritData[i][5] = momentum.mag();		
+                                        //Transport Coordinates
+                                        G4ThreeVector pos_tr = transport_zplanes.TransformPoint(position)/1000.;
+                                        G4ThreeVector mom_tr = transport_zplanes.TransformPoint(momentum);
+                                        ZCritData[i][6] = pos_tr.x();
+                                        ZCritData[i][7] = pos_tr.y();
+                                        ZCritData[i][8] = pos_tr.z();
+                                        ZCritData[i][9] = mom_tr.x()/mom_tr.z();
+                                        ZCritData[i][10] = mom_tr.y()/mom_tr.z();
+                                        ZCritData[i][11] = mom_tr.mag();
+
+
+
 		}
 			}
 
