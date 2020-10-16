@@ -137,6 +137,9 @@ void g4hrsGenNuclElastic::SamplePhysics(g4hrsVertex *vert, g4hrsEvent *evt){
     double Q2  = 2.0*beamE*ef*(1.0-cos(th));
     evt->SetQ2( Q2 );
     evt->fVEP = ef;
+    evt->fEvThSamp = th;
+    evt->SetNuclA(std::round(thisA)); 
+
      //RR - For debugging purposes to make sure the flag worked
     //bool table = fDatabase->Table; G4cout << table << G4endl;
 
