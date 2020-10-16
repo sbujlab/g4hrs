@@ -154,7 +154,9 @@ void g4hrsIO::InitializeTree(){
     fTree->Branch("ev.W2",    &fEvW2,     "ev.W2/D");
     fTree->Branch("ev.thcom", &fEvThCoM,  "ev.thcom/D");
     fTree->Branch("ev.beamp",  &fEvBeamP,   "ev.beamp/D");
-
+   
+    fTree->Branch("ev.Th", &fThsamp, "ev.Th/D");
+    fTree->Branch("ev.nuclA",&fEvNuclA,"ev.nuclA/I");
     fTree->Branch("ev.ep",    &fEvEp,     "ev.ep/D");
 
     fTree->Branch("ev.npart", &fNEvPart   ,     "ev.npart/I");
@@ -344,8 +346,10 @@ void g4hrsIO::SetEventData(g4hrsEvent *ev){
     fEvW2     = ev->fW2/__E_UNIT/__E_UNIT;
     fEvThCoM  = ev->fThCoM/deg; // specify this in degrees over anything else
 
+    fThsamp = ev->fEvThSamp/deg; //deg
     fEvEp     = ev->fVEP/__E_UNIT;
-
+    fEvNuclA = ev->fNuclA;
+ 
     int idx;
     for( idx = 0; idx < n; idx++ ){
 	fEvPID[idx] = ev->fPartType[idx]->GetPDGEncoding();
