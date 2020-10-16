@@ -77,8 +77,9 @@ class g4hrsIO {
 	Double_t fEvQ2;
 	Double_t fEvW2;
 	Double_t fEvThCoM;
-
-	Double_t fEvEp;
+        Double_t fThsamp; //Vertex theta
+	Double_t fEvEp;// E'
+        Int_t fEvNuclA; 
 
 	Double_t fBmX;
 	Double_t fBmY;
