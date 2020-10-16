@@ -30,6 +30,8 @@ class g4hrsEvent {
 	void SetW2( G4double w2 ){ fW2 = w2; }
 	void SetXbj( G4double x ){ fXbj = x; }
 	void SetThCoM( G4double th ){ fThCoM = th; }
+        void SetNuclA( G4int val){ fNuclA  = val; }
+
 
 	void Reset();
 	void UndoLastParticle();
@@ -62,6 +64,8 @@ class g4hrsEvent {
 	G4double fXbj;
 	G4double fThCoM;
  	G4double fVEP;   // scattered momentum right after the vertex
+        G4int fNuclA; //Nuclear A 
+        G4double fEvThSamp; //vertex theta
 };
 
 #endif//__REMOLLEVENT_HH
