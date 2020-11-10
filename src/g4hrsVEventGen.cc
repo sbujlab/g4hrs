@@ -18,8 +18,9 @@ g4hrsVEventGen::g4hrsVEventGen() {
 	fIsVMomHCSSet = false;
 	fIsVMomTCSSet = false;
   
-    fSampType       = kMainTarget;
-    fApplyMultScatt = true;
+//    fSampType       = kMainTarget;
+      fSampType = kFullTarget;  
+  fApplyMultScatt = true;
 	fSeptumAngle = 5.*deg;
 }
 
