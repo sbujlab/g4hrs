@@ -65,6 +65,9 @@ class g4hrsBeamTarget {
 	G4double fBeamCurr;
 	G4double fBeamPol;
 	G4String fTargetMaterial;
+ 
+        //RR - flag to turn on/off diamond foil volumes for DPbD target
+        G4bool sandwich;
 	
 	G4VPhysicalVolume * GetTargVol(){ return fTargVol; }
 
