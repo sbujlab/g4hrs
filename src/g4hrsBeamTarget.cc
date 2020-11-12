@@ -269,7 +269,6 @@ void g4hrsBeamTarget::SetTargetMaterial(G4String targMat) {
 		exit(1);
 	}
 
-        if(fTargetMaterial == "Pb208") { sandwich = true; } else { sandwich = false; }
 
 
 	G4GeometryManager::GetInstance()->OpenGeometry(fTargVol);
