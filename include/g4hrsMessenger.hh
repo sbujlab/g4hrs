@@ -89,6 +89,9 @@ class g4hrsMessenger : public G4UImessenger {
 
 	G4UIcmdWithABool       *rasTypeCmd;
 
+        //RR adding sandwich flag command
+        G4UIcmdWithABool *sandwichTypeCmd;
+
 	G4UIcmdWithADoubleAndUnit *rasXCmd;
 	G4UIcmdWithADoubleAndUnit *rasYCmd;
 

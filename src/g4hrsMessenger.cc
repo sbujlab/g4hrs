@@ -103,6 +103,11 @@ g4hrsMessenger::g4hrsMessenger(){
 	hrsSetupCmd = new G4UIcmdWithAnInteger("/g4hrs/hrssetup",this);
 	hrsSetupCmd->SetGuidance("Set HRS setup level");
 	hrsSetupCmd->SetParameterName("hrssetup",false);
+
+        //RR - sandwich command for the .mac file
+        sandwichTypeCmd = new G4UIcmdWithABool("/g4hrs/sandwich",this);
+        sandwichTypeCmd->SetGuidance("Set Sandwich volumes");
+        sandwichTypeCmd->SetParameterName("sandwich",false);
 	
 	sepMomCmd = new G4UIcmdWithADoubleAndUnit("/g4hrs/sepmom",this);
 	sepMomCmd->SetGuidance("Set septum momentum");
@@ -472,7 +477,13 @@ void g4hrsMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 		fStepAct->fHRSMomentum = p;
 		ftune->HRSMomentum = p;
 	}
-	
+
+        //RR setting up sandwich flag command
+        if( cmd == sandwichTypeCmd ) { 
+          G4bool sandType = sandwichTypeCmd->GetNewBoolValue(newValue);
+          fdetcon->fSetupSandwich = sandType;
+        }
+
 	if( cmd == hrsSetupCmd ) {
 		G4int hrs = hrsSetupCmd->GetNewIntValue(newValue);
 		fdetcon->fSetupHRS = hrs;
