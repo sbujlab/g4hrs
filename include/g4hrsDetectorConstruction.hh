@@ -48,6 +48,7 @@ class g4hrsDetectorConstruction : public G4VUserDetectorConstruction
 	g4hrsEMFieldSetup* GetEMFieldSetup() {return fEMFieldSetup;}
 	g4hrsEMField* GetEMFieldFromSetup();
 	int    fSetupHRS;
+        bool fSetupSandwich;
 
   private:
       void CreateTarget(G4LogicalVolume *);
