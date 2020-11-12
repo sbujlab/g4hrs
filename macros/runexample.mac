@@ -17,6 +17,12 @@
 #*** (build all magnets in HRS)
 /g4hrs/hrssetup 4
 
+#** Setup Diamond foils for Pb target only 
+#** This has to be called before run initialize
+# ** Pb208 - true else false
+/g4hrs/sandwich FALSE
+
+
 #*** Septum and HRS angles
 /g4hrs/sepangle 4.984 deg
 /g4hrs/hrsangle 12.5 deg
